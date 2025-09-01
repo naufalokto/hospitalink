@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>HOSPITALINK - Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -58,17 +59,29 @@
             </div>
 
             <!-- Login Form -->
-            <form x-show="activeTab === 'login'" class="space-y-3 mx-6 sm:mx-10 mt-8">
-                <!-- Email/Username Input -->
+            <form x-show="activeTab === 'login'" @submit.prevent="login()" class="space-y-3 mx-6 sm:mx-10 mt-8">
+                <!-- Error Message -->
+                <div x-show="loginError" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded text-sm">
+                    <span x-text="loginError"></span>
+                </div>
+
+                <!-- Success Message -->
+                <div x-show="loginSuccess" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded text-sm">
+                    <span x-text="loginSuccess"></span>
+                </div>
+
+                <!-- Email Input -->
                 <div class="relative">
-                    <input type="text" placeholder="Enter email or username"
-                        class="w-full py-1.5 border-0 border-b border-gray-400 focus:border-hospitalink-green focus:outline-none bg-transparent text-gray-700 placeholder-gray-400 text-sm">
+                    <input type="email" x-model="loginForm.email" placeholder="Enter email"
+                        class="w-full py-1.5 border-0 border-b border-gray-400 focus:border-hospitalink-green focus:outline-none bg-transparent text-gray-700 placeholder-gray-400 text-sm"
+                        required>
                 </div>
 
                 <!-- Password Input -->
                 <div class="relative">
-                    <input :type="showPassword ? 'text' : 'password'" placeholder="Password"
-                        class="w-full py-1.5 pr-8 border-0 border-b border-gray-400 focus:border-hospitalink-green focus:outline-none bg-transparent text-gray-700 placeholder-gray-400 text-sm">
+                    <input :type="showPassword ? 'text' : 'password'" x-model="loginForm.password" placeholder="Password"
+                        class="w-full py-1.5 pr-8 border-0 border-b border-gray-400 focus:border-hospitalink-green focus:outline-none bg-transparent text-gray-700 placeholder-gray-400 text-sm"
+                        required>
                     <button type="button" @click="showPassword = !showPassword"
                         class="absolute right-0 top-1.5 text-gray-400 hover:text-gray-600">
                         <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'" class="text-md"></i>
@@ -81,9 +94,10 @@
                 </div>
 
                 <!-- Login Button -->
-                <button type="submit"
-                    class="w-full bg-hospitalink-green text-white py-3 rounded-full text-sm font-small hover:bg-green-600 transition-all duration-200 shadow-lg hover:shadow-xl">
-                    Log In
+                <button type="submit" :disabled="isLoading"
+                    class="w-full bg-hospitalink-green text-white py-3 rounded-full text-sm font-small hover:bg-green-600 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50">
+                    <span x-show="!isLoading">Log In</span>
+                    <span x-show="isLoading">Loading...</span>
                 </button>
 
                 <!-- Switch to Signup -->
@@ -96,23 +110,36 @@
             </form>
 
             <!-- Signup Form -->
-            <form x-show="activeTab === 'signup'" class="space-y-3 mx-6 sm:mx-10 mt-8" x-cloak>
+            <form x-show="activeTab === 'signup'" @submit.prevent="signup()" class="space-y-3 mx-6 sm:mx-10 mt-8" x-cloak>
+                <!-- Error Message -->
+                <div x-show="signupError" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded text-sm">
+                    <span x-text="signupError"></span>
+                </div>
+
+                <!-- Success Message -->
+                <div x-show="signupSuccess" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded text-sm">
+                    <span x-text="signupSuccess"></span>
+                </div>
+
                 <!-- Full Name Input -->
                 <div class="relative">
-                    <input type="text" placeholder="Full Name"
-                        class="w-full py-1.5 border-0 border-b border-gray-400 focus:border-hospitalink-green focus:outline-none bg-transparent text-gray-700 placeholder-gray-400 text-sm">
+                    <input type="text" x-model="signupForm.name" placeholder="Full Name"
+                        class="w-full py-1.5 border-0 border-b border-gray-400 focus:border-hospitalink-green focus:outline-none bg-transparent text-gray-700 placeholder-gray-400 text-sm"
+                        required>
                 </div>
 
                 <!-- Email Input -->
                 <div class="relative">
-                    <input type="email" placeholder="Email"
-                        class="w-full py-1.5 border-0 border-b border-gray-400 focus:border-hospitalink-green focus:outline-none bg-transparent text-gray-700 placeholder-gray-400 text-sm">
+                    <input type="email" x-model="signupForm.email" placeholder="Email"
+                        class="w-full py-1.5 border-0 border-b border-gray-400 focus:border-hospitalink-green focus:outline-none bg-transparent text-gray-700 placeholder-gray-400 text-sm"
+                        required>
                 </div>
 
                 <!-- Password Input -->
                 <div class="relative">
-                    <input :type="showPassword ? 'text' : 'password'" placeholder="Password"
-                        class="w-full py-2 pr-10 border-0 border-b border-gray-400 focus:border-hospitalink-green focus:outline-none bg-transparent text-gray-700 placeholder-gray-400 text-sm">
+                    <input :type="showPassword ? 'text' : 'password'" x-model="signupForm.password" placeholder="Password"
+                        class="w-full py-2 pr-10 border-0 border-b border-gray-400 focus:border-hospitalink-green focus:outline-none bg-transparent text-gray-700 placeholder-gray-400 text-sm"
+                        required>
                     <button type="button" @click="showPassword = !showPassword"
                         class="absolute right-0 top-2 text-gray-400 hover:text-gray-600">
                         <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
@@ -121,8 +148,9 @@
 
                 <!-- Confirm Password Input -->
                 <div class="relative">
-                    <input :type="showConfirmPassword ? 'text' : 'password'" placeholder="Konfirmasi password"
-                        class="w-full py-1.5 pr-8 border-0 border-b border-gray-400 focus:border-hospitalink-green focus:outline-none bg-transparent text-gray-700 placeholder-gray-400 text-sm mb-2">
+                    <input :type="showConfirmPassword ? 'text' : 'password'" x-model="signupForm.password_confirmation" placeholder="Konfirmasi password"
+                        class="w-full py-1.5 pr-8 border-0 border-b border-gray-400 focus:border-hospitalink-green focus:outline-none bg-transparent text-gray-700 placeholder-gray-400 text-sm mb-2"
+                        required>
                     <button type="button" @click="showConfirmPassword = !showConfirmPassword"
                         class="absolute right-0 top-1.5 text-gray-400 hover:text-gray-600">
                         <i :class="showConfirmPassword ? 'fas fa-eye-slash' : 'fas fa-eye'" class="text-md"></i>
@@ -130,9 +158,10 @@
                 </div>
 
                 <!-- Sign Up Button -->
-                <button type="submit"
-                    class="w-full bg-hospitalink-green text-white py-3 rounded-full text-sm font-small hover:bg-green-600 transition-all duration-200 shadow-lg hover:shadow-xl">
-                    Sign Up
+                <button type="submit" :disabled="isLoading"
+                    class="w-full bg-hospitalink-green text-white py-3 rounded-full text-sm font-small hover:bg-green-600 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50">
+                    <span x-show="!isLoading">Sign Up</span>
+                    <span x-show="isLoading">Loading...</span>
                 </button>
 
                 <!-- Switch to Login -->
@@ -148,16 +177,16 @@
             <div class="mt-5 mx-7">
                 <p class="text-center text-xs text-gray-500 mb-3">OR</p>
                 <div class="flex justify-center space-x-4 sm:space-x-6">
-                    <a href="#"
-                        class="block w-8 h-8 sm:w-9 sm:h-9 rounded-full border-1 border-gray-300 overflow-hidden">
+                    <a href="/auth/facebook"
+                        class="block w-8 h-8 sm:w-9 sm:h-9 rounded-full border-1 border-gray-300 overflow-hidden hover:scale-110 transition-transform">
                         <img src="/images/Facebook_Logo.png" alt="Facebook" class="w-full h-full object-cover">
                     </a>
-                    <a href="#"
-                        class="block w-9 h-9 sm:w-10 sm:h-10 rounded-full border-1 border-gray-300 overflow-hidden">
+                    <a href="/auth/google"
+                        class="block w-9 h-9 sm:w-10 sm:h-10 rounded-full border-1 border-gray-300 overflow-hidden hover:scale-110 transition-transform">
                         <img src="/images/Google_Logo.jpg" alt="Google" class="w-full h-full object-cover scale-125">
                     </a>
-                    <a href="#"
-                        class="block w-9 h-9 sm:w-10 sm:h-10 rounded-full border-1 border-gray-300 overflow-hidden -translate-x-1">
+                    <a href="/auth/twitter"
+                        class="block w-9 h-9 sm:w-10 sm:h-10 rounded-full border-1 border-gray-300 overflow-hidden -translate-x-1 hover:scale-110 transition-transform">
                         <img src="/images/X_Logo.png" alt="X" class="w-full h-full object-cover scale-75">
                     </a>
                 </div>
@@ -195,17 +224,29 @@
                 </div>
 
                 <!-- Login Form -->
-                <form x-show="activeTab === 'login'" class="space-y-3 mx-8">
+                <form x-show="activeTab === 'login'" @submit.prevent="login()" class="space-y-3 mx-8">
+                    <!-- Error Message -->
+                    <div x-show="loginError" class="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded text-xs">
+                        <span x-text="loginError"></span>
+                    </div>
+
+                    <!-- Success Message -->
+                    <div x-show="loginSuccess" class="bg-green-100 border border-green-400 text-green-700 px-3 py-2 rounded text-xs">
+                        <span x-text="loginSuccess"></span>
+                    </div>
+
                     <!-- Email/Username Input -->
                     <div class="relative">
-                        <input type="text" placeholder="Enter email or username"
-                            class="w-full py-1.5 border-0 border-b border-gray-300 focus:border-hospitalink-green focus:outline-none bg-transparent text-gray-700 placeholder-gray-400 text-xs">
+                        <input type="email" x-model="loginForm.email" placeholder="Enter email"
+                            class="w-full py-1.5 border-0 border-b border-gray-300 focus:border-hospitalink-green focus:outline-none bg-transparent text-gray-700 placeholder-gray-400 text-xs"
+                            required>
                     </div>
 
                     <!-- Password Input -->
                     <div class="relative">
-                        <input :type="showPassword ? 'text' : 'password'" placeholder="Password"
-                            class="w-full py-1.5 pr-8 border-0 border-b border-gray-300 focus:border-hospitalink-green focus:outline-none bg-transparent text-gray-700 placeholder-gray-400 text-xs">
+                        <input :type="showPassword ? 'text' : 'password'" x-model="loginForm.password" placeholder="Password"
+                            class="w-full py-1.5 pr-8 border-0 border-b border-gray-300 focus:border-hospitalink-green focus:outline-none bg-transparent text-gray-700 placeholder-gray-400 text-xs"
+                            required>
                         <button type="button" @click="showPassword = !showPassword"
                             class="absolute right-0 top-1.5 text-gray-400 hover:text-gray-600">
                             <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'" class="text-xs"></i>
@@ -219,9 +260,10 @@
                     </div>
 
                     <!-- Login Button -->
-                    <button type="submit"
-                        class="w-full bg-hospitalink-green text-white py-2 rounded-full text-xs font-medium hover:bg-green-600 transition-all duration-200">
-                        Login
+                    <button type="submit" :disabled="isLoading"
+                        class="w-full bg-hospitalink-green text-white py-2 rounded-full text-xs font-medium hover:bg-green-600 transition-all duration-200 disabled:opacity-50">
+                        <span x-show="!isLoading">Login</span>
+                        <span x-show="isLoading">Loading...</span>
                     </button>
 
                     <!-- Switch to Signup -->
@@ -234,23 +276,36 @@
                 </form>
 
                 <!-- Signup Form -->
-                <form x-show="activeTab === 'signup'" class="space-y-3 mx-8" x-cloak>
+                <form x-show="activeTab === 'signup'" @submit.prevent="signup()" class="space-y-3 mx-8" x-cloak>
+                    <!-- Error Message -->
+                    <div x-show="signupError" class="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded text-xs">
+                        <span x-text="signupError"></span>
+                    </div>
+
+                    <!-- Success Message -->
+                    <div x-show="signupSuccess" class="bg-green-100 border border-green-400 text-green-700 px-3 py-2 rounded text-xs">
+                        <span x-text="signupSuccess"></span>
+                    </div>
+
                     <!-- Full Name Input -->
                     <div class="relative">
-                        <input type="text" placeholder="Full Name"
-                            class="w-full py-1.5 border-0 border-b border-gray-300 focus:border-hospitalink-green focus:outline-none bg-transparent text-gray-700 placeholder-gray-400 text-xs">
+                        <input type="text" x-model="signupForm.name" placeholder="Full Name"
+                            class="w-full py-1.5 border-0 border-b border-gray-300 focus:border-hospitalink-green focus:outline-none bg-transparent text-gray-700 placeholder-gray-400 text-xs"
+                            required>
                     </div>
 
                     <!-- Email Input -->
                     <div class="relative">
-                        <input type="email" placeholder="Email"
-                            class="w-full py-1.5 border-0 border-b border-gray-300 focus:border-hospitalink-green focus:outline-none bg-transparent text-gray-700 placeholder-gray-400 text-xs">
+                        <input type="email" x-model="signupForm.email" placeholder="Email"
+                            class="w-full py-1.5 border-0 border-b border-gray-300 focus:border-hospitalink-green focus:outline-none bg-transparent text-gray-700 placeholder-gray-400 text-xs"
+                            required>
                     </div>
 
                     <!-- Password Input -->
                     <div class="relative">
-                        <input :type="showPassword ? 'text' : 'password'" placeholder="Password"
-                            class="w-full py-1.5 pr-8 border-0 border-b border-gray-300 focus:border-hospitalink-green focus:outline-none bg-transparent text-gray-700 placeholder-gray-400 text-xs">
+                        <input :type="showPassword ? 'text' : 'password'" x-model="signupForm.password" placeholder="Password"
+                            class="w-full py-1.5 pr-8 border-0 border-b border-gray-300 focus:border-hospitalink-green focus:outline-none bg-transparent text-gray-700 placeholder-gray-400 text-xs"
+                            required>
                         <button type="button" @click="showPassword = !showPassword"
                             class="absolute right-0 top-1.5 text-gray-400 hover:text-gray-600">
                             <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'" class="text-xs"></i>
@@ -259,8 +314,9 @@
 
                     <!-- Confirm Password Input -->
                     <div class="relative">
-                        <input :type="showConfirmPassword ? 'text' : 'password'" placeholder="Confirm Password"
-                            class="w-full py-1.5 pr-8 border-0 border-b border-gray-300 focus:border-hospitalink-green focus:outline-none bg-transparent text-gray-700 placeholder-gray-400 text-xs">
+                        <input :type="showConfirmPassword ? 'text' : 'password'" x-model="signupForm.password_confirmation" placeholder="Confirm Password"
+                            class="w-full py-1.5 pr-8 border-0 border-b border-gray-300 focus:border-hospitalink-green focus:outline-none bg-transparent text-gray-700 placeholder-gray-400 text-xs"
+                            required>
                         <button type="button" @click="showConfirmPassword = !showConfirmPassword"
                             class="absolute right-0 top-1.5 text-gray-400 hover:text-gray-600">
                             <i :class="showConfirmPassword ? 'fas fa-eye-slash' : 'fas fa-eye'" class="text-xs"></i>
@@ -268,9 +324,10 @@
                     </div>
 
                     <!-- Sign Up Button -->
-                    <button type="submit"
-                        class="w-full bg-hospitalink-green text-white py-2 rounded-full text-xs font-medium hover:bg-green-600 transition-all duration-200">
-                        Sign Up
+                    <button type="submit" :disabled="isLoading"
+                        class="w-full bg-hospitalink-green text-white py-2 rounded-full text-xs font-medium hover:bg-green-600 transition-all duration-200 disabled:opacity-50">
+                        <span x-show="!isLoading">Sign Up</span>
+                        <span x-show="isLoading">Loading...</span>
                     </button>
 
                     <!-- Switch to Login -->
@@ -286,13 +343,13 @@
                 <div class="mt-5 mx-8">
                     <p class="text-center text-xs text-gray-500 mb-3">Login dengan</p>
                     <div class="flex justify-center space-x-3">
-                        <a href="#" class="bg-blue-600 text-white p-1.5 rounded-full hover:bg-blue-700 text-md">
+                        <a href="/auth/facebook" class="bg-blue-600 text-white p-1.5 rounded-full hover:bg-blue-700 text-md transition-colors">
                             <i class="fab fa-facebook-f"></i>
                         </a>
-                        <a href="#" class="bg-red-600 text-white p-1.5 rounded-full hover:bg-red-700 text-xs">
+                        <a href="/auth/google" class="bg-red-600 text-white p-1.5 rounded-full hover:bg-red-700 text-xs transition-colors">
                             <i class="fab fa-google"></i>
                         </a>
-                        <a href="#" class="bg-black text-white p-1.5 rounded-full hover:bg-gray-800 text-xs">
+                        <a href="/auth/twitter" class="bg-black text-white p-1.5 rounded-full hover:bg-gray-800 text-xs transition-colors">
                             <i class="fab fa-x-twitter"></i>
                         </a>
                     </div>
@@ -306,7 +363,97 @@
             return {
                 activeTab: 'login',
                 showPassword: false,
-                showConfirmPassword: false
+                showConfirmPassword: false,
+                isLoading: false,
+                loginError: '',
+                loginSuccess: '',
+                signupError: '',
+                signupSuccess: '',
+                loginForm: {
+                    email: '',
+                    password: ''
+                },
+                signupForm: {
+                    name: '',
+                    email: '',
+                    password: '',
+                    password_confirmation: ''
+                },
+                
+                async login() {
+                    this.isLoading = true;
+                    this.loginError = '';
+                    this.loginSuccess = '';
+                    
+                    try {
+                        const response = await fetch('/api/auth/login', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                            },
+                            body: JSON.stringify(this.loginForm)
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            this.loginSuccess = 'Login berhasil!';
+                            // Store token
+                            localStorage.setItem('auth_token', data.token);
+                            // Redirect to dashboard immediately
+                            window.location.href = '/dashboard';
+                        } else {
+                            this.loginError = data.message || 'Login gagal';
+                        }
+                    } catch (error) {
+                        this.loginError = 'Terjadi kesalahan saat login';
+                        console.error('Login error:', error);
+                    } finally {
+                        this.isLoading = false;
+                    }
+                },
+                
+                async signup() {
+                    this.isLoading = true;
+                    this.signupError = '';
+                    this.signupSuccess = '';
+                    
+                    // Validate password confirmation
+                    if (this.signupForm.password !== this.signupForm.password_confirmation) {
+                        this.signupError = 'Password dan konfirmasi password tidak sama';
+                        this.isLoading = false;
+                        return;
+                    }
+                    
+                    try {
+                        const response = await fetch('/api/auth/register', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                            },
+                            body: JSON.stringify(this.signupForm)
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            this.signupSuccess = 'Registrasi berhasil!';
+                            // Store token
+                            localStorage.setItem('auth_token', data.token);
+                            // Redirect to dashboard immediately
+                            window.location.href = '/dashboard';
+                        } else {
+                            this.signupError = data.message || 'Registrasi gagal';
+                        }
+                    } catch (error) {
+                        this.signupError = 'Terjadi kesalahan saat registrasi';
+                        console.error('Signup error:', error);
+                    } finally {
+                        this.isLoading = false;
+                    }
+                }
             }
         }
     </script>

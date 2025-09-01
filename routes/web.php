@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 
 
 
@@ -22,14 +23,21 @@ Route::get('/register', function () {
     return redirect()->route('login')->with('tab', 'signup');
 })->name('register');
 
-Route::post('/login', function () {
-    // Handle login form submission
-    // Add your authentication logic here
-    return redirect()->back()->with('message', 'Login functionality to be implemented');
-})->name('login.submit');
+// redirect dashboard joy
 
-Route::post('/register', function () {
-    // Handle registration form submission
-    // Add your user registration logic here
-    return redirect()->back()->with('message', 'Registration functionality to be implemented');
-})->name('register.submit');
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->name('dashboard');
+
+// OAuth Routes
+// Google OAuth
+Route::get('/auth/google', [AuthController::class, 'redirectToGoogle']);
+Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
+
+// Facebook OAuth
+Route::get('/auth/facebook', [AuthController::class, 'redirectToFacebook']);
+Route::get('/auth/facebook/callback', [AuthController::class, 'handleFacebookCallback']);
+
+// Twitter OAuth
+Route::get('/auth/twitter', [AuthController::class, 'redirectToTwitter']);
+Route::get('/auth/twitter/callback', [AuthController::class, 'handleTwitterCallback']);

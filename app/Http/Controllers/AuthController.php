@@ -16,7 +16,7 @@ class AuthController extends Controller
      */
     public function redirectToGoogle()
     {
-        return Socialite::driver('google')->redirect();
+        return Socialite::driver('google')->stateless()->redirect();
     }
 
     /**
@@ -25,7 +25,65 @@ class AuthController extends Controller
     public function handleGoogleCallback()
     {
         try {
-            $googleUser = Socialite::driver('google')->user();
+            \Log::info('Google OAuth callback started');
+            \Log::info('Request parameters', request()->all());
+            
+            try {
+                // Check if we're in development mode and using test parameters
+                if (app()->environment('local') && request('code') === 'test') {
+                    \Log::info('Using test mode for Google OAuth');
+                    
+                    // Create a test user for development
+                    $testUser = User::firstOrCreate(
+                        ['email' => 'test@example.com'],
+                        [
+                            'name' => 'Test User',
+                            'google_id' => 'test_google_id',
+                            'password' => Hash::make('password'),
+                            'email_verified_at' => now(),
+                        ]
+                    );
+                    
+                    Auth::login($testUser);
+                    
+                    // Store token in session for API access
+                    session(['auth_token' => $testUser->createToken('auth-token')->plainTextToken]);
+                    
+                    // Redirect to dashboard
+                    return redirect()->route('dashboard')->with('success', 'Test login successful!');
+                }
+                
+                $googleUser = Socialite::driver('google')->stateless()->user();
+                \Log::info('Google user data received', ['user_id' => $googleUser->getId(), 'email' => $googleUser->getEmail()]);
+            } catch (\Laravel\Socialite\Two\InvalidStateException $e) {
+                \Log::error('Invalid state exception', ['error' => $e->getMessage()]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid state parameter. Please try logging in again.',
+                    'error_type' => 'invalid_state'
+                ], 400);
+            } catch (\GuzzleHttp\Exception\ClientException $e) {
+                $responseBody = $e->getResponse()->getBody();
+                $errorData = json_decode($responseBody, true);
+                
+                \Log::error('Google API error', [
+                    'error' => $e->getMessage(), 
+                    'response' => $responseBody,
+                    'error_data' => $errorData
+                ]);
+                
+                $errorMessage = 'Google authentication failed.';
+                if (isset($errorData['error_description'])) {
+                    $errorMessage .= ' ' . $errorData['error_description'];
+                }
+                
+                return response()->json([
+                    'success' => false,
+                    'message' => $errorMessage,
+                    'error_type' => 'google_api_error',
+                    'error_details' => $errorData
+                ], 400);
+            }
 
             // Check if user exists
             $user = User::where('google_id', $googleUser->getId())->first();
@@ -56,12 +114,11 @@ class AuthController extends Controller
             // Login user
             Auth::login($user);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Login successful',
-                'user' => $user,
-                'token' => $user->createToken('auth-token')->plainTextToken ?? null,
-            ]);
+            // Store token in session for API access
+            session(['auth_token' => $user->createToken('auth-token')->plainTextToken]);
+
+            // Redirect to dashboard
+            return redirect()->route('dashboard')->with('success', 'Login successful!');
 
         } catch (\Exception $e) {
             return response()->json([
