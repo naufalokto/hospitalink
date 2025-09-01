@@ -26,7 +26,7 @@ class AuthController extends Controller
     {
         try {
             \Log::info('Google OAuth callback started');
-            \Log::info('Request parameters', request()->all());
+            \Log::info('Request parameters', ['params' => request()->all()]);
             
             try {
                 // Check if we're in development mode and using test parameters
@@ -133,9 +133,28 @@ class AuthController extends Controller
      */
     public function redirectToFacebook()
     {
-        return Socialite::driver('facebook')
-            ->scopes(['public_profile'])
-            ->redirect();
+        try {
+            // Create Facebook OAuth URL manually to avoid scope issues
+            $clientId = env('FACEBOOK_CLIENT_ID');
+            $redirectUri = env('FACEBOOK_REDIRECT_URI');
+            
+            $params = [
+                'client_id' => $clientId,
+                'redirect_uri' => $redirectUri,
+                'response_type' => 'code',
+                'state' => csrf_token(), // Add CSRF protection
+            ];
+            
+            $facebookUrl = 'https://www.facebook.com/v23.0/dialog/oauth?' . http_build_query($params);
+            
+            \Log::info('Facebook OAuth URL generated', ['url' => $facebookUrl]);
+            
+            return redirect($facebookUrl);
+            
+        } catch (\Exception $e) {
+            \Log::error('Facebook redirect error', ['error' => $e->getMessage()]);
+            return redirect()->route('login')->with('error', 'Facebook login tidak tersedia saat ini. Silakan coba metode login lain.');
+        }
     }
 
     /**
@@ -145,51 +164,94 @@ class AuthController extends Controller
     {
         try {
             \Log::info('Facebook OAuth callback started');
-            \Log::info('Request parameters', request()->all());
+            \Log::info('Request parameters', ['params' => request()->all()]);
+            \Log::info('Request URL', ['url' => request()->fullUrl()]);
+            \Log::info('Request method', ['method' => request()->method()]);
             
-            $facebookUser = Socialite::driver('facebook')->user();
-            \Log::info('Facebook user data received', ['user_id' => $facebookUser->getId(), 'name' => $facebookUser->getName()]);
+            // Check for error from Facebook
+            if (request()->has('error')) {
+                $error = request('error');
+                $errorDescription = request('error_description', 'Unknown error');
+                \Log::error('Facebook OAuth error received', [
+                    'error' => $error,
+                    'error_description' => $errorDescription
+                ]);
+                
+                return redirect()->route('login')->with('error', 'Facebook login failed: ' . $errorDescription);
+            }
+            
+            // Check for authorization code
+            if (!request()->has('code')) {
+                \Log::error('No authorization code received from Facebook');
+                \Log::error('Available parameters', request()->all());
+                return redirect()->route('login')->with('error', 'No authorization code received from Facebook');
+            }
+            
+            \Log::info('Authorization code received', ['code' => request('code')]);
+            
+            // Exchange code for access token and get user info
+            $facebookUser = Socialite::driver('facebook')->stateless()->user();
+            \Log::info('Facebook user data received', [
+                'user_id' => $facebookUser->getId(), 
+                'name' => $facebookUser->getName(),
+                'email' => $facebookUser->getEmail(),
+                'avatar' => $facebookUser->getAvatar()
+            ]);
 
             // Check if user exists
             $user = User::where('facebook_id', $facebookUser->getId())->first();
+            \Log::info('User lookup by facebook_id', ['found' => $user ? true : false]);
 
             if (!$user) {
                 // For Facebook, we might not get email, so we'll use a generated email
                 $email = $facebookUser->getEmail() ?? $facebookUser->getId() . '@facebook.local';
+                \Log::info('Generated email for user', ['email' => $email]);
                 
                 // Check if user exists with same email
                 $user = User::where('email', $email)->first();
+                \Log::info('User lookup by email', ['found' => $user ? true : false]);
 
                 if ($user) {
                     // Update existing user with Facebook ID
+                    \Log::info('Updating existing user with Facebook ID');
                     $user->update([
                         'facebook_id' => $facebookUser->getId(),
                         'avatar' => $facebookUser->getAvatar(),
                     ]);
                 } else {
                     // Create new user
+                    \Log::info('Creating new user');
                     $user = User::create([
                         'name' => $facebookUser->getName(),
                         'email' => $email,
                         'facebook_id' => $facebookUser->getId(),
-                        'avatar' => $facebookUser->getAvatar(),
+                        'avatar' => $facebookUser->getAvatar(), // Now using TEXT column, can handle long URLs
                         'password' => Hash::make(Str::random(16)), // Random password for Facebook users
                         'email_verified_at' => $facebookUser->getEmail() ? now() : null, // Only verify if we got email
                     ]);
+                    \Log::info('New user created', ['user_id' => $user->id]);
                 }
             }
 
             // Login user
             Auth::login($user);
+            \Log::info('User logged in', ['user_id' => $user->id]);
 
             // Store token in session for API access
             session(['auth_token' => $user->createToken('auth-token')->plainTextToken]);
+            \Log::info('Auth token stored in session');
 
             // Redirect to dashboard
+            \Log::info('Redirecting to dashboard');
             return redirect()->route('dashboard')->with('success', 'Facebook login successful!');
 
         } catch (\Exception $e) {
-            \Log::error('Facebook OAuth error', ['error' => $e->getMessage()]);
+            \Log::error('Facebook OAuth error', [
+                'error' => $e->getMessage(), 
+                'trace' => $e->getTraceAsString(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
             return redirect()->route('login')->with('error', 'Facebook login failed: ' . $e->getMessage());
         }
     }
