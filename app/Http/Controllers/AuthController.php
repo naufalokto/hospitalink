@@ -133,7 +133,9 @@ class AuthController extends Controller
      */
     public function redirectToFacebook()
     {
-        return Socialite::driver('facebook')->redirect();
+        return Socialite::driver('facebook')
+            ->scopes(['public_profile'])
+            ->redirect();
     }
 
     /**
@@ -142,14 +144,21 @@ class AuthController extends Controller
     public function handleFacebookCallback()
     {
         try {
+            \Log::info('Facebook OAuth callback started');
+            \Log::info('Request parameters', request()->all());
+            
             $facebookUser = Socialite::driver('facebook')->user();
+            \Log::info('Facebook user data received', ['user_id' => $facebookUser->getId(), 'name' => $facebookUser->getName()]);
 
             // Check if user exists
             $user = User::where('facebook_id', $facebookUser->getId())->first();
 
             if (!$user) {
+                // For Facebook, we might not get email, so we'll use a generated email
+                $email = $facebookUser->getEmail() ?? $facebookUser->getId() . '@facebook.local';
+                
                 // Check if user exists with same email
-                $user = User::where('email', $facebookUser->getEmail())->first();
+                $user = User::where('email', $email)->first();
 
                 if ($user) {
                     // Update existing user with Facebook ID
@@ -161,11 +170,11 @@ class AuthController extends Controller
                     // Create new user
                     $user = User::create([
                         'name' => $facebookUser->getName(),
-                        'email' => $facebookUser->getEmail(),
+                        'email' => $email,
                         'facebook_id' => $facebookUser->getId(),
                         'avatar' => $facebookUser->getAvatar(),
                         'password' => Hash::make(Str::random(16)), // Random password for Facebook users
-                        'email_verified_at' => now(), // Facebook emails are verified
+                        'email_verified_at' => $facebookUser->getEmail() ? now() : null, // Only verify if we got email
                     ]);
                 }
             }
@@ -173,18 +182,15 @@ class AuthController extends Controller
             // Login user
             Auth::login($user);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Login successful',
-                'user' => $user,
-                'token' => $user->createToken('auth-token')->plainTextToken ?? null,
-            ]);
+            // Store token in session for API access
+            session(['auth_token' => $user->createToken('auth-token')->plainTextToken]);
+
+            // Redirect to dashboard
+            return redirect()->route('dashboard')->with('success', 'Facebook login successful!');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Login failed: ' . $e->getMessage(),
-            ], 500);
+            \Log::error('Facebook OAuth error', ['error' => $e->getMessage()]);
+            return redirect()->route('login')->with('error', 'Facebook login failed: ' . $e->getMessage());
         }
     }
 
