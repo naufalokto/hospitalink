@@ -1,22 +1,35 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
 
+
+
+// Landing Page Route
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home');
 
-// Google OAuth Routes
-Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('google.login');
-Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('google.callback');
+// Authentication Selection Page Route
+Route::get('/auth', function () {
+    return view('auth');
+})->name('auth');
 
-// Authentication Routes
-Route::post('/auth/register', [AuthController::class, 'register'])->name('auth.register');
-Route::post('/auth/login', [AuthController::class, 'login'])->name('auth.login');
-Route::post('/auth/logout', [AuthController::class, 'logout'])->name('auth.logout')->middleware('auth:sanctum');
+Route::get('/login', function () {
+    return view('auth.login');
+})->name('login');
 
-// Protected Routes
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/auth/user', [AuthController::class, 'user'])->name('auth.user');
-});
+Route::get('/register', function () {
+    return redirect()->route('login')->with('tab', 'signup');
+})->name('register');
+
+Route::post('/login', function () {
+    // Handle login form submission
+    // Add your authentication logic here
+    return redirect()->back()->with('message', 'Login functionality to be implemented');
+})->name('login.submit');
+
+Route::post('/register', function () {
+    // Handle registration form submission
+    // Add your user registration logic here
+    return redirect()->back()->with('message', 'Registration functionality to be implemented');
+})->name('register.submit');
