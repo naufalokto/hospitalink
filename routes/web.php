@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\NewsController;
+use App\Http\Controllers\HospitalController;
 
 
 
@@ -28,6 +30,13 @@ Route::get('/register', function () {
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->name('dashboard');
+
+Route::get('/hospital', [HospitalController::class, 'index'])->name('hospital');
+Route::get('/hospital/{slug}', [HospitalController::class, 'show'])->name('hospital.detail');
+
+// News routes
+Route::get('/news/{slug}', [NewsController::class, 'show'])->name('news.detail');
+Route::get('/news', [NewsController::class, 'index'])->name('news.index');
 
 // OAuth Routes
 // Google OAuth

@@ -19,73 +19,19 @@
     <div class="lg:hidden min-h-screen flex flex-col">
 
         <div class="pt-8 pb-4 px-6 text-center -mt-4">
-            <img src="{{ asset('images/Logo-Hospitalink2.png') }}" alt="HOSPITALINK" class="mx-auto h-24 mb-1">
+            <img src="{{ asset('images/Logo-Hospitalink3.png') }}" alt="HOSPITALINK" class="mx-auto h-48 mb-1">
 
         </div>
 
 
         <div class="px-6 mb-4" x-data="carousel()">
 
-            <div class="bg-teal-600 rounded-2xl p-4 mb-3 overflow-hidden relative max-w-[340px] mx-auto">
-
-                <div class="flex transition-transform duration-500 ease-in-out"
-                    :style="`transform: translateX(-${currentSlide * 100}%)`">
-
-                    <div class="w-full flex-shrink-0 flex items-center justify-between">
-                        <div class="text-white">
-                            <h3 class="font-bold text-sm mb-1">TURUN HARGA</h3>
-                            <h2 class="font-bold text-lg mb-1">BESAR-BESARAN</h2>
-                            <p class="text-xs leading-tight">SEMUA PRODUK<br>TURUN HINGGA 50%<br>BURUAN SEBELUM<br>DAN
-                                KEHABISAN</p>
-                        </div>
-                        <div class="w-24 h-16 bg-white/20 rounded-lg flex items-center justify-center">
-                            <div class="w-16 h-12 bg-white/30 rounded"></div>
-                        </div>
-                    </div>
-
-                    <div class="w-full flex-shrink-0 flex items-center justify-between">
-                        <div class="text-white">
-                            <h3 class="font-bold text-sm mb-1">PROMO SPESIAL</h3>
-                            <h2 class="font-bold text-lg mb-1">ALAT KESEHATAN</h2>
-                            <p class="text-xs leading-tight">DAPATKAN DISKON<br>HINGGA 40%<br>UNTUK SEMUA<br>PRODUK
-                                PILIHAN</p>
-                        </div>
-                        <div class="w-24 h-16 bg-white/20 rounded-lg flex items-center justify-center">
-                            <div class="w-16 h-12 bg-white/30 rounded"></div>
-                        </div>
-                    </div>
-
-                    <div class="w-full flex-shrink-0 flex items-center justify-between">
-                        <div class="text-white">
-                            <h3 class="font-bold text-sm mb-1">KONSULTASI</h3>
-                            <h2 class="font-bold text-lg mb-1">GRATIS</h2>
-                            <p class="text-xs leading-tight">KONSULTASI DENGAN<br>DOKTER AHLI<br>TANPA BIAYA<br>TAMBAHAN
-                            </p>
-                        </div>
-                        <div class="w-24 h-16 bg-white/20 rounded-lg flex items-center justify-center">
-                            <div class="w-16 h-12 bg-white/30 rounded"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
-            <div class="flex justify-center space-x-2 mb-3">
-                <template x-for="(slide, index) in slides" :key="index">
-                    <button class="w-2 h-2 rounded-full transition-colors duration-200"
-                        :class="currentSlide === index ? 'bg-white' : 'bg-white/50'" @click="goToSlide(index)">
-                    </button>
-                </template>
-            </div>
-
-
-
 
 
             <div class="flex-1 bg-[#B4DBF1] rounded-t-3xl px-6 pt-6 pb-20 -mx-6">
 
                 <div class="flex items-center justify-between mb-5">
-                    <h2 class="text-3xl font-bold text-gray-800 pl-4">HEALTH NEWS</h2>
+                    <h2 class="text-2xl font-bold text-gray-800 pl-4">HOSPITAL INFORMATION</h2>
                     <div class="relative pr-5 pt-1">
                         <img src="{{ asset('images/icons/icon-notif.png') }}" alt="Notifications" class="w-7 h-9">
 
@@ -94,52 +40,22 @@
 
 
                 <div class="space-y-4">
-
-                    <a href="{{ route('news.detail', ['slug' => 'flu-singapura-indonesia']) }}" class="block">
-                        <div
-                            class="bg-[#9AC1D6] rounded-2xl p-4 shadow-md max-w-[360px] mx-auto hover:bg-[#8BB5CD] transition-colors">
-                            <div class="flex gap-8">
-                                <div class="flex-1 max-w-[55%]">
-                                    <h3 class="font-bold text-sm text-gray-800 mb-2 leading-tight">Kasus FLU Singapura
-                                        di
-                                        Indonesia Meroket, Tembus hingga 5 Ribu</h3>
-                                    <p class="text-xs text-gray-600">SINDONEWS.com</p>
+                    @foreach ($hospitals as $hospital)
+                        <a href="{{ route('hospital.detail', ['slug' => $hospital->slug]) }}" class="block">
+                            <div
+                                class="bg-[#9AC1D6] rounded-2xl p-4 shadow-md max-w-[360px] mx-auto hover:bg-[#8BB5CD] transition-colors">
+                                <div class="flex gap-8">
+                                    <div class="flex-1 max-w-[55%]">
+                                        <h3 class="font-bold text-sm text-gray-800 mb-2 leading-tight">
+                                            {{ $hospital->name }}</h3>
+                                        <p class="text-xs text-gray-600">{{ Str::limit($hospital->address, 50) }}</p>
+                                    </div>
+                                    <img src="{{ asset($hospital->image_url) }}" alt="{{ $hospital->name }}"
+                                        class="w-28 h-22 object-cover rounded-lg flex-shrink-0">
                                 </div>
-                                <img src="{{ asset('images/news/news-card1.png') }}" alt="Flu Singapura"
-                                    class="w-28 h-22 object-cover rounded-lg flex-shrink-0">
                             </div>
-                        </div>
-                    </a>
-
-                    <a href="{{ route('news.detail', ['slug' => 'kanker-usia-muda']) }}" class="block">
-                        <div
-                            class="bg-[#9AC1D6] rounded-2xl p-4 shadow-md max-w-[360px] mx-auto hover:bg-[#8BB5CD] transition-colors">
-                            <div class="flex gap-8">
-                                <div class="flex-1 max-w-[55%]">
-                                    <h3 class="font-bold text-sm text-gray-800 mb-2 leading-tight">Kebiasaan yang Tak
-                                        Disadari Picu Kanker Usus Besar di Usia Muda</h3>
-                                    <p class="text-xs text-gray-600">Detikhealth.com</p>
-                                </div>
-                                <img src="{{ asset('images/news/news-card2.jpg') }}" alt="Kanker Usus"
-                                    class="w-28 h-22 object-cover rounded-lg flex-shrink-0">
-                            </div>
-                        </div>
-                    </a>
-
-                    <a href="{{ route('news.detail', ['slug' => 'olahraga-kanker']) }}" class="block">
-                        <div
-                            class="bg-[#9AC1D6] rounded-2xl p-4 shadow-md max-w-[360px] mx-auto hover:bg-[#8BB5CD] transition-colors">
-                            <div class="flex gap-8">
-                                <div class="flex-1 max-w-[55%]">
-                                    <h3 class="font-bold text-sm text-gray-800 mb-2 leading-tight">Olahraga Lari Bisa
-                                        Turunkan Risiko Kanker dan Kematian Dini</h3>
-                                    <p class="text-xs text-gray-600">KOMPAS.com</p>
-                                </div>
-                                <img src="{{ asset('images/news/news-card3.jpg') }}" alt="Olahraga Lari"
-                                    class="w-28 h-22 object-cover rounded-lg flex-shrink-0">
-                            </div>
-                        </div>
-                    </a>
+                        </a>
+                    @endforeach
                 </div>
             </div>
 
@@ -147,17 +63,17 @@
             <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
                 <div class="flex items-center justify-around py-2">
 
+                    <a href="{{ route('dashboard') }}" class="flex flex-col items-center py-2">
+                        <img src="{{ asset('images/icons/icon-home.png') }}" alt="Home"
+                            class="w-6 h-6 mb-1 opacity-50">
+                        <span class="text-xs text-gray-400">Home</span>
+                    </a>
+
                     <div class="flex flex-col items-center py-2">
-                        <img src="{{ asset('images/icons/icon-home.png') }}" alt="Home" class="w-6 h-6 mb-1">
-                        <span class="text-xs text-black">Home</span>
+                        <img src="{{ asset('images/icons/icon-hospital.png') }}" alt="Hospital" class="w-7 h-7 mb-1">
+                        <span class="text-xs text-[#000000]">Hospital</span>
                         <div class="w-1 h-1 bg-[#00A2FA] rounded-full mt-1"></div>
                     </div>
-
-                    <a href="{{ route('hospital') }}" class="flex flex-col items-center py-2">
-                        <img src="{{ asset('images/icons/icon-hospital.png') }}" alt="Hospital"
-                            class="w-7 h-7 mb-1 opacity-50 hover:opacity-100">
-                        <span class="text-xs text-gray-400 hover:text-black">Hospital</span>
-                    </a>
 
                     <div class="flex flex-col items-center py-2">
                         <img src="{{ asset('images/icons/icon-room.png') }}" alt="Room"
@@ -187,17 +103,16 @@
 
                     <div class="flex flex-col items-center">
                         <img src="{{ asset('images/icons/icon-hospital.png') }}" alt="Hospital"
-                            class="w-8 h-8 opacity-50">
+                            class="w-8 h-8 mb-2 opacity-50">
+
                     </div>
 
                     <div class="flex flex-col items-center">
-                        <img src="{{ asset('images/icons/icon-room.png') }}" alt="Room"
-                            class="w-8 h-8 opacity-50">
+                        <img src="{{ asset('images/icons/icon-room.png') }}" alt="Room" class="w-8 h-8 opacity-50">
                     </div>
 
                     <div class="flex flex-col items-center">
-                        <img src="{{ asset('images/icons/icon-help.png') }}" alt="Help"
-                            class="w-8 h-8 opacity-50">
+                        <img src="{{ asset('images/icons/icon-help.png') }}" alt="Help" class="w-8 h-8 opacity-50">
                     </div>
                 </div>
             </div>
@@ -206,8 +121,7 @@
             <div class="w-[85%] bg-[#00A2FA] overflow-y-auto">
                 Header
                 <div class="pt-8 pb-6 px-8 text-center">
-                    <img src="{{ asset('images/logo-hospitalink.png') }}" alt="HOSPITALINK"
-                        class="mx-auto h-32 mb-3">
+                    <img src="{{ asset('images/logo-hospitalink.png') }}" alt="HOSPITALINK" class="mx-auto h-32 mb-3">
                     <h1 class="text-3xl font-bold text-red-500">HOSPITALINK</h1>
                     <p class="text-lg text-red-400">Peduli Akses Kesehatan Anda</p>
                 </div>
