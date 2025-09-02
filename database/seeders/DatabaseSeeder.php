@@ -13,8 +13,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-    public function run(): void
-    {
         $this->call(HospitalSeeder::class);
         $this->call(NewsSeeder::class);
 

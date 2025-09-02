@@ -296,7 +296,7 @@
                         News Card 1
                         <div class="bg-[#D9D9D9] rounded-2xl p-6 shadow-sm">
                             <div class="mb-4">
-                                <div class="w-full h-32 bg-gray-300 rounded-xl mb-4"></div>
+                                <img src="{{ asset('images/news/news-card1.png') }}" alt="Flu Singapura" class="w-full h-32 object-cover rounded-xl mb-4">
                                 <h3 class="font-bold text-base text-gray-800 mb-3 leading-tight">Kasus FLU Singapura di
                                     Indonesia Meroket, Tembus hingga 5 Ribu</h3>
                                 <p class="text-sm text-gray-600">SINDONEWS.com</p>
@@ -306,7 +306,7 @@
                         News Card 2
                         <div class="bg-[#D9D9D9] rounded-2xl p-6 shadow-sm">
                             <div class="mb-4">
-                                <div class="w-full h-32 bg-gray-300 rounded-xl mb-4"></div>
+                                <img src="{{ asset('images/news/news-card2.jpg') }}" alt="Kanker Usus" class="w-full h-32 object-cover rounded-xl mb-4">
                                 <h3 class="font-bold text-base text-gray-800 mb-3 leading-tight">Kebiasaan yang Tak
                                     Disadari Picu Kanker Usus Besar di Usia Muda</h3>
                                 <p class="text-sm text-gray-600">Detikhealth.com</p>
@@ -316,7 +316,7 @@
                         News Card 3
                         <div class="bg-[#D9D9D9] rounded-2xl p-6 shadow-sm">
                             <div class="mb-4">
-                                <div class="w-full h-32 bg-gray-300 rounded-xl mb-4"></div>
+                                <img src="{{ asset('images/news/news-card3.jpg') }}" alt="Olahraga Lari" class="w-full h-32 object-cover rounded-xl mb-4">
                                 <h3 class="font-bold text-base text-gray-800 mb-3 leading-tight">Olahraga Lari Bisa
                                     Turunkan Risiko Kanker dan Kematian Dini</h3>
                                 <p class="text-sm text-gray-600">KOMPAS.com</p>

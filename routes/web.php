@@ -88,6 +88,39 @@ Route::get('/debug/facebook-callback', function () {
     ]);
 });
 
+// Debug News Data
+Route::get('/debug/news-test', function () {
+    try {
+        $news = \App\Models\News::all();
+        $newsData = $news->map(function($item) {
+            return [
+                'id' => $item->id,
+                'slug' => $item->slug,
+                'title' => $item->title,
+                'image' => $item->image,
+                'image_url' => asset($item->image),
+                'source' => $item->source,
+                'content_length' => strlen($item->content)
+            ];
+        });
+        
+        return response()->json([
+            'news_count' => $news->count(),
+            'news_data' => $newsData,
+            'asset_helper_test' => [
+                'news1' => asset('images/news/news-card1.png'),
+                'news2' => asset('images/news/news-card2.jpg'),
+                'news3' => asset('images/news/news-card3.jpg')
+            ]
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ], 500);
+    }
+});
+
 // Debug User Model and Database
 Route::get('/debug/user-test', function () {
     try {
@@ -174,6 +207,55 @@ Route::get('/debug/facebook-real-test', function () {
             'real_code' => $realCode,
             'response_type' => get_class($response),
             'response_status' => method_exists($response, 'getStatusCode') ? $response->getStatusCode() : 'N/A',
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ], 500);
+    }
+});
+
+// Test Asset Helper for Production
+Route::get('/debug/asset-test', function () {
+    return response()->json([
+        'current_app_url' => config('app.url'),
+        'asset_helper_test' => [
+            'news1' => asset('images/news/news-card1.png'),
+            'news2' => asset('images/news/news-card2.jpg'),
+            'news3' => asset('images/news/news-card3.jpg'),
+            'logo' => asset('images/Logo-Hospitalink.png')
+        ],
+        'url_helper_test' => [
+            'news1' => url('images/news/news-card1.png'),
+            'news2' => url('images/news/news-card2.jpg')
+        ]
+    ]);
+});
+
+// Debug Hospital Data
+Route::get('/debug/hospital-test', function () {
+    try {
+        $hospitals = \App\Models\Hospital::all();
+        $hospitalData = $hospitals->map(function($item) {
+            return [
+                'id' => $item->id,
+                'name' => $item->name,
+                'slug' => $item->slug,
+                'image_url' => $item->image_url,
+                'image_asset' => asset($item->image_url),
+                'website_url' => $item->website_url
+            ];
+        });
+        
+        return response()->json([
+            'hospital_count' => $hospitals->count(),
+            'hospitals' => $hospitalData,
+            'file_check' => [
+                'rsud_sidoarjo' => file_exists(public_path('images/hospitals/rsud_sidoarjo.jpg')),
+                'rsud_suwandi' => file_exists(public_path('images/hospitals/rsud_suwandi.jpg')),
+                'rsud_wahidin' => file_exists(public_path('images/hospitals/rsud_wahidin.jpg'))
+            ]
         ]);
     } catch (\Exception $e) {
         return response()->json([

@@ -49,7 +49,7 @@
 
 
                 <div class="mb-3 mx-6">
-                    <img src="{{ $article['image'] ?? '/placeholder.svg?height=150&width=250' }}"
+                    <img src="{{ asset($article['image']) ?? asset('images/news/news-card1.png') }}"
                         alt="{{ $article['title'] ?? 'Article Image' }}" class="w-full h-48 object-cover rounded-lg">
                 </div>
 
@@ -95,7 +95,7 @@
 
                     Article Image
                     <div class="mb-4 mx-8">
-                        <img src="{{ $article['image'] ?? '/placeholder.svg?height=300&width=600' }}"
+                        <img src="{{ asset($article['image']) ?? asset('images/news/news-card1.png') }}"
                             alt="{{ $article['title'] ?? 'Article Image' }}"
                             class="w-full h-64 object-cover rounded-lg">
                     </div>
