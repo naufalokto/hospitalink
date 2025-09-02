@@ -13,7 +13,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+    public function run(): void
+    {
+        $this->call(HospitalSeeder::class);
+        $this->call(NewsSeeder::class);
 
         User::factory()->create([
             'name' => 'Test User',
