@@ -50,7 +50,11 @@
                                             {{ $hospital->name }}</h3>
                                         <p class="text-xs text-gray-600">{{ Str::limit($hospital->address, 50) }}</p>
                                     </div>
-                                    <img src="{{ asset($hospital->image_url) }}" alt="{{ $hospital->name }}"
+                                    <img src="{{ \Illuminate\Support\Str::startsWith($hospital->image_url, ['http://','https://'])
+                                        ? $hospital->image_url
+                                        : (\Illuminate\Support\Str::startsWith($hospital->image_url, ['storage/','images/'])
+                                            ? asset($hospital->image_url)
+                                            : asset('storage/'.$hospital->image_url)) }}" alt="{{ $hospital->name }}"
                                         class="w-28 h-22 object-cover rounded-lg flex-shrink-0">
                                 </div>
                             </div>

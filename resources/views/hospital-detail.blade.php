@@ -44,7 +44,11 @@
 
 
                 <div class="mb-3 mx-6">
-                    <img src="{{ asset($hospital->image_url) }}" alt="{{ $hospital->name }}"
+                    <img src="{{ \Illuminate\Support\Str::startsWith($hospital->image_url, ['http://','https://'])
+                        ? $hospital->image_url
+                        : (\Illuminate\Support\Str::startsWith($hospital->image_url, ['storage/','images/'])
+                            ? asset($hospital->image_url)
+                            : asset('storage/'.$hospital->image_url)) }}" alt="{{ $hospital->name }}"
                         class="w-full h-48 object-cover rounded-lg">
                 </div>
 
