@@ -165,11 +165,11 @@
                         <span class="text-xs text-gray-400">Room</span>
                     </div>
 
-                    <div class="flex flex-col items-center py-2">
+                    <a href="{{ route('help') }}" class="flex flex-col items-center py-2">
                         <img src="{{ asset('images/icons/icon-help.png') }}" alt="Help"
                             class="w-7 h-7 mb-1 opacity-50">
                         <span class="text-xs text-gray-400">Help</span>
-                    </div>
+                    </a>
                 </div>
             </div>
         </div>

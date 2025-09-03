@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\HospitalController;
@@ -21,6 +22,11 @@ Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
 
+Route::post('/logout', function () {
+    Auth::logout();
+    return redirect('/login'); 
+})->name('logout');
+
 Route::get('/register', function () {
     return redirect()->route('login')->with('tab', 'signup');
 })->name('register');
@@ -33,6 +39,10 @@ Route::get('/dashboard', function () {
 
 Route::get('/hospital', [HospitalController::class, 'index'])->name('hospital');
 Route::get('/hospital/{slug}', [HospitalController::class, 'show'])->name('hospital.detail');
+
+Route::get('/help', function () {
+    return view('help');
+})->name('help');
 
 // News routes
 Route::get('/news/{slug}', [NewsController::class, 'show'])->name('news.detail');
