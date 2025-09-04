@@ -159,11 +159,11 @@
                         <span class="text-xs text-gray-400 hover:text-black">Hospital</span>
                     </a>
 
-                    <div class="flex flex-col items-center py-2">
+                    <a href="{{ route('room') }}" class="flex flex-col items-center py-2">
                         <img src="{{ asset('images/icons/icon-room.png') }}" alt="Room"
                             class="w-7 h-7 mb-1 opacity-50">
                         <span class="text-xs text-gray-400">Room</span>
-                    </div>
+                    </a>
 
                     <a href="{{ route('help') }}" class="flex flex-col items-center py-2">
                         <img src="{{ asset('images/icons/icon-help.png') }}" alt="Help"

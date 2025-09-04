@@ -40,6 +40,13 @@ Route::get('/dashboard', function () {
 Route::get('/hospital', [HospitalController::class, 'index'])->name('hospital');
 Route::get('/hospital/{slug}', [HospitalController::class, 'show'])->name('hospital.detail');
 
+Route::get('/room', function () {
+    return view('room');
+})->name('room');
+
+Route::get('/checking/{hospital_id}', [App\Http\Controllers\RoomController::class, 'checking'])->name('checking');
+Route::get('/checking/{hospital_id}/room/{room_id}', [App\Http\Controllers\RoomController::class, 'checkingDetail'])->name('checking-detail');
+
 Route::get('/help', function () {
     return view('help');
 })->name('help');

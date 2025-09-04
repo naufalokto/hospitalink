@@ -25,7 +25,7 @@ class HospitalSeeder extends Seeder
                 'address' => 'Jl. Tambak Rejo No.45-47, Tambakrejo, Kec. Simokerto, Surabaya, Jawa Timur 60142',
                 'description' => 'RSUD Dr. Mohammad Soewandhie adalah rumah sakit umum daerah yang melayani masyarakat Surabaya dan sekitarnya.',
                 'public_service' => 'Menyediakan pelayanan kesehatan yang berkualitas dan terjangkau untuk masyarakat.',
-                'image_url' => 'images/hospitals/rsud_suwandi.jpg',
+                'image_url' => 'images/hospitals/rsud_soewandhie.jpg',
                 'website_url' => 'https://rs-soewandhie.surabaya.go.id/'
             ],
             [

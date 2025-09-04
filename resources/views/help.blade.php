@@ -24,14 +24,14 @@
     <div class="px-6 mb-4" x-data="carousel()">
 
         <!-- ✅ Card Help Center -->
-        <div class="flex-1 bg-sky-200 rounded-t-3xl px-6 pt-6 pb-24 -mx-6">
+        <div class="flex-1 bg-[#B4DBF1] rounded-t-3xl px-6 pt-6 pb-24 -mx-6">
             <div class="w-full max-w-md mx-auto">
 
                 <!-- Header -->
                 <div class="flex items-center justify-between mb-5">
-                    <h2 class="text-xl font-bold text-gray-800">HELP CENTER</h2>
-                    <div class="relative">
-                        <img src="{{ asset('images/icons/icon-notif.png') }}" alt="Notifications" class="w-7 h-7">
+                    <h2 class="text-2xl font-bold text-gray-800">HELP CENTER</h2>
+                    <div class="relative pr-5 pt-1">
+                        <img src="{{ asset('images/icons/icon-notif.png') }}" alt="Notifications" class="w-7 h-9">
                     </div>
                 </div>
                 <p class="text-sm text-gray-700 mb-6">
@@ -42,21 +42,21 @@
                 <div class="space-y-4">
                     <!-- Hotline -->
                     <div onclick="showContact('hotline')"
-                        class="flex items-center bg-sky-300 rounded-xl px-4 py-3 shadow hover:bg-sky-400 transition cursor-pointer">
+                        class="flex items-center bg-[#9AC1D6] rounded-xl px-4 py-3 shadow hover:bg-[#8BB5CD] transition cursor-pointer">
                         <img src="{{ asset('images/icons/icon-hotline.png') }}" alt="Hotline" class="w-7 h-7 mr-3">
                         <span id="hotline-text" class="font-semibold text-gray-800">HOTLINE</span>
                     </div>
 
                     <!-- Message -->
                     <div onclick="showContact('message')"
-                        class="flex items-center bg-sky-300 rounded-xl px-4 py-3 shadow hover:bg-sky-400 transition cursor-pointer">
+                        class="flex items-center bg-[#9AC1D6] rounded-xl px-4 py-3 shadow hover:bg-[#8BB5CD] transition cursor-pointer">
                         <img src="{{ asset('images/icons/icon-message.png') }}" alt="Message" class="w-7 h-7 mr-3">
                         <span id="message-text" class="font-semibold text-gray-800">MESSAGE</span>
                     </div>
 
                     <!-- Email -->
                     <div onclick="showContact('email')"
-                        class="flex items-center bg-sky-300 rounded-xl px-4 py-3 shadow hover:bg-sky-400 transition cursor-pointer">
+                        class="flex items-center bg-[#9AC1D6] rounded-xl px-4 py-3 shadow hover:bg-[#8BB5CD] transition cursor-pointer">
                         <img src="{{ asset('images/icons/icon-email.png') }}" alt="Email" class="w-7 h-7 mr-3">
                         <span id="email-text" class="font-semibold text-gray-800">EMAIL</span>
                     </div>
@@ -92,10 +92,10 @@
                     <span class="text-xs text-gray-400">Hospital</span>
                 </a>
 
-                <div class="flex flex-col items-center py-2 opacity-50">
-                    <img src="{{ asset('images/icons/icon-room.png') }}" alt="Room" class="w-7 h-7 mb-1">
+                <a href="{{ route('room') }}" class="flex flex-col items-center py-2">
+                    <img src="{{ asset('images/icons/icon-room.png') }}" alt="Room" class="w-7 h-7 mb-1 opacity-50">
                     <span class="text-xs text-gray-400">Room</span>
-                </div>
+                </a>
 
                 <div class="flex flex-col items-center py-2">
                     <img src="{{ asset('images/icons/icon-help.png') }}" alt="Help" class="w-7 h-7 mb-1">

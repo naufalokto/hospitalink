@@ -49,12 +49,14 @@
                                         <h3 class="font-bold text-sm text-gray-800 mb-2 leading-tight">
                                             {{ $hospital->name }}</h3>
                                         <p class="text-xs text-gray-600">{{ Str::limit($hospital->address, 50) }}</p>
+                                        <p class="text-xs text-blue-600 mb-1 truncate">{{ $hospital->website_url }}</p>
                                     </div>
-                                    <img src="{{ \Illuminate\Support\Str::startsWith($hospital->image_url, ['http://','https://'])
+                                    <img src="{{ \Illuminate\Support\Str::startsWith($hospital->image_url, ['http://', 'https://'])
                                         ? $hospital->image_url
-                                        : (\Illuminate\Support\Str::startsWith($hospital->image_url, ['storage/','images/'])
+                                        : (\Illuminate\Support\Str::startsWith($hospital->image_url, ['storage/', 'images/'])
                                             ? asset($hospital->image_url)
-                                            : asset('storage/'.$hospital->image_url)) }}" alt="{{ $hospital->name }}"
+                                            : asset('storage/' . $hospital->image_url)) }}"
+                                        alt="{{ $hospital->name }}"
                                         class="w-28 h-22 object-cover rounded-lg flex-shrink-0">
                                 </div>
                             </div>
@@ -79,11 +81,11 @@
                         <div class="w-1 h-1 bg-[#00A2FA] rounded-full mt-1"></div>
                     </div>
 
-                    <div class="flex flex-col items-center py-2">
+                    <a href="{{ route('room') }}" class="flex flex-col items-center py-2">
                         <img src="{{ asset('images/icons/icon-room.png') }}" alt="Room"
                             class="w-7 h-7 mb-1 opacity-50">
                         <span class="text-xs text-gray-400">Room</span>
-                    </div>
+                    </a>
 
                     <a href="{{ route('help') }}" class="flex flex-col items-center py-2">
                         <img src="{{ asset('images/icons/icon-help.png') }}" alt="Help"

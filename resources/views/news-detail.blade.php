@@ -49,7 +49,7 @@
 
 
                 <div class="mb-3 mx-6">
-                    <img src="{{ asset($article['image']) ?? asset('images/news/news-card1.png') }}"
+                    <img src="{{ asset($article['image']) }}"
                         alt="{{ $article['title'] ?? 'Article Image' }}" class="w-full h-48 object-cover rounded-lg">
                 </div>
 
