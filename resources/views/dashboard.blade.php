@@ -181,6 +181,13 @@
                             class="w-7 h-7 mb-1 opacity-50">
                         <span class="text-xs text-gray-400">Help</span>
                     </a>
+
+                    <a href="{{ route('my-bookings') }}" class="flex flex-col items-center py-2">
+                        <svg class="w-7 h-7 mb-1 opacity-50 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
+                        <span class="text-xs text-gray-400">My Bookings</span>
+                    </a>
                 </div>
             </div>
         </div>

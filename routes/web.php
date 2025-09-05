@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\HospitalController;
+use App\Http\Controllers\RoomViewController;
 
 
 
@@ -39,19 +40,28 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->name('dashboard');
 
-Route::get('/admin-dashboard', function () {
-    return view('admin-dashboard');
-})->name('admin-dashboard')->middleware('admin');
+Route::get('/admin-dashboard', [App\Http\Controllers\AdminController::class, 'dashboard'])->name('admin-dashboard')->middleware('admin');
+
+// Admin update routes
+Route::post('/admin/update-hospital', [App\Http\Controllers\AdminController::class, 'updateAllRoomQuantitiesWeb'])->name('admin.update-hospital')->middleware(['admin', 'web']);
+
 
 Route::get('/hospital', [HospitalController::class, 'index'])->name('hospital');
 Route::get('/hospital/{slug}', [HospitalController::class, 'show'])->name('hospital.detail');
 
-Route::get('/room', function () {
-    return view('room');
-})->name('room');
+Route::get('/room', [RoomViewController::class, 'index'])->name('room');
 
 Route::get('/checking/{hospital_id}', [App\Http\Controllers\RoomController::class, 'checking'])->name('checking');
 Route::get('/checking/{hospital_id}/room/{room_id}', [App\Http\Controllers\RoomController::class, 'checkingDetail'])->name('checking-detail');
+
+// Booking routes
+Route::middleware('auth')->group(function () {
+    Route::get('/booking/{hospital_id}/room/{room_id}', [App\Http\Controllers\BookingController::class, 'showBookingForm'])->name('booking.form');
+    Route::post('/booking/{hospital_id}/room/{room_id}', [App\Http\Controllers\BookingController::class, 'processBooking'])->name('booking.process');
+    Route::get('/booking/{booking_id}/invoice', [App\Http\Controllers\BookingController::class, 'showInvoice'])->name('booking.invoice');
+    Route::get('/booking/{booking_id}/download', [App\Http\Controllers\BookingController::class, 'downloadInvoice'])->name('booking.download');
+    Route::get('/my-bookings', [App\Http\Controllers\BookingController::class, 'myBookings'])->name('my-bookings');
+});
 
 Route::get('/help', function () {
     return view('help');

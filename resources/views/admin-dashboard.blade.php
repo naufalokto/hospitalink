@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Admin Dashboard - HOSPITALINK</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -20,6 +21,8 @@
             min-height: 100vh;
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
         @media (max-width: 375px) {
             .mobile-container {
@@ -45,302 +48,180 @@
         </div>
 
         <!-- Main Content -->
-        <div class="flex-1 px-5 py-4 space-y-6">
+        <div class="flex-1 px-5" style="display: flex; flex-direction: column; padding-top: 21px; padding-bottom: 40px;">
+            <!-- Flash Messages -->
+            @if(session('success'))
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                    {{ session('success') }}
+                </div>
+            @endif
+            
+            @if(session('error'))
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                    {{ session('error') }}
+                </div>
+            @endif
+            
             <!-- Hospital Cards -->
-            <div x-data="adminDashboard()">
-                <!-- RSUD Sidoarjo Card -->
-                <div class="gradient-bg rounded-lg shadow-lg p-4 mb-6" style="box-shadow: 0px 4px 4px 2px rgba(0, 0, 0, 0.25); height: 260px;">
-                    <h2 class="text-black text-xl font-semibold mb-4">RSUD Sidoarjo</h2>
-                    
-                    <!-- Room Types -->
-                    <div class="space-y-3 mb-4">
-                        <!-- VVIP Room -->
-                        <div class="flex items-center justify-between">
-                            <span class="text-black text-sm font-normal">VVIP Room</span>
-                            <div class="flex items-center space-x-2">
-                                <button @click="decreaseQuantity('rsud_sidoarjo', 'vvip')" class="w-7 h-7 bg-[#D9D9D9] rounded-full flex items-center justify-center shadow-md">
-                                    <span class="text-black text-sm">-</span>
-                                </button>
-                                <div class="w-10 h-6 bg-white border border-black rounded text-center flex items-center justify-center">
-                                    <span class="text-black text-xs" x-text="hospitals.rsud_sidoarjo.vvip"></span>
+            <div x-data="adminDashboard()" style="display: flex; flex-direction: column; gap: 23px; align-items: center;">
+                <!-- Hospital Cards -->
+                <template x-for="hospital in hospitals" :key="hospital.id">
+                    <div class="gradient-bg rounded-lg shadow-lg flex flex-col justify-between" style="box-shadow: 0px 4px 4px 2px rgba(0, 0, 0, 0.25); width: 336px; height: 260px; padding: 12px;">
+                        <div>
+                            <h2 class="text-black text-lg font-semibold mb-3" x-text="hospital.name"></h2>
+                            
+                            <!-- Room Types -->
+                            <div class="space-y-2">
+                            <!-- VVIP Room -->
+                            <div class="flex items-center justify-between">
+                                <span class="text-black text-xs font-normal">VVIP Room</span>
+                                <div class="flex items-center space-x-1">
+                                    <button @click="decreaseQuantity(hospital.id, 'vvip')" class="w-6 h-6 bg-[#D9D9D9] rounded-full flex items-center justify-center shadow-md">
+                                        <span class="text-black text-xs">-</span>
+                                    </button>
+                                    <div class="w-8 h-5 bg-white border border-black rounded text-center flex items-center justify-center">
+                                        <span class="text-black text-xs" x-text="hospital.rooms.vvip"></span>
+                                    </div>
+                                    <button @click="increaseQuantity(hospital.id, 'vvip')" class="w-6 h-6 bg-[#D9D9D9] rounded-full flex items-center justify-center shadow-md">
+                                        <span class="text-black text-xs">+</span>
+                                    </button>
                                 </div>
-                                <button @click="increaseQuantity('rsud_sidoarjo', 'vvip')" class="w-7 h-7 bg-[#D9D9D9] rounded-full flex items-center justify-center shadow-md">
-                                    <span class="text-black text-sm">+</span>
-                                </button>
+                            </div>
+
+                            <!-- Class 1 Room -->
+                            <div class="flex items-center justify-between">
+                                <span class="text-black text-xs font-normal">Class 1 Room</span>
+                                <div class="flex items-center space-x-1">
+                                    <button @click="decreaseQuantity(hospital.id, 'class1')" class="w-6 h-6 bg-[#D9D9D9] rounded-full flex items-center justify-center shadow-md">
+                                        <span class="text-black text-xs">-</span>
+                                    </button>
+                                    <div class="w-8 h-5 bg-white border border-black rounded text-center flex items-center justify-center">
+                                        <span class="text-black text-xs" x-text="hospital.rooms.class1"></span>
+                                    </div>
+                                    <button @click="increaseQuantity(hospital.id, 'class1')" class="w-6 h-6 bg-[#D9D9D9] rounded-full flex items-center justify-center shadow-md">
+                                        <span class="text-black text-xs">+</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Class 2 Room -->
+                            <div class="flex items-center justify-between">
+                                <span class="text-black text-xs font-normal">Class 2 Room</span>
+                                <div class="flex items-center space-x-1">
+                                    <button @click="decreaseQuantity(hospital.id, 'class2')" class="w-6 h-6 bg-[#D9D9D9] rounded-full flex items-center justify-center shadow-md">
+                                        <span class="text-black text-xs">-</span>
+                                    </button>
+                                    <div class="w-8 h-5 bg-white border border-black rounded text-center flex items-center justify-center">
+                                        <span class="text-black text-xs" x-text="hospital.rooms.class2"></span>
+                                    </div>
+                                    <button @click="increaseQuantity(hospital.id, 'class2')" class="w-6 h-6 bg-[#D9D9D9] rounded-full flex items-center justify-center shadow-md">
+                                        <span class="text-black text-xs">+</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Class 3 Room -->
+                            <div class="flex items-center justify-between">
+                                <span class="text-black text-xs font-normal">Class 3 Room</span>
+                                <div class="flex items-center space-x-1">
+                                    <button @click="decreaseQuantity(hospital.id, 'class3')" class="w-6 h-6 bg-[#D9D9D9] rounded-full flex items-center justify-center shadow-md">
+                                        <span class="text-black text-xs">-</span>
+                                    </button>
+                                    <div class="w-8 h-5 bg-white border border-black rounded text-center flex items-center justify-center">
+                                        <span class="text-black text-xs" x-text="hospital.rooms.class3"></span>
+                                    </div>
+                                    <button @click="increaseQuantity(hospital.id, 'class3')" class="w-6 h-6 bg-[#D9D9D9] rounded-full flex items-center justify-center shadow-md">
+                                        <span class="text-black text-xs">+</span>
+                                    </button>
+                                </div>
+                            </div>
                             </div>
                         </div>
 
-                        <!-- Class 1 Room -->
-                        <div class="flex items-center justify-between">
-                            <span class="text-black text-sm font-normal">Class 1 Room</span>
-                            <div class="flex items-center space-x-2">
-                                <button @click="decreaseQuantity('rsud_sidoarjo', 'class1')" class="w-7 h-7 bg-[#D9D9D9] rounded-full flex items-center justify-center shadow-md">
-                                    <span class="text-black text-sm">-</span>
-                                </button>
-                                <div class="w-10 h-6 bg-white border border-black rounded text-center flex items-center justify-center">
-                                    <span class="text-black text-xs" x-text="hospitals.rsud_sidoarjo.class1"></span>
-                                </div>
-                                <button @click="increaseQuantity('rsud_sidoarjo', 'class1')" class="w-7 h-7 bg-[#D9D9D9] rounded-full flex items-center justify-center shadow-md">
-                                    <span class="text-black text-sm">+</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Class 2 Room -->
-                        <div class="flex items-center justify-between">
-                            <span class="text-black text-sm font-normal">Class 2 Room</span>
-                            <div class="flex items-center space-x-2">
-                                <button @click="decreaseQuantity('rsud_sidoarjo', 'class2')" class="w-7 h-7 bg-[#D9D9D9] rounded-full flex items-center justify-center shadow-md">
-                                    <span class="text-black text-sm">-</span>
-                                </button>
-                                <div class="w-10 h-6 bg-white border border-black rounded text-center flex items-center justify-center">
-                                    <span class="text-black text-xs" x-text="hospitals.rsud_sidoarjo.class2"></span>
-                                </div>
-                                <button @click="increaseQuantity('rsud_sidoarjo', 'class2')" class="w-7 h-7 bg-[#D9D9D9] rounded-full flex items-center justify-center shadow-md">
-                                    <span class="text-black text-sm">+</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Class 3 Room -->
-                        <div class="flex items-center justify-between">
-                            <span class="text-black text-sm font-normal">Class 3 Room</span>
-                            <div class="flex items-center space-x-2">
-                                <button @click="decreaseQuantity('rsud_sidoarjo', 'class3')" class="w-7 h-7 bg-[#D9D9D9] rounded-full flex items-center justify-center shadow-md">
-                                    <span class="text-black text-sm">-</span>
-                                </button>
-                                <div class="w-10 h-6 bg-white border border-black rounded text-center flex items-center justify-center">
-                                    <span class="text-black text-xs" x-text="hospitals.rsud_sidoarjo.class3"></span>
-                                </div>
-                                <button @click="increaseQuantity('rsud_sidoarjo', 'class3')" class="w-7 h-7 bg-[#D9D9D9] rounded-full flex items-center justify-center shadow-md">
-                                    <span class="text-black text-sm">+</span>
-                                </button>
-                            </div>
-                        </div>
+                        <!-- Update Button -->
+                        <button @click="updateHospital(hospital.id)" class="w-full bg-white text-black text-xs font-semibold py-2 rounded-lg" style="box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25); margin-top: 12px;">
+                            Update
+                        </button>
                     </div>
+                </template>
 
-                    <!-- Update Button -->
-                    <button @click="updateHospital('rsud_sidoarjo')" class="w-full bg-white text-black text-sm font-semibold py-2 rounded-lg" style="box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);">
-                        Update
-                    </button>
-                </div>
-
-                <!-- RSUD Dr. Mohammad Soewandhie Card -->
-                <div class="gradient-bg rounded-lg shadow-lg p-4 mb-6" style="box-shadow: 0px 4px 4px 2px rgba(0, 0, 0, 0.25); height: 260px;">
-                    <h2 class="text-black text-lg font-semibold mb-4">RSUD Dr. Mohammad Soewandhie</h2>
-                    
-                    <!-- Room Types -->
-                    <div class="space-y-3 mb-4">
-                        <!-- VVIP Room -->
-                        <div class="flex items-center justify-between">
-                            <span class="text-black text-sm font-normal">VVIP Room</span>
-                            <div class="flex items-center space-x-2">
-                                <button @click="decreaseQuantity('rsud_soewandhie', 'vvip')" class="w-7 h-7 bg-[#D9D9D9] rounded-full flex items-center justify-center shadow-md">
-                                    <span class="text-black text-sm">-</span>
-                                </button>
-                                <div class="w-10 h-6 bg-white border border-black rounded text-center flex items-center justify-center">
-                                    <span class="text-black text-xs" x-text="hospitals.rsud_soewandhie.vvip"></span>
-                                </div>
-                                <button @click="increaseQuantity('rsud_soewandhie', 'vvip')" class="w-7 h-7 bg-[#D9D9D9] rounded-full flex items-center justify-center shadow-md">
-                                    <span class="text-black text-sm">+</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Class 1 Room -->
-                        <div class="flex items-center justify-between">
-                            <span class="text-black text-sm font-normal">Class 1 Room</span>
-                            <div class="flex items-center space-x-2">
-                                <button @click="decreaseQuantity('rsud_soewandhie', 'class1')" class="w-7 h-7 bg-[#D9D9D9] rounded-full flex items-center justify-center shadow-md">
-                                    <span class="text-black text-sm">-</span>
-                                </button>
-                                <div class="w-10 h-6 bg-white border border-black rounded text-center flex items-center justify-center">
-                                    <span class="text-black text-xs" x-text="hospitals.rsud_soewandhie.class1"></span>
-                                </div>
-                                <button @click="increaseQuantity('rsud_soewandhie', 'class1')" class="w-7 h-7 bg-[#D9D9D9] rounded-full flex items-center justify-center shadow-md">
-                                    <span class="text-black text-sm">+</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Class 2 Room -->
-                        <div class="flex items-center justify-between">
-                            <span class="text-black text-sm font-normal">Class 2 Room</span>
-                            <div class="flex items-center space-x-2">
-                                <button @click="decreaseQuantity('rsud_soewandhie', 'class2')" class="w-7 h-7 bg-[#D9D9D9] rounded-full flex items-center justify-center shadow-md">
-                                    <span class="text-black text-sm">-</span>
-                                </button>
-                                <div class="w-10 h-6 bg-white border border-black rounded text-center flex items-center justify-center">
-                                    <span class="text-black text-xs" x-text="hospitals.rsud_soewandhie.class2"></span>
-                                </div>
-                                <button @click="increaseQuantity('rsud_soewandhie', 'class2')" class="w-7 h-7 bg-[#D9D9D9] rounded-full flex items-center justify-center shadow-md">
-                                    <span class="text-black text-sm">+</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Class 3 Room -->
-                        <div class="flex items-center justify-between">
-                            <span class="text-black text-sm font-normal">Class 3 Room</span>
-                            <div class="flex items-center space-x-2">
-                                <button @click="decreaseQuantity('rsud_soewandhie', 'class3')" class="w-7 h-7 bg-[#D9D9D9] rounded-full flex items-center justify-center shadow-md">
-                                    <span class="text-black text-sm">-</span>
-                                </button>
-                                <div class="w-10 h-6 bg-white border border-black rounded text-center flex items-center justify-center">
-                                    <span class="text-black text-xs" x-text="hospitals.rsud_soewandhie.class3"></span>
-                                </div>
-                                <button @click="increaseQuantity('rsud_soewandhie', 'class3')" class="w-7 h-7 bg-[#D9D9D9] rounded-full flex items-center justify-center shadow-md">
-                                    <span class="text-black text-sm">+</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Update Button -->
-                    <button @click="updateHospital('rsud_soewandhie')" class="w-full bg-white text-black text-sm font-semibold py-2 rounded-lg" style="box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);">
-                        Update
-                    </button>
-                </div>
-
-                <!-- RSUD Dr Wahidin Sudiro Husodo Card -->
-                <div class="gradient-bg rounded-lg shadow-lg p-4 mb-6" style="box-shadow: 0px 4px 4px 2px rgba(0, 0, 0, 0.25); height: 260px;">
-                    <h2 class="text-black text-lg font-semibold mb-4">RSUD Dr Wahidin Sudiro Husodo</h2>
-                    
-                    <!-- Room Types -->
-                    <div class="space-y-3 mb-4">
-                        <!-- VVIP Room -->
-                        <div class="flex items-center justify-between">
-                            <span class="text-black text-sm font-normal">VVIP Room</span>
-                            <div class="flex items-center space-x-2">
-                                <button @click="decreaseQuantity('rsud_wahidin', 'vvip')" class="w-7 h-7 bg-[#D9D9D9] rounded-full flex items-center justify-center shadow-md">
-                                    <span class="text-black text-sm">-</span>
-                                </button>
-                                <div class="w-10 h-6 bg-white border border-black rounded text-center flex items-center justify-center">
-                                    <span class="text-black text-xs" x-text="hospitals.rsud_wahidin.vvip"></span>
-                                </div>
-                                <button @click="increaseQuantity('rsud_wahidin', 'vvip')" class="w-7 h-7 bg-[#D9D9D9] rounded-full flex items-center justify-center shadow-md">
-                                    <span class="text-black text-sm">+</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Class 1 Room -->
-                        <div class="flex items-center justify-between">
-                            <span class="text-black text-sm font-normal">Class 1 Room</span>
-                            <div class="flex items-center space-x-2">
-                                <button @click="decreaseQuantity('rsud_wahidin', 'class1')" class="w-7 h-7 bg-[#D9D9D9] rounded-full flex items-center justify-center shadow-md">
-                                    <span class="text-black text-sm">-</span>
-                                </button>
-                                <div class="w-10 h-6 bg-white border border-black rounded text-center flex items-center justify-center">
-                                    <span class="text-black text-xs" x-text="hospitals.rsud_wahidin.class1"></span>
-                                </div>
-                                <button @click="increaseQuantity('rsud_wahidin', 'class1')" class="w-7 h-7 bg-[#D9D9D9] rounded-full flex items-center justify-center shadow-md">
-                                    <span class="text-black text-sm">+</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Class 2 Room -->
-                        <div class="flex items-center justify-between">
-                            <span class="text-black text-sm font-normal">Class 2 Room</span>
-                            <div class="flex items-center space-x-2">
-                                <button @click="decreaseQuantity('rsud_wahidin', 'class2')" class="w-7 h-7 bg-[#D9D9D9] rounded-full flex items-center justify-center shadow-md">
-                                    <span class="text-black text-sm">-</span>
-                                </button>
-                                <div class="w-10 h-6 bg-white border border-black rounded text-center flex items-center justify-center">
-                                    <span class="text-black text-xs" x-text="hospitals.rsud_wahidin.class2"></span>
-                                </div>
-                                <button @click="increaseQuantity('rsud_wahidin', 'class2')" class="w-7 h-7 bg-[#D9D9D9] rounded-full flex items-center justify-center shadow-md">
-                                    <span class="text-black text-sm">+</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Class 3 Room -->
-                        <div class="flex items-center justify-between">
-                            <span class="text-black text-sm font-normal">Class 3 Room</span>
-                            <div class="flex items-center space-x-2">
-                                <button @click="decreaseQuantity('rsud_wahidin', 'class3')" class="w-7 h-7 bg-[#D9D9D9] rounded-full flex items-center justify-center shadow-md">
-                                    <span class="text-black text-sm">-</span>
-                                </button>
-                                <div class="w-10 h-6 bg-white border border-black rounded text-center flex items-center justify-center">
-                                    <span class="text-black text-xs" x-text="hospitals.rsud_wahidin.class3"></span>
-                                </div>
-                                <button @click="increaseQuantity('rsud_wahidin', 'class3')" class="w-7 h-7 bg-[#D9D9D9] rounded-full flex items-center justify-center shadow-md">
-                                    <span class="text-black text-sm">+</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Update Button -->
-                    <button @click="updateHospital('rsud_wahidin')" class="w-full bg-white text-black text-sm font-semibold py-2 rounded-lg" style="box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);">
-                        Update
-                    </button>
-                </div>
             </div>
         </div>
 
-        <!-- Pagination -->
-        <div class="flex items-center justify-center py-4">
-            <div class="flex items-center space-x-4">
-                <button class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded transition-colors">
-                    <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                    </svg>
-                </button>
-                <span class="text-sm text-gray-600 font-medium">10 / 33</span>
-                <button class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded transition-colors">
-                    <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                    </svg>
-                </button>
-            </div>
-        </div>
     </div>
 
     <script>
         function adminDashboard() {
             return {
-                hospitals: {
-                    rsud_sidoarjo: {
-                        vvip: 10,
-                        class1: 10,
-                        class2: 10,
-                        class3: 10
-                    },
-                    rsud_soewandhie: {
-                        vvip: 10,
-                        class1: 10,
-                        class2: 10,
-                        class3: 10
-                    },
-                    rsud_wahidin: {
-                        vvip: 10,
-                        class1: 10,
-                        class2: 10,
-                        class3: 10
+                hospitals: @json($hospitalsData),
+
+                increaseQuantity(hospitalId, roomType) {
+                    const hospital = this.hospitals.find(h => h.id === hospitalId);
+                    if (hospital && hospital.rooms[roomType] < 999) {
+                        hospital.rooms[roomType]++;
+                        this.updateRoomQuantity(hospitalId, roomType, hospital.rooms[roomType]);
                     }
                 },
 
-                increaseQuantity(hospital, roomType) {
-                    if (this.hospitals[hospital][roomType] < 99) {
-                        this.hospitals[hospital][roomType]++;
+                decreaseQuantity(hospitalId, roomType) {
+                    const hospital = this.hospitals.find(h => h.id === hospitalId);
+                    if (hospital && hospital.rooms[roomType] > 0) {
+                        hospital.rooms[roomType]--;
+                        this.updateRoomQuantity(hospitalId, roomType, hospital.rooms[roomType]);
                     }
                 },
 
-                decreaseQuantity(hospital, roomType) {
-                    if (this.hospitals[hospital][roomType] > 0) {
-                        this.hospitals[hospital][roomType]--;
-                    }
+                updateRoomQuantity(hospitalId, roomType, quantity) {
+                    // Simple update without AJAX - just update the UI
+                    // Data will be saved when user clicks "Update" button
+                    console.log(`Updated ${roomType} to ${quantity} for hospital ${hospitalId}`);
                 },
 
-                updateHospital(hospital) {
-                    // Here you would typically send the data to your backend
-                    console.log(`Updating ${hospital}:`, this.hospitals[hospital]);
+                updateHospital(hospitalId) {
+                    const hospital = this.hospitals.find(h => h.id === hospitalId);
+                    if (!hospital) return;
+
+                    // Create a form and submit it
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '{{ route("admin.update-hospital") }}';
                     
-                    // Show success message (you can replace this with a proper notification)
-                    alert(`Hospital ${hospital} updated successfully!`);
+                    // Add CSRF token
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                    if (csrfToken) {
+                        const csrfInput = document.createElement('input');
+                        csrfInput.type = 'hidden';
+                        csrfInput.name = '_token';
+                        csrfInput.value = csrfToken;
+                        form.appendChild(csrfInput);
+                    }
+                    
+                    // Add hospital ID
+                    const hospitalInput = document.createElement('input');
+                    hospitalInput.type = 'hidden';
+                    hospitalInput.name = 'hospital_id';
+                    hospitalInput.value = hospitalId;
+                    form.appendChild(hospitalInput);
+                    
+                    // Add rooms data
+                    const roomsInput = document.createElement('input');
+                    roomsInput.type = 'hidden';
+                    roomsInput.name = 'rooms';
+                    roomsInput.value = JSON.stringify(hospital.rooms);
+                    form.appendChild(roomsInput);
+                    
+                    document.body.appendChild(form);
+                    form.submit();
+                },
+
+                getHospitalSlug(hospital) {
+                    // Map hospital names to slugs for display
+                    const slugMap = {
+                        'RSUD Sidoarjo': 'rsud_sidoarjo',
+                        'RSUD Dr. Mohammad Soewandhie': 'rsud_soewandhie',
+                        'RSUD Dr Wahidin Sudiro Husodo': 'rsud_wahidin'
+                    };
+                    return slugMap[hospital.name] || hospital.slug;
                 }
             }
         }

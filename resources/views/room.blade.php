@@ -54,77 +54,30 @@
 
                 <!-- Hospital Cards -->
                 <div class="space-y-4 pb-20">
-                    <!-- RSUD Sidoarjo -->
-                    <a href="{{ route('checking', ['hospital_id' => 'rsud-sidoarjo']) }}" class="block">
+                    @foreach($hospitalsData as $hospital)
+                    <a href="{{ route('checking', ['hospital_id' => $hospital['slug']]) }}" class="block">
                         <div
                             class="bg-[#9AC1D6] rounded-2xl p-4 shadow-md hover:shadow-lg h-[120px] transition-all duration-200 hover:bg-[#8BB5CD] cursor-pointer">
                             <div class="flex justify-between items-start h-full">
                                 <div class="flex-1 pr-4 flex flex-col">
-                                    <h3 class="font-bold text-gray-800 mb-1 line-clamp-1">RSUD Sidoarjo</h3>
-                                    <div class="text-xs font-medium px-0 py-1 rounded mb-2 inline-block">
-                                        NOT ROOM AVAILABLE
+                                    <h3 class="font-bold text-gray-800 mb-1 line-clamp-1">{{ $hospital['name'] }}</h3>
+                                    <div class="text-xs font-medium px-0 py-1 rounded mb-2 inline-block {{ $hospital['status_class'] }}">
+                                        {{ $hospital['status'] }}
                                     </div>
-                                    <p class="text-xs text-blue-600 mb-1 truncate">https://rsud.sidoarjokab.go.id/</p>
-                                    <p class="text-xs text-gray-500 mt-auto">Rabu, 25 Juni 2025</p>
+                                    <p class="text-xs text-blue-600 mb-1 truncate">{{ $hospital['website_url'] }}</p>
+                                    <p class="text-xs text-gray-500 mt-auto">{{ date('l, d F Y') }}</p>
                                 </div>
                                 <div class="relative w-28 flex-shrink-0">
                                     <div class="aspect-[4/3] bg-gray-200 rounded-lg overflow-hidden">
-                                        <img src="{{ asset('images/hospitals/rsud_sidoarjo.jpg') }}" alt="RSUD Sidoarjo"
+                                        <img src="{{ asset($hospital['image_url']) }}" alt="{{ $hospital['name'] }}"
                                             class="w-full h-full object-cover">
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </a>
+                    @endforeach
 
-                    <!-- RSUD Dr. Mohammad Soewandhie -->
-                    <a href="{{ route('checking', ['hospital_id' => 'rsud-soewandhie']) }}" class="block">
-                        <div
-                            class="bg-[#9AC1D6] rounded-2xl p-4 shadow-md hover:shadow-lg h-[150px] transition-all duration-200 hover:bg-[#8BB5CD] cursor-pointer">
-                            <div class="flex justify-between items-start h-full">
-                                <div class="flex-1 pr-4 flex flex-col">
-                                    <h3 class="font-bold text-gray-800 mb-1 line-clamp-2">RSUD Dr. Mohammad Soewandhie
-                                    </h3>
-                                    <div class="text-xs font-medium px-0 py-1 rounded mb-2 inline-block">
-                                        NO ROOM AVAILABLE
-                                    </div>
-                                    <p class="text-xs text-blue-600 mb-1 max-w-m">https://rs-soewandhie.surabaya.go.id/
-                                    </p>
-                                    <p class="text-xs text-gray-500 mt-auto">Rabu, 25 Juni 2025</p>
-                                </div>
-                                <div class="relative w-28 flex-shrink-0">
-                                    <div class="aspect-[4/3] bg-gray-200 rounded-lg overflow-hidden">
-                                        <img src="{{ asset('images/hospitals/rsud_soewandhie.jpg') }}"
-                                            alt="RSUD Dr. Mohammad Soewandhie" class="w-full h-full object-cover">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-
-                    <!-- RSUD Dr Wahidin Sudiro Husodo -->
-                    <a href="{{ route('checking', ['hospital_id' => 'rsud-wahidin']) }}" class="block">
-                        <div
-                            class="bg-[#9AC1D6] rounded-2xl p-4 shadow-md hover:shadow-lg h-[150px] transition-all duration-200 hover:bg-[#8BB5CD] cursor-pointer">
-                            <div class="flex justify-between items-start h-full">
-                                <div class="flex-1 pr-4 flex flex-col">
-                                    <h3 class="font-bold text-gray-800 mb-1 line-clamp-2">RSUD Dr Wahidin Sudiro Husodo
-                                    </h3>
-                                    <div class=" text-xs font-medium px-0 py-1 rounded mb-2 inline-block">
-                                        10 ROOM AVAILABLE
-                                    </div>
-                                    <p class="text-xs text-blue-600 mb-1 truncate">https://rssurabaya.com/</p>
-                                    <p class="text-xs text-gray-500 mt-auto">Rabu, 25 Juni 2025</p>
-                                </div>
-                                <div class="relative w-28 flex-shrink-0">
-                                    <div class="aspect-[4/3] bg-gray-200 rounded-lg overflow-hidden">
-                                        <img src="{{ asset('images/hospitals/rsud_wahidin.jpg') }}"
-                                            alt="RSUD Dr Wahidin Sudiro Husodo" class="w-full h-full object-cover">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
                 </div>
             </div>
         </div>
@@ -237,64 +190,24 @@
 
                     <!-- Hospital Cards Grid -->
                     <div class="grid gap-6">
-                        <!-- RSUD Sidoarjo -->
+                        @foreach($hospitalsData as $hospital)
                         <div class="bg-gray-50 rounded-2xl p-6 shadow-sm">
                             <div class="flex justify-between items-start">
                                 <div class="flex-1 pr-6">
-                                    <h3 class="text-xl font-semibold text-gray-800 mb-2">RSUD Sidoarjo</h3>
-                                    <div
-                                        class="bg-red-100 text-red-600 text-sm font-medium px-3 py-1 rounded mb-3 inline-block">
-                                        NOT ROOM AVAILABLE
+                                    <h3 class="text-xl font-semibold text-gray-800 mb-2">{{ $hospital['name'] }}</h3>
+                                    <div class="text-sm font-medium px-3 py-1 rounded mb-3 inline-block {{ $hospital['total_rooms'] > 0 ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600' }}">
+                                        {{ $hospital['status'] }}
                                     </div>
-                                    <p class="text-sm text-blue-600 mb-2">https://rsud.sidoarjokab.go.id/</p>
-                                    <p class="text-sm text-gray-500">Rabu, 25 Juni 2025</p>
+                                    <p class="text-sm text-blue-600 mb-2">{{ $hospital['website_url'] }}</p>
+                                    <p class="text-sm text-gray-500">{{ date('l, d F Y') }}</p>
                                 </div>
                                 <div class="w-32 h-24 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
-                                    <img src="/placeholder.svg?height=96&width=128" alt="RSUD Sidoarjo"
+                                    <img src="{{ asset($hospital['image_url']) }}" alt="{{ $hospital['name'] }}"
                                         class="w-full h-full object-cover">
                                 </div>
                             </div>
                         </div>
-
-                        <!-- RSUD Dr. Mohammad Soewandhie -->
-                        <div class="bg-gray-50 rounded-2xl p-6 shadow-sm">
-                            <div class="flex justify-between items-start">
-                                <div class="flex-1 pr-6">
-                                    <h3 class="text-xl font-semibold text-gray-800 mb-2">RSUD Dr. Mohammad Soewandhie
-                                    </h3>
-                                    <div
-                                        class="bg-red-100 text-red-600 text-sm font-medium px-3 py-1 rounded mb-3 inline-block">
-                                        NO ROOM AVAILABLE
-                                    </div>
-                                    <p class="text-sm text-blue-600 mb-2">https://rs-soewandhie.surabaya.go.id/</p>
-                                    <p class="text-sm text-gray-500">Rabu, 25 Juni 2025</p>
-                                </div>
-                                <div class="w-32 h-24 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
-                                    <img src="/placeholder.svg?height=96&width=128" alt="RSUD Dr. Mohammad Soewandhie"
-                                        class="w-full h-full object-cover">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- RSUD Dr Wahidin Sudiro Husodo -->
-                        <div class="bg-gray-50 rounded-2xl p-6 shadow-sm">
-                            <div class="flex justify-between items-start">
-                                <div class="flex-1 pr-6">
-                                    <h3 class="text-xl font-semibold text-gray-800 mb-2">RSUD Dr Wahidin Sudiro Husodo
-                                    </h3>
-                                    <div
-                                        class="bg-green-100 text-green-600 text-sm font-medium px-3 py-1 rounded mb-3 inline-block">
-                                        10 ROOM AVAILABLE
-                                    </div>
-                                    <p class="text-sm text-blue-600 mb-2">https://rssurabaya.com/</p>
-                                    <p class="text-sm text-gray-500">Rabu, 25 Juni 2025</p>
-                                </div>
-                                <div class="w-32 h-24 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
-                                    <img src="/placeholder.svg?height=96&width=128"
-                                        alt="RSUD Dr Wahidin Sudiro Husodo" class="w-full h-full object-cover">
-                                </div>
-                            </div>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
             </div>

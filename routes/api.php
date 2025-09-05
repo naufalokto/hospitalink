@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AdminController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,7 +27,17 @@ Route::post('/auth/logout', [AuthController::class, 'logout'])->middleware('auth
 
 
 
+// Public API Routes (for patient side)
+Route::get('/hospitals/rooms', [AdminController::class, 'getPublicRoomData']);
+
 // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/auth/user', [AuthController::class, 'user']);
+    
+    // Admin Routes
+    Route::middleware('admin')->group(function () {
+        Route::get('/admin/hospitals', [AdminController::class, 'getHospitals']);
+        Route::post('/admin/hospitals/{hospital}/rooms/update', [AdminController::class, 'updateRoomQuantities']);
+        Route::post('/admin/hospitals/{hospital}/rooms/update-all', [AdminController::class, 'updateAllRoomQuantities']);
+    });
 });

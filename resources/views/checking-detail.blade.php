@@ -22,7 +22,7 @@
         <!-- Header -->
         <div class="px-4 py-3">
             <div class="flex items-center justify-between mb-4">
-                <a href="{{ route('checking', ['hospital_id' => $hospital['id']]) }}"
+                <a href="{{ route('checking', ['hospital_id' => $hospital->slug]) }}"
                     class="text-black hover:text-gray-600 transition-colors flex items-center mt-5">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
@@ -41,7 +41,7 @@
 
             <!-- Hospital Name -->
             <div class="text-center mb-1">
-                <h2 class="text-black text-3xl font-bold">{{ $hospital['name'] }}</h2>
+                <h2 class="text-black text-3xl font-bold">{{ $hospital->name }}</h2>
             </div>
 
             <!-- Location -->
@@ -55,12 +55,7 @@
                 <div>
                     <h3 class="text-black text-lg font-bold mb-2">TENTANG</h3>
                     <p class="text-black text-sm leading-relaxed text-justify">
-                        Kamar VVIP di RSUD Sidoarjo adalah ruang perawatan ekslusif yang dirancang untuk memberikan
-                        pengalaman menginap yang nyaman dan mewah. Ruangan ini telah memenuhi perlatan khusus, dengan
-                        fasilitas modern dan nyaman. Kamar VVIP menyediakan lingkungan yang tenang dan pribadi untuk
-                        pasien serta keluarga. Staff medis yang terlatih dengan baik dan memberikan perawatan yang
-                        personal dan terbaik karena hanya ada 3 kamar yang tersedia. RSUD Sidoarjo selalu pilihan utama
-                        bagi mereka yang menginginkan layanan informasi terbaik.
+                        {{ $room['description'] }}
                     </p>
                 </div>
 
@@ -68,28 +63,24 @@
                 <div>
                     <h3 class="text-black text-lg font-bold mb-2">FASILITAS</h3>
                     <ul class="text-black text-sm space-y-2">
-                        <li>• 1 Bed Pasien</li>
-                        <li>• 1 Ruang Keluarga/Pribadi</li>
-                        <li>• 1 Lemari ES</li>
-                        <li>• 1 Kamar mandi</li>
-                        <li>• Wastafel</li>
-                        <li>• AC</li>
-                        <li>• TV</li>
+                        @foreach($room['facilities'] as $facility)
+                            <li>• {{ $facility }}</li>
+                        @endforeach
                     </ul>
                 </div>
 
                 <!-- Harga Section -->
                 <div>
                     <h3 class="text-black text-lg font-bold mb-2">HARGA</h3>
-                    <p class="text-black text-sm">Rp 825.000,- Per hari</p>
+                    <p class="text-black text-sm">{{ $room['price'] }}</p>
                 </div>
 
                 <!-- Booking Button -->
                 <div class="flex justify-end">
-                    <button
-                        class="w-40 bg-[#0B9078] text-white font-bold py-3 rounded-xl text-base hover:bg-[#097A63] transition-colors shadow-2xl mb-7">
+                    <a href="{{ route('booking.form', ['hospital_id' => $hospital->slug, 'room_id' => $room['id']]) }}"
+                        class="w-40 bg-[#0B9078] text-white font-bold py-3 rounded-xl text-base hover:bg-[#097A63] transition-colors shadow-2xl mb-7 text-center">
                         BOOKING ROOM
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>
