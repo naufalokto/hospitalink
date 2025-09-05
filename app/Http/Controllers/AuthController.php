@@ -49,7 +49,10 @@ class AuthController extends Controller
                     // Store token in session for API access
                     session(['auth_token' => $testUser->createToken('auth-token')->plainTextToken]);
                     
-                    // Redirect to dashboard
+                    // Redirect based on user role
+                    if ($testUser->isAdmin()) {
+                        return redirect()->route('admin-dashboard')->with('success', 'Test login successful!');
+                    }
                     return redirect()->route('dashboard')->with('success', 'Test login successful!');
                 }
                 
@@ -106,6 +109,7 @@ class AuthController extends Controller
                         'google_id' => $googleUser->getId(),
                         'avatar' => $googleUser->getAvatar(),
                         'password' => Hash::make(Str::random(16)), // Random password for Google users
+                        'role' => 'patient', // Default role for OAuth users
                         'email_verified_at' => now(), // Google emails are verified
                     ]);
                 }
@@ -117,7 +121,10 @@ class AuthController extends Controller
             // Store token in session for API access
             session(['auth_token' => $user->createToken('auth-token')->plainTextToken]);
 
-            // Redirect to dashboard
+            // Redirect based on user role
+            if ($user->isAdmin()) {
+                return redirect()->route('admin-dashboard')->with('success', 'Login successful!');
+            }
             return redirect()->route('dashboard')->with('success', 'Login successful!');
 
         } catch (\Exception $e) {
@@ -227,6 +234,7 @@ class AuthController extends Controller
                         'facebook_id' => $facebookUser->getId(),
                         'avatar' => $facebookUser->getAvatar(), // Now using TEXT column, can handle long URLs
                         'password' => Hash::make(Str::random(16)), // Random password for Facebook users
+                        'role' => 'patient', // Default role for OAuth users
                         'email_verified_at' => $facebookUser->getEmail() ? now() : null, // Only verify if we got email
                     ]);
                     \Log::info('New user created', ['user_id' => $user->id]);
@@ -241,8 +249,11 @@ class AuthController extends Controller
             session(['auth_token' => $user->createToken('auth-token')->plainTextToken]);
             \Log::info('Auth token stored in session');
 
-            // Redirect to dashboard
-            \Log::info('Redirecting to dashboard');
+            // Redirect based on user role
+            \Log::info('Redirecting based on user role');
+            if ($user->isAdmin()) {
+                return redirect()->route('admin-dashboard')->with('success', 'Facebook login successful!');
+            }
             return redirect()->route('dashboard')->with('success', 'Facebook login successful!');
 
         } catch (\Exception $e) {
@@ -293,6 +304,7 @@ class AuthController extends Controller
                         'twitter_id' => $twitterUser->getId(),
                         'avatar' => $twitterUser->getAvatar(),
                         'password' => Hash::make(Str::random(16)), // Random password for Twitter users
+                        'role' => 'patient', // Default role for OAuth users
                         'email_verified_at' => now(), // Twitter emails are verified
                     ]);
                 }
@@ -331,6 +343,7 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'role' => 'patient', // Default role for registered users
         ]);
 
         Auth::login($user);
@@ -356,18 +369,22 @@ class AuthController extends Controller
         if (Auth::attempt($request->only('email', 'password'))) {
             $user = Auth::user();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Login successful',
-                'user' => $user,
-                'token' => $user->createToken('auth-token')->plainTextToken ?? null,
-            ]);
+            // Redirect based on user role
+            if ($user->isAdmin()) {
+                return redirect()->route('admin-dashboard')->with('success', 'Login successful!');
+            }
+            return redirect()->route('dashboard')->with('success', 'Login successful!');
         }
 
-        return response()->json([
-            'success' => false,
-            'message' => 'Invalid credentials',
-        ], 401);
+        // For web requests, redirect back with error
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid credentials',
+            ], 401);
+        }
+
+        return redirect()->back()->withErrors(['email' => 'Invalid credentials']);
     }
 
     /**

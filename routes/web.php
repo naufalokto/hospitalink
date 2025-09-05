@@ -22,6 +22,8 @@ Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
 
+Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+
 Route::post('/logout', function () {
     Auth::logout();
     return redirect('/login'); 
@@ -36,6 +38,10 @@ Route::get('/register', function () {
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->name('dashboard');
+
+Route::get('/admin-dashboard', function () {
+    return view('admin-dashboard');
+})->name('admin-dashboard')->middleware('admin');
 
 Route::get('/hospital', [HospitalController::class, 'index'])->name('hospital');
 Route::get('/hospital/{slug}', [HospitalController::class, 'show'])->name('hospital.detail');

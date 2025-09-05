@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(HospitalSeeder::class);
         $this->call(NewsSeeder::class);
+        $this->call(AdminUserSeeder::class);
 
         User::factory()->create([
             'name' => 'Test User',

@@ -17,6 +17,17 @@
 <body class="h-full bg-[#00A2FA] font-sans">
 
     <div class="lg:hidden min-h-screen flex flex-col">
+        <!-- Logout Button -->
+        <div class="absolute top-4 right-4 z-10">
+            <form method="POST" action="{{ route('logout') }}" class="inline">
+                @csrf
+                <button type="submit" class="bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full p-2 transition-colors" title="Logout">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                    </svg>
+                </button>
+            </form>
+        </div>
 
         <div class="pt-8 pb-4 px-6 text-center -mt-4">
             <img src="{{ asset('images/Logo-Hospitalink2.png') }}" alt="HOSPITALINK" class="mx-auto h-24 mb-1">
@@ -203,7 +214,19 @@
             </div>
 
             Main Content
-            <div class="w-[85%] bg-[#00A2FA] overflow-y-auto">
+            <div class="w-[85%] bg-[#00A2FA] overflow-y-auto relative">
+                <!-- Logout Button -->
+                <div class="absolute top-4 right-4 z-10">
+                    <form method="POST" action="{{ route('logout') }}" class="inline">
+                        @csrf
+                        <button type="submit" class="bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full p-2 transition-colors" title="Logout">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+                
                 Header
                 <div class="pt-8 pb-6 px-8 text-center">
                     <img src="{{ asset('images/logo-hospitalink.png') }}" alt="HOSPITALINK"

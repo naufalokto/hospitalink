@@ -64,6 +64,12 @@
                 <div x-show="loginError" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded text-sm">
                     <span x-text="loginError"></span>
                 </div>
+                
+                @if ($errors->has('email'))
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded text-sm">
+                    {{ $errors->first('email') }}
+                </div>
+                @endif
 
                 <!-- Success Message -->
                 <div x-show="loginSuccess" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded text-sm">
@@ -185,10 +191,10 @@
                         class="block w-9 h-9 sm:w-10 sm:h-10 rounded-full border-1 border-gray-300 overflow-hidden hover:scale-110 transition-transform">
                         <img src="/images/Google_Logo.jpg" alt="Google" class="w-full h-full object-cover scale-125">
                     </a>
-                    <a href="/auth/twitter"
+                    <button @click="showTwitterPopup = true"
                         class="block w-9 h-9 sm:w-10 sm:h-10 rounded-full border-1 border-gray-300 overflow-hidden -translate-x-1 hover:scale-110 transition-transform">
                         <img src="/images/X_Logo.png" alt="X" class="w-full h-full object-cover scale-75">
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>
@@ -229,6 +235,12 @@
                     <div x-show="loginError" class="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded text-xs">
                         <span x-text="loginError"></span>
                     </div>
+                    
+                    @if ($errors->has('email'))
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded text-xs">
+                        {{ $errors->first('email') }}
+                    </div>
+                    @endif
 
                     <!-- Success Message -->
                     <div x-show="loginSuccess" class="bg-green-100 border border-green-400 text-green-700 px-3 py-2 rounded text-xs">
@@ -349,11 +361,41 @@
                         <a href="/auth/google" class="bg-red-600 text-white p-1.5 rounded-full hover:bg-red-700 text-xs transition-colors">
                             <i class="fab fa-google"></i>
                         </a>
-                        <a href="/auth/twitter" class="bg-black text-white p-1.5 rounded-full hover:bg-gray-800 text-xs transition-colors">
+                        <button @click="showTwitterPopup = true" class="bg-black text-white p-1.5 rounded-full hover:bg-gray-800 text-xs transition-colors">
                             <i class="fab fa-x-twitter"></i>
-                        </a>
+                        </button>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Twitter Popup Modal -->
+    <div x-show="showTwitterPopup" x-cloak 
+         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+         @click.self="showTwitterPopup = false">
+        <div class="bg-white rounded-2xl p-6 mx-4 max-w-sm w-full shadow-2xl transform transition-all duration-300"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 scale-100"
+             x-transition:leave-end="opacity-0 scale-95">
+            
+            <!-- Close Button -->
+            <div class="flex justify-end mb-4">
+                <button @click="showTwitterPopup = false" 
+                        class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- Message -->
+            <div class="text-center">
+                <h3 class="text-lg font-semibold text-gray-800 mb-3">Maaf!</h3>
+                <p class="text-gray-600 text-sm leading-relaxed">
+                    Fitur login dengan Twitter belum tersedia saat ini. Silakan gunakan opsi login lainnya atau daftar dengan email.
+                </p>
             </div>
         </div>
     </div>
@@ -364,6 +406,7 @@
                 activeTab: 'login',
                 showPassword: false,
                 showConfirmPassword: false,
+                showTwitterPopup: false,
                 isLoading: false,
                 loginError: '',
                 loginSuccess: '',
@@ -386,25 +429,25 @@
                     this.loginSuccess = '';
                     
                     try {
-                        const response = await fetch('/api/auth/login', {
+                        const formData = new FormData();
+                        formData.append('email', this.loginForm.email);
+                        formData.append('password', this.loginForm.password);
+                        formData.append('_token', document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '');
+                        
+                        const response = await fetch('/login', {
                             method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
-                            },
-                            body: JSON.stringify(this.loginForm)
+                            body: formData
                         });
                         
-                        const data = await response.json();
-                        
-                        if (data.success) {
-                            this.loginSuccess = 'Login berhasil!';
-                            // Store token
-                            localStorage.setItem('auth_token', data.token);
-                            // Redirect to dashboard immediately
-                            window.location.href = '/dashboard';
+                        if (response.ok) {
+                            // Check if redirected to admin dashboard
+                            if (response.url.includes('/admin-dashboard')) {
+                                window.location.href = '/admin-dashboard';
+                            } else {
+                                window.location.href = '/dashboard';
+                            }
                         } else {
-                            this.loginError = data.message || 'Login gagal';
+                            this.loginError = 'Email atau password salah';
                         }
                     } catch (error) {
                         this.loginError = 'Terjadi kesalahan saat login';
