@@ -6,7 +6,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\HospitalController;
 use App\Http\Controllers\RoomViewController;
-
+use App\Http\Controllers\BookingController;
+use App\Http\Controllers\PaymentController;
 
 
 // Landing Page Route
@@ -27,7 +28,7 @@ Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 
 Route::post('/logout', function () {
     Auth::logout();
-    return redirect('/login'); 
+    return redirect('/login');
 })->name('logout');
 
 Route::get('/register', function () {
@@ -61,6 +62,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/booking/{booking_id}/invoice', [App\Http\Controllers\BookingController::class, 'showInvoice'])->name('booking.invoice');
     Route::get('/booking/{booking_id}/download', [App\Http\Controllers\BookingController::class, 'downloadInvoice'])->name('booking.download');
     Route::get('/my-bookings', [App\Http\Controllers\BookingController::class, 'myBookings'])->name('my-bookings');
+});
+
+// Payment Routes
+Route::prefix('payment')->group(function () {
+    Route::get('/detail-booking', [App\Http\Controllers\PaymentController::class, 'showDetailBooking'])->name('payment.detail-booking');
+    Route::get('/pay', [App\Http\Controllers\PaymentController::class, 'showPayment'])->name('payment.pay');
 });
 
 Route::get('/help', function () {

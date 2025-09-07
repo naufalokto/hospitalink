@@ -77,7 +77,7 @@
 
                 <!-- Booking Button -->
                 <div class="flex justify-end">
-                    <a href="{{ route('booking.form', ['hospital_id' => $hospital->slug, 'room_id' => $room['id']]) }}"
+                    <a href="{{ route('payment.detail-booking', ['hospital_id' => $hospital->slug, 'room_id' => $room['id']]) }}"
                         class="w-40 bg-[#0B9078] text-white font-bold py-3 rounded-xl text-base hover:bg-[#097A63] transition-colors shadow-2xl mb-7 text-center">
                         BOOKING ROOM
                     </a>

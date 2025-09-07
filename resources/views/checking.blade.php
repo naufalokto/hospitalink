@@ -49,7 +49,7 @@
 
         <!-- Room Types Section -->
         <div class="bg-[#00A2FA] py-4">
-            <div class="bg-[#B4DBF0] px-4 py-4 space-y-3 rounded-3xl -mb-6 pb-10">
+            <div class="bg-[#B4DBF0] px-4 py-4 space-y-3 rounded-t-3xl -mb-6">
                 @foreach ($roomTypes as $room)
                     <div class="bg-[#99C1D6] backdrop-blur-sm rounded-2xl p-4 shadow-sm">
                         <div class="flex justify-between">

@@ -16,70 +16,68 @@
 
 <body class="h-full bg-[#00A2FA] font-sans">
 
+    <!-- Mobile Layout (unchanged) -->
     <div class="lg:hidden min-h-screen flex flex-col">
-        <!-- Logout Button -->
-        <div class="absolute top-4 right-4 z-10">
-            <form method="POST" action="{{ route('logout') }}" class="inline">
-                @csrf
-                <button type="submit" class="bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full p-2 transition-colors" title="Logout">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                    </svg>
-                </button>
-            </form>
-        </div>
-
         <div class="pt-8 pb-4 px-6 text-center -mt-4">
             <img src="{{ asset('images/Logo-Hospitalink2.png') }}" alt="HOSPITALINK" class="mx-auto h-24 mb-1">
-
         </div>
 
-
         <div class="px-6 mb-4" x-data="carousel()">
-
-            <div class="bg-teal-600 rounded-2xl p-4 mb-3 overflow-hidden relative max-w-[340px] mx-auto">
-
+            <div class="rounded-2xl mb-3 overflow-hidden relative max-w-[340px] mx-auto">
                 <div class="flex transition-transform duration-500 ease-in-out"
                     :style="`transform: translateX(-${currentSlide * 100}%)`">
-
-                    <div class="w-full flex-shrink-0 flex items-center justify-between">
-                        <div class="text-white">
-                            <h3 class="font-bold text-sm mb-1">TURUN HARGA</h3>
-                            <h2 class="font-bold text-lg mb-1">BESAR-BESARAN</h2>
-                            <p class="text-xs leading-tight">SEMUA PRODUK<br>TURUN HINGGA 50%<br>BURUAN SEBELUM<br>DAN
-                                KEHABISAN</p>
+                    <!-- Slide 1 -->
+                    <div class="w-full flex-shrink-0 relative rounded-2xl overflow-hidden">
+                        <div class="absolute inset-0 bg-cover bg-center"
+                            style="background-image: url('/images/Iklan/Iklan-Slide1.jpg');">
+                            <div class="absolute inset-0 bg-black/40"></div>
                         </div>
-                        <div class="w-24 h-16 bg-white/20 rounded-lg flex items-center justify-center">
-                            <div class="w-16 h-12 bg-white/30 rounded"></div>
-                        </div>
-                    </div>
-
-                    <div class="w-full flex-shrink-0 flex items-center justify-between">
-                        <div class="text-white">
-                            <h3 class="font-bold text-sm mb-1">PROMO SPESIAL</h3>
-                            <h2 class="font-bold text-lg mb-1">ALAT KESEHATAN</h2>
-                            <p class="text-xs leading-tight">DAPATKAN DISKON<br>HINGGA 40%<br>UNTUK SEMUA<br>PRODUK
-                                PILIHAN</p>
-                        </div>
-                        <div class="w-24 h-16 bg-white/20 rounded-lg flex items-center justify-center">
-                            <div class="w-16 h-12 bg-white/30 rounded"></div>
+                        <div class="relative z-10 flex items-center justify-between p-4">
+                            <div class="text-white">
+                                <h3 class="font-bold text-sm mb-1">TURUN HARGA</h3>
+                                <h2 class="font-bold text-lg mb-1">BESAR-BESARAN</h2>
+                                <p class="text-xs leading-tight">
+                                    SEMUA PRODUK<br>TURUN HINGGA 50%<br>BURUAN SEBELUM<br>DAN KEHABISAN
+                                </p>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="w-full flex-shrink-0 flex items-center justify-between">
-                        <div class="text-white">
-                            <h3 class="font-bold text-sm mb-1">KONSULTASI</h3>
-                            <h2 class="font-bold text-lg mb-1">GRATIS</h2>
-                            <p class="text-xs leading-tight">KONSULTASI DENGAN<br>DOKTER AHLI<br>TANPA BIAYA<br>TAMBAHAN
-                            </p>
+                    <!-- Slide 2 -->
+                    <div class="w-full flex-shrink-0 relative rounded-2xl overflow-hidden">
+                        <div class="absolute inset-0 bg-cover bg-center"
+                            style="background-image: url('/images/Iklan/Iklan-Slide2.png');">
+                            <div class="absolute inset-0 bg-black/40"></div>
                         </div>
-                        <div class="w-24 h-16 bg-white/20 rounded-lg flex items-center justify-center">
-                            <div class="w-16 h-12 bg-white/30 rounded"></div>
+                        <div class="relative z-10 flex items-center justify-between p-4">
+                            <div class="text-white">
+                                <h3 class="font-bold text-sm mb-1">PROMO SPESIAL</h3>
+                                <h2 class="font-bold text-lg mb-1">ALAT KESEHATAN</h2>
+                                <p class="text-xs leading-tight">
+                                    DAPATKAN DISKON<br>HINGGA 40%<br>UNTUK SEMUA<br>PRODUK PILIHAN
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 3 -->
+                    <div class="w-full flex-shrink-0 relative rounded-2xl overflow-hidden">
+                        <div class="absolute inset-0 bg-cover bg-center"
+                            style="background-image: url('/images/Iklan/Iklan-Slide3.jpg');">
+                            <div class="absolute inset-0 bg-black/40"></div>
+                        </div>
+                        <div class="relative z-10 flex items-center justify-between p-4">
+                            <div class="text-white">
+                                <h3 class="font-bold text-sm mb-1">KONSULTASI</h3>
+                                <h2 class="font-bold text-lg mb-1">GRATIS</h2>
+                                <p class="text-xs leading-tight">
+                                    KONSULTASI DENGAN<br>DOKTER AHLI<br>TANPA BIAYA<br>TAMBAHAN
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-
 
             <div class="flex justify-center space-x-2 mb-3">
                 <template x-for="(slide, index) in slides" :key="index">
@@ -89,23 +87,15 @@
                 </template>
             </div>
 
-
-
-
-
             <div class="flex-1 bg-[#B4DBF1] rounded-t-3xl px-6 pt-6 pb-20 -mx-6">
-
                 <div class="flex items-center justify-between mb-5">
                     <h2 class="text-3xl font-bold text-gray-800 pl-4">HEALTH NEWS</h2>
-                    <div class="relative pr-5 pt-1">
+                    <a href="{{ route('my-bookings') }}" class="block">
                         <img src="{{ asset('images/icons/icon-notif.png') }}" alt="Notifications" class="w-7 h-9">
-
-                    </div>
+                    </a>
                 </div>
 
-
                 <div class="space-y-4">
-
                     <a href="{{ route('news.detail', ['slug' => 'flu-singapura-indonesia']) }}" class="block">
                         <div
                             class="bg-[#9AC1D6] rounded-2xl p-4 shadow-md max-w-[360px] mx-auto hover:bg-[#8BB5CD] transition-colors">
@@ -154,10 +144,9 @@
                 </div>
             </div>
 
-
+            <!-- Mobile Bottom Navigation -->
             <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
                 <div class="flex items-center justify-around py-2">
-
                     <div class="flex flex-col items-center py-2">
                         <img src="{{ asset('images/icons/icon-home.png') }}" alt="Home" class="w-6 h-6 mb-1">
                         <span class="text-xs text-black">Home</span>
@@ -181,219 +170,232 @@
                             class="w-7 h-7 mb-1 opacity-50">
                         <span class="text-xs text-gray-400">Help</span>
                     </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                    <a href="{{ route('my-bookings') }}" class="flex flex-col items-center py-2">
-                        <svg class="w-7 h-7 mb-1 opacity-50 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                        </svg>
-                        <span class="text-xs text-gray-400">My Bookings</span>
+    <!-- Enhanced Desktop Layout with better responsive design -->
+    <div class="hidden lg:flex h-screen bg-gray-50">
+        <!-- Enhanced Sidebar with better spacing and hover effects -->
+        <div class="w-64 xl:w-72 bg-white shadow-lg flex flex-col">
+            <!-- Added logo to desktop sidebar -->
+            <div class="p-6 xl:p-8 border-b border-gray-200">
+                <img src="{{ asset('images/Logo-Hospitalink2.png') }}" alt="HOSPITALINK"
+                    class="h-12 xl:h-16 mx-auto">
+            </div>
+
+            <nav class="flex-1 p-4 xl:p-6">
+                <ul class="space-y-3">
+                    <li>
+                        <a href="{{ route('dashboard') }}"
+                            class="flex items-center px-4 py-3 xl:py-4 text-[#00A2FA] bg-blue-50 rounded-lg">
+                            <img src="{{ asset('images/icons/icon-home.png') }}" alt="Home"
+                                class="w-6 h-6 xl:w-7 xl:h-7 mr-3">
+                            <span class="font-medium">Home</span>
+                            <div class="ml-auto w-2 h-2 bg-[#00A2FA] rounded-full"></div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('hospital') }}"
+                            class="flex items-center px-4 py-3 xl:py-4 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors group">
+                            <img src="{{ asset('images/icons/icon-hospital.png') }}" alt="Hospital"
+                                class="w-6 h-6 xl:w-7 xl:h-7 mr-3 opacity-60 group-hover:opacity-100">
+                            <span class="font-medium">Hospital</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('room') }}"
+                            class="flex items-center px-4 py-3 xl:py-4 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors group">
+                            <img src="{{ asset('images/icons/icon-room.png') }}" alt="Room"
+                                class="w-6 h-6 xl:w-7 xl:h-7 mr-3 opacity-60 group-hover:opacity-100">
+                            <span class="font-medium">Room</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('help') }}"
+                            class="flex items-center px-4 py-3 xl:py-4 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors group">
+                            <img src="{{ asset('images/icons/icon-help.png') }}" alt="Help"
+                                class="w-6 h-6 xl:w-7 xl:h-7 mr-3 opacity-60 group-hover:opacity-100">
+                            <span class="font-medium">Help</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Enhanced Main Content with better responsive layout -->
+        <div class="flex-1 overflow-y-auto">
+            <!-- Enhanced Header with better typography and spacing -->
+            <div class="bg-[#00A2FA] px-8 xl:px-12 py-8 xl:py-12 text-center">
+                <img src="{{ asset('images/logo-hospitalink.png') }}" alt="HOSPITALINK"
+                    class="mx-auto h-32 xl:h-40 2xl:h-48 mb-3 xl:mb-4">
+
+            <!-- Enhanced Carousel Section with better responsive design -->
+            <div class="px-8 xl:px-12 2xl:px-16 mb-8 xl:mb-12" x-data="carousel()">
+                <!-- Enhanced Carousel Container with better styling -->
+                <div
+                    class="bg-gradient-to-r from-teal-600 to-teal-700 rounded-2xl p-4 md:p-6 lg:p-8 mb-4 max-w-3xl mx-auto shadow-lg">
+                    <div class="flex transition-transform duration-500 ease-in-out"
+                        :style="`transform: translateX(-${currentSlide * 100}%)`">
+
+                        <!-- Slide 1 -->
+                        <div class="w-full flex-shrink-0 flex items-center justify-between">
+                            <div class="text-white">
+                                
+                                <h3 class="font-bold text-sm md:text-base mb-1"></h3>
+                                <h2 class="font-bold text-xl md:text-2xl mb-2"></h2>
+                                <p class="text-xs md:text-sm leading-snug">
+                                    
+                                </p>
+                            </div>
+        
+                        </div>
+
+                        <!-- Slide 2 -->
+                        <div class="w-full flex-shrink-0 flex items-center justify-between">
+                            <div class="text-white">
+                                <h3 class="font-bold text-sm md:text-base mb-1"></h3>
+                                <h2 class="font-bold text-xl md:text-2xl mb-2"></h2>
+                                <p class="text-xs md:text-sm leading-snug">
+                                   
+                                </p>
+                            </div>
+                            
+                        </div>
+
+                        <!-- Slide 3 -->
+                        <div class="w-full flex-shrink-0 flex items-center justify-between">
+                            <div class="text-white">
+                                <h3 class="font-bold text-sm md:text-base mb-1"></h3>
+                                <h2 class="font-bold text-xl md:text-2xl mb-2"></h2>
+                                <p class="text-xs md:text-sm leading-snug">
+                                    
+                                </p>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+                <!-- Enhanced Pagination Dots -->
+                <div class="flex justify-center space-x-3 xl:space-x-4 mb-6 xl:mb-8">
+                    <template x-for="(slide, index) in slides" :key="index">
+                        <button class="w-3 h-3 xl:w-4 xl:h-4 rounded-full transition-all duration-300 hover:scale-110"
+                            :class="currentSlide === index ? 'bg-white shadow-lg' : 'bg-white/50 hover:bg-white/70'"
+                            @click="goToSlide(index)">
+                        </button>
+                    </template>
+                </div>
+
+            </div>
+
+            <!-- Enhanced Health News Section -->
+            <div
+                class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-t-3xl xl:rounded-t-[2rem] px-8 xl:px-12 2xl:px-16 pt-8 xl:pt-12 pb-8 xl:pb-12 min-h-[50vh]">
+                <!-- Enhanced Header with better spacing -->
+                <div class="flex items-center justify-between mb-8 xl:mb-12 max-w-7xl mx-auto">
+                    <h2 class="text-4xl xl:text-5xl 2xl:text-6xl font-bold text-gray-800">HEALTH NEWS</h2>
+                    <div class="relative group cursor-pointer">
+                        <div
+                            class="p-2 xl:p-3 rounded-xl">
+                            <img src="{{ asset('images/icons/icon-notif.png') }}" alt="Notifications"
+                                class="w-8 h-8 xl:w-10 xl:h-10">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Enhanced News Cards Grid with better responsive layout -->
+                <div
+                    class="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-6 xl:gap-8 2xl:gap-10 max-w-7xl mx-auto">
+                    <!-- Enhanced News Card 1 -->
+                    <a href="{{ route('news.detail', ['slug' => 'flu-singapura-indonesia']) }}" class="block group">
+                        <div
+                            class="bg-white rounded-2xl xl:rounded-3xl p-6 xl:p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+                            <div class="mb-4 xl:mb-6">
+                                <img src="{{ asset('images/news/news-card1.png') }}" alt="Flu Singapura"
+                                    class="w-full h-32 xl:h-40 2xl:h-48 object-cover rounded-xl xl:rounded-2xl mb-4 xl:mb-6 group-hover:scale-105 transition-transform duration-300">
+                                <h3
+                                    class="font-bold text-base xl:text-lg 2xl:text-xl text-gray-800 mb-3 xl:mb-4 leading-tight group-hover:text-[#00A2FA] transition-colors">
+                                    Kasus FLU Singapura di Indonesia Meroket, Tembus hingga 5 Ribu</h3>
+                                <p class="text-sm xl:text-base text-gray-600 font-medium">SINDONEWS.com</p>
+                            </div>
+                        </div>
+                    </a>
+
+                    <!-- Enhanced News Card 2 -->
+                    <a href="{{ route('news.detail', ['slug' => 'kanker-usia-muda']) }}" class="block group">
+                        <div
+                            class="bg-white rounded-2xl xl:rounded-3xl p-6 xl:p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+                            <div class="mb-4 xl:mb-6">
+                                <img src="{{ asset('images/news/news-card2.jpg') }}" alt="Kanker Usus"
+                                    class="w-full h-32 xl:h-40 2xl:h-48 object-cover rounded-xl xl:rounded-2xl mb-4 xl:mb-6 group-hover:scale-105 transition-transform duration-300">
+                                <h3
+                                    class="font-bold text-base xl:text-lg 2xl:text-xl text-gray-800 mb-3 xl:mb-4 leading-tight group-hover:text-[#00A2FA] transition-colors">
+                                    Kebiasaan yang Tak Disadari Picu Kanker Usus Besar di Usia Muda</h3>
+                                <p class="text-sm xl:text-base text-gray-600 font-medium">Detikhealth.com</p>
+                            </div>
+                        </div>
+                    </a>
+
+                    <!-- Enhanced News Card 3 -->
+                    <a href="{{ route('news.detail', ['slug' => 'olahraga-kanker']) }}" class="block group">
+                        <div
+                            class="bg-white rounded-2xl xl:rounded-3xl p-6 xl:p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+                            <div class="mb-4 xl:mb-6">
+                                <img src="{{ asset('images/news/news-card3.jpg') }}" alt="Olahraga Lari"
+                                    class="w-full h-32 xl:h-40 2xl:h-48 object-cover rounded-xl xl:rounded-2xl mb-4 xl:mb-6 group-hover:scale-105 transition-transform duration-300">
+                                <h3
+                                    class="font-bold text-base xl:text-lg 2xl:text-xl text-gray-800 mb-3 xl:mb-4 leading-tight group-hover:text-[#00A2FA] transition-colors">
+                                    Olahraga Lari Bisa Turunkan Risiko Kanker dan Kematian Dini</h3>
+                                <p class="text-sm xl:text-base text-gray-600 font-medium">KOMPAS.com</p>
+                            </div>
+                        </div>
                     </a>
                 </div>
             </div>
         </div>
+    </div>
 
+    <script>
+        function carousel() {
+            return {
+                currentSlide: 0,
+                slides: [1, 2, 3],
+                autoSlideInterval: null,
 
-        <div class="hidden lg:flex h-screen">
+                init() {
+                    this.startAutoSlide();
+                },
 
-            <div class="w-[15%] bg-white shadow-lg flex flex-col items-center py-8">
-                <div class="space-y-8">
+                startAutoSlide() {
+                    this.autoSlideInterval = setInterval(() => {
+                        this.nextSlide();
+                    }, 4000);
+                },
 
-                    <div class="flex flex-col items-center">
-                        <img src="{{ asset('images/icons/home.png') }}" alt="Home" class="w-8 h-8 mb-2">
-                        <div class="w-2 h-2 bg-[#00A2FA] rounded-full"></div>
-                    </div>
-
-                    <div class="flex flex-col items-center">
-                        <img src="{{ asset('images/icons/icon-hospital.png') }}" alt="Hospital"
-                            class="w-8 h-8 opacity-50">
-                    </div>
-
-                    <div class="flex flex-col items-center">
-                        <img src="{{ asset('images/icons/icon-room.png') }}" alt="Room"
-                            class="w-8 h-8 opacity-50">
-                    </div>
-
-                    <div class="flex flex-col items-center">
-                        <img src="{{ asset('images/icons/icon-help.png') }}" alt="Help"
-                            class="w-8 h-8 opacity-50">
-                    </div>
-                </div>
-            </div>
-
-            Main Content
-            <div class="w-[85%] bg-[#00A2FA] overflow-y-auto relative">
-                <!-- Logout Button -->
-                <div class="absolute top-4 right-4 z-10">
-                    <form method="POST" action="{{ route('logout') }}" class="inline">
-                        @csrf
-                        <button type="submit" class="bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full p-2 transition-colors" title="Logout">
-                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                            </svg>
-                        </button>
-                    </form>
-                </div>
-                
-                Header
-                <div class="pt-8 pb-6 px-8 text-center">
-                    <img src="{{ asset('images/logo-hospitalink.png') }}" alt="HOSPITALINK"
-                        class="mx-auto h-32 mb-3">
-                    <h1 class="text-3xl font-bold text-red-500">HOSPITALINK</h1>
-                    <p class="text-lg text-red-400">Peduli Akses Kesehatan Anda</p>
-                </div>
-
-                Carousel Section
-                <div class="px-8 mb-8" x-data="carousel()">
-                    Carousel Container
-                    <div class="bg-teal-600 rounded-3xl p-8 mb-4 overflow-hidden relative max-w-4xl mx-auto">
-                        <div class="flex transition-transform duration-500 ease-in-out"
-                            :style="`transform: translateX(-${currentSlide * 100}%)`">
-                            Slide 1
-                            <div class="w-full flex-shrink-0 flex items-center justify-between">
-                                <div class="text-white">
-                                    <h3 class="font-bold text-lg mb-2">TURUN HARGA</h3>
-                                    <h2 class="font-bold text-3xl mb-3">BESAR-BESARAN</h2>
-                                    <p class="text-base leading-relaxed">SEMUA PRODUK<br>TURUN HINGGA 50%<br>BURUAN
-                                        SEBELUM<br>DAN KEHABISAN</p>
-                                </div>
-                                <div class="w-40 h-32 bg-white/20 rounded-2xl flex items-center justify-center">
-                                    <div class="w-32 h-24 bg-white/30 rounded-xl"></div>
-                                </div>
-                            </div>
-                            Slide 2
-                            <div class="w-full flex-shrink-0 flex items-center justify-between">
-                                <div class="text-white">
-                                    <h3 class="font-bold text-lg mb-2">PROMO SPESIAL</h3>
-                                    <h2 class="font-bold text-3xl mb-3">ALAT KESEHATAN</h2>
-                                    <p class="text-base leading-relaxed">DAPATKAN DISKON<br>HINGGA 40%<br>UNTUK
-                                        SEMUA<br>PRODUK PILIHAN</p>
-                                </div>
-                                <div class="w-40 h-32 bg-white/20 rounded-2xl flex items-center justify-center">
-                                    <div class="w-32 h-24 bg-white/30 rounded-xl"></div>
-                                </div>
-                            </div>
-                            Slide 3
-                            <div class="w-full flex-shrink-0 flex items-center justify-between">
-                                <div class="text-white">
-                                    <h3 class="font-bold text-lg mb-2">KONSULTASI</h3>
-                                    <h2 class="font-bold text-3xl mb-3">GRATIS</h2>
-                                    <p class="text-base leading-relaxed">KONSULTASI DENGAN<br>DOKTER AHLI<br>TANPA
-                                        BIAYA<br>TAMBAHAN</p>
-                                </div>
-                                <div class="w-40 h-32 bg-white/20 rounded-2xl flex items-center justify-center">
-                                    <div class="w-32 h-24 bg-white/30 rounded-xl"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    Pagination Dots
-                    <div class="flex justify-center space-x-3 mb-6">
-                        <template x-for="(slide, index) in slides" :key="index">
-                            <button class="w-3 h-3 rounded-full transition-colors duration-200"
-                                :class="currentSlide === index ? 'bg-white' : 'bg-white/50'" @click="goToSlide(index)">
-                            </button>
-                        </template>
-                    </div>
-
-                    Ad Banner
-                    <div class="flex items-center justify-center space-x-6">
-                        <span class="text-white text-lg">Anda Miliki Iklan?</span>
-                        <button
-                            class="border-2 border-white text-white px-6 py-2 rounded-full text-lg hover:bg-white hover:text-[#00A2FA] transition-colors">
-                            Masuk di sini
-                        </button>
-                    </div>
-                </div>
-
-                Health News Section
-                <div class="bg-gray-100 rounded-t-3xl px-8 pt-8 pb-8 min-h-[50vh]">
-                    Header
-                    <div class="flex items-center justify-between mb-8 max-w-6xl mx-auto">
-                        <h2 class="text-4xl font-bold text-gray-800">HEALTH NEWS</h2>
-                        <div class="relative">
-                            <img src="{{ asset('images/icons/notification.png') }}" alt="Notifications"
-                                class="w-8 h-8">
-                            <div
-                                class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
-                                <span class="text-white text-xs font-bold">3</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    News Cards Grid
-                    <div class="grid grid-cols-1 xl:grid-cols-3 lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
-                        News Card 1
-                        <div class="bg-[#D9D9D9] rounded-2xl p-6 shadow-sm">
-                            <div class="mb-4">
-                                <img src="{{ asset('images/news/news-card1.png') }}" alt="Flu Singapura" class="w-full h-32 object-cover rounded-xl mb-4">
-                                <h3 class="font-bold text-base text-gray-800 mb-3 leading-tight">Kasus FLU Singapura di
-                                    Indonesia Meroket, Tembus hingga 5 Ribu</h3>
-                                <p class="text-sm text-gray-600">SINDONEWS.com</p>
-                            </div>
-                        </div>
-
-                        News Card 2
-                        <div class="bg-[#D9D9D9] rounded-2xl p-6 shadow-sm">
-                            <div class="mb-4">
-                                <img src="{{ asset('images/news/news-card2.jpg') }}" alt="Kanker Usus" class="w-full h-32 object-cover rounded-xl mb-4">
-                                <h3 class="font-bold text-base text-gray-800 mb-3 leading-tight">Kebiasaan yang Tak
-                                    Disadari Picu Kanker Usus Besar di Usia Muda</h3>
-                                <p class="text-sm text-gray-600">Detikhealth.com</p>
-                            </div>
-                        </div>
-
-                        News Card 3
-                        <div class="bg-[#D9D9D9] rounded-2xl p-6 shadow-sm">
-                            <div class="mb-4">
-                                <img src="{{ asset('images/news/news-card3.jpg') }}" alt="Olahraga Lari" class="w-full h-32 object-cover rounded-xl mb-4">
-                                <h3 class="font-bold text-base text-gray-800 mb-3 leading-tight">Olahraga Lari Bisa
-                                    Turunkan Risiko Kanker dan Kematian Dini</h3>
-                                <p class="text-sm text-gray-600">KOMPAS.com</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <script>
-            function carousel() {
-                return {
-                    currentSlide: 0,
-                    slides: [1, 2, 3],
-                    autoSlideInterval: null,
-
-                    init() {
-                        this.startAutoSlide();
-                    },
-
-                    startAutoSlide() {
-                        this.autoSlideInterval = setInterval(() => {
-                            this.nextSlide();
-                        }, 4000);
-                    },
-
-                    stopAutoSlide() {
-                        if (this.autoSlideInterval) {
-                            clearInterval(this.autoSlideInterval);
-                        }
-                    },
-
-                    nextSlide() {
-                        this.currentSlide = (this.currentSlide + 1) % this.slides.length;
-                    },
-
-                    goToSlide(index) {
-                        this.currentSlide = index;
-                        this.stopAutoSlide();
-                        setTimeout(() => {
-                            this.startAutoSlide();
-                        }, 5000);
+                stopAutoSlide() {
+                    if (this.autoSlideInterval) {
+                        clearInterval(this.autoSlideInterval);
                     }
+                },
+
+                nextSlide() {
+                    this.currentSlide = (this.currentSlide + 1) % this.slides.length;
+                },
+
+                goToSlide(index) {
+                    this.currentSlide = index;
+                    this.stopAutoSlide();
+                    setTimeout(() => {
+                        this.startAutoSlide();
+                    }, 5000);
                 }
             }
-        </script>
+        }
+    </script>
 </body>
 
 </html>
