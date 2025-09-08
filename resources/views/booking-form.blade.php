@@ -22,7 +22,7 @@
         <!-- Header -->
         <div class="px-4 py-3">
             <div class="flex items-center justify-between mb-4">
-                <a href="{{ route('checking-detail', ['hospital_id' => $hospital->slug, 'room_id' => $room['id']]) }}"
+                <a href="{{ route('checking-detail', ['hospital_id' => $hospital->id, 'room_id' => $room['id']]) }}"
                     class="text-black hover:text-gray-600 transition-colors flex items-center mt-5">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
@@ -50,7 +50,7 @@
 
         <!-- Booking Form -->
         <div class="bg-white rounded-t-3xl px-4 py-6 min-h-screen">
-            <form action="{{ route('booking.process', ['hospital_id' => $hospital->slug, 'room_id' => $room['id']]) }}" 
+            <form action="{{ route('booking.process', ['hospital_id' => $hospital->id, 'room_id' => $room['id']]) }}" 
                   method="POST" class="space-y-4">
                 @csrf
 

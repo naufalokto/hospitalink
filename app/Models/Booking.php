@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 class Booking extends Model
@@ -75,5 +76,21 @@ class Booking extends Model
     public function getFormattedTotalPriceAttribute(): string
     {
         return 'Rp ' . number_format($this->total_price, 0, ',', '.') . ',-';
+    }
+
+    /**
+     * Get the payments for the booking
+     */
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    /**
+     * Get the latest payment for the booking
+     */
+    public function latestPayment(): BelongsTo
+    {
+        return $this->belongsTo(Payment::class, 'id', 'booking_id')->latest();
     }
 }

@@ -174,6 +174,32 @@
             <p>Invoice ini dibuat secara otomatis pada {{ $booking->created_at->format('d/m/Y H:i') }}</p>
         </div>
     </div>
+
+    {{-- Payment Success Modal --}}
+    @if(request()->boolean('paid') || ($booking->status === 'confirmed'))
+    <div id="paidModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 no-print">
+        <div class="bg-white rounded-xl shadow-2xl w-11/12 max-w-md p-6 text-center">
+            <div class="mx-auto mb-4 w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-green-600" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-7.25 7.25a1 1 0 01-1.414 0l-3-3a1 1 0 111.414-1.414l2.293 2.293 6.543-6.543a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-1">Pembayaran Berhasil</h3>
+            <p class="text-gray-600 mb-6">Booking <span class="font-semibold">#{{ $booking->booking_number }}</span> telah dikonfirmasi.</p>
+            <div class="flex items-center justify-center gap-3">
+                <button onclick="document.getElementById('paidModal').classList.add('hidden')" class="px-4 py-2 rounded-lg bg-gray-200 text-gray-800 hover:bg-gray-300">Tutup</button>
+                <button onclick="window.print()" class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700">Cetak Invoice</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Ensure modal is visible on load when condition matched
+        window.addEventListener('load', function () {
+            const m = document.getElementById('paidModal');
+            if (m) m.classList.remove('hidden');
+        });
+    </script>
+    @endif
 </body>
 
 </html>

@@ -26,6 +26,10 @@ class HospitalRoomSeeder extends Seeder
                     'class1_rooms' => 10,
                     'class2_rooms' => 10,
                     'class3_rooms' => 10,
+                    'vvip_price_per_day' => 800000,
+                    'class1_price_per_day' => 500000,
+                    'class2_price_per_day' => 300000,
+                    'class3_price_per_day' => 200000,
                 ]);
             }
         }

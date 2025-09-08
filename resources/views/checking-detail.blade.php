@@ -17,6 +17,26 @@
 </head>
 
 <body class="bg-[#00A2FA] min-h-screen">
+    @if(request()->boolean('paid'))
+    <div id="successOverlay" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+        <div id="successModal" class="relative" style="width:254px; height:359px; background:#D9D9D9; border-radius:10px;">
+            <button onclick="document.getElementById('successOverlay').remove()" aria-label="Close"
+                style="position:absolute; top:10px; left:10px; background:transparent; border:none; font-size:18px; line-height:1; cursor:pointer">✕</button>
+            <div style="padding:18px; text-align:center; display:flex; flex-direction:column; justify-content:center; align-items:center; height:100%; gap:12px;">
+                <div style="font-weight:700;">BOOKING ROOM SUCCESS</div>
+                <div style="font-size:12px; line-height:1.4;">
+                    SILAHKAN MENGHUBUNGI NOMOR DIBAWAH INI UNTUK MELAKUKAN KONFIRMASI BOOKING ROOM DAN PEMBAYARAN BOOKING ROOM
+                </div>
+                <div style="font-size:12px; line-height:1.4;">
+                    ({{ $hospital->name }})<br>
+                    BPJS - 0318961649<br>
+                    Non BPJS - 0218961649
+                </div>
+                <div style="font-size:12px; font-weight:700;">Berlaku hingga 10 menit</div>
+            </div>
+        </div>
+    </div>
+    @endif
     <!-- Mobile Layout -->
     <div class="lg:hidden">
         <!-- Header -->
@@ -77,7 +97,7 @@
 
                 <!-- Booking Button -->
                 <div class="flex justify-end">
-                    <a href="{{ route('payment.detail-booking', ['hospital_id' => $hospital->slug, 'room_id' => $room['id']]) }}"
+                    <a href="{{ route('payment.detail-booking', ['hospital_id' => $hospital->id, 'room_id' => $room['id']]) }}"
                         class="w-40 bg-[#0B9078] text-white font-bold py-3 rounded-xl text-base hover:bg-[#097A63] transition-colors shadow-2xl mb-7 text-center">
                         BOOKING ROOM
                     </a>
