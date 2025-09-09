@@ -28,17 +28,43 @@
         </div>
 
         <div class="bg-[#00A2FA] px-4 pb-4 mb-2 -mt-6 flex justify-center">
-            <div class="relative w-3/4">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i class="fas fa-search text-gray-400"></i>
+            <div class="relative w-44" x-data="{ open: false, selectedService: '{{ request()->query('service', 'ALL') }}' }">
+                <button @click="open = !open"
+                    class="w-full flex items-center justify-between bg-white px-3 py-1.5 rounded-3xl text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 shadow-md hover:shadow-lg transition-all duration-200">
+                    <span class="font-medium" x-text="selectedService">ALL</span>
+                    <svg :class="{ 'transform rotate-180': open }" class="w-4 h-4 ml-2 transition-transform duration-200"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+
+                <!-- Dropdown menu -->
+                <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 transform scale-95"
+                    x-transition:enter-end="opacity-100 transform scale-100"
+                    x-transition:leave="transition ease-in duration-100"
+                    x-transition:leave-start="opacity-100 transform scale-100"
+                    x-transition:leave-end="opacity-0 transform scale-95"
+                    class="absolute left-0 right-0 mt-1 bg-white rounded-xl shadow-lg z-50">
+                    <div class="py-1">
+                        <a href="{{ route('room', ['service' => 'ALL']) }}"
+                            class="block w-full text-left px-3 py-1.5 text-sm rounded-xl text-gray-700 hover:bg-gray-100 hover:text-gray-900">ALL</a>
+                        <a href="{{ route('room', ['service' => 'IGD 24 Jam']) }}"
+                            class="block w-full text-left px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">IGD
+                            24 Jam</a>
+                        <a href="{{ route('room', ['service' => 'Poliklinik']) }}"
+                            class="block w-full text-left px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">Poliklinik
+                            Spesialis</a>
+                        <a href="{{ route('room', ['service' => 'Farmasi 24 Jam']) }}"
+                            class="block w-full text-left px-3 py-1.5 text-sm rounded-xl text-gray-700 hover:bg-gray-100 hover:text-gray-900">Farmasi
+                            24 Jam</a>
+                    </div>
                 </div>
-                <input type="text" placeholder="Cari rekomendasi"
-                    class="w-full pl-10 pr-4 py-2 bg-white rounded-full text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-300 shadow-md hover:shadow-lg transition-shadow duration-200">
             </div>
         </div>
 
         <div class="px-6 mb-1" x-data="carousel()">
-            <div class="flex-1 bg-[#B4DBF1] rounded-t-3xl px-6 pt-6 pb-10 -mx-6">
+            <div class="flex-1 bg-[#B4DBF1] rounded-t-3xl px-6 pt-6 pb-40 -mx-6">
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-xl font-bold text-gray-800">CHECKING AND BOOKING ROOM</h2>
                     <div class="relative pr-1 pt-1">
@@ -110,7 +136,8 @@
         <div class="w-64 xl:w-72 bg-white shadow-lg flex flex-col">
             <!-- Logo Section -->
             <div class="p-6 xl:p-8 border-b border-gray-200">
-                <img src="{{ asset('images/Logo-Hospitalink3.png') }}" alt="HOSPITALINK" class="h-12 xl:h-16 mx-auto">
+                <img src="{{ asset('images/Logo-Hospitalink3.png') }}" alt="HOSPITALINK"
+                    class="h-12 xl:h-16 mx-auto">
             </div>
 
             <!-- Navigation Menu -->
