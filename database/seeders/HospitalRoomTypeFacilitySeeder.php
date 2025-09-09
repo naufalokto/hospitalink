@@ -16,29 +16,12 @@ class HospitalRoomTypeFacilitySeeder extends Seeder
         $hospitals = Hospital::all();
         $roomTypes = RoomType::all();
         
-        // Define facilities for each room type
-        $roomTypeFacilities = [
-            'vvip' => [
-                'AC', 'TV', 'Wi-Fi', 'Kamar mandi dalam', 'Nurse Call', 
-                'Lemari', 'Meja', 'Kursi', 'Wastafel', 'Lemari ES', 
-                'Ruang keluarga', 'Bed pasien', 'Telepon', 'Kulkas', 
-                'Sofa', 'Karpet', 'Lampu baca', 'Ventilasi', 'Pintu otomatis'
-            ],
-            'class1' => [
-                'AC', 'TV', 'Wi-Fi', 'Kamar mandi dalam', 'Nurse Call', 
-                'Lemari', 'Meja', 'Kursi', 'Wastafel', 'Bed pasien', 
-                'Telepon', 'Lampu baca', 'Ventilasi'
-            ],
-            'class2' => [
-                'AC', 'Wi-Fi', 'Kamar mandi dalam', 'Nurse Call', 
-                'Lemari', 'Meja', 'Kursi', 'Wastafel', 'Bed pasien', 
-                'Lampu baca', 'Ventilasi'
-            ],
-            'class3' => [
-                'AC', 'Kamar mandi dalam', 'Nurse Call', 
-                'Lemari', 'Meja', 'Kursi', 'Wastafel', 'Bed pasien', 
-                'Ventilasi'
-            ],
+        // Map room types to their corresponding facilities
+        $roomTypeToFacility = [
+            'vvip' => 'VVIP Facility',
+            'class1' => 'Class 1 Facility',
+            'class2' => 'Class 2/3 Facility',
+            'class3' => 'Class 2/3 Facility',
         ];
         
         foreach ($hospitals as $hospital) {
@@ -47,14 +30,13 @@ class HospitalRoomTypeFacilitySeeder extends Seeder
                     ->where('room_type_id', $roomType->id)
                     ->first();
                 
-                if ($hospitalRoomType && isset($roomTypeFacilities[$roomType->code])) {
-                    $facilities = $roomTypeFacilities[$roomType->code];
+                if ($hospitalRoomType && isset($roomTypeToFacility[$roomType->code])) {
+                    $facilityName = $roomTypeToFacility[$roomType->code];
+                    $facility = Facility::where('facility', $facilityName)->first();
                     
-                    foreach ($facilities as $facilityName) {
-                        $facility = Facility::where('facility', $facilityName)->first();
-                        if ($facility) {
-                            $hospitalRoomType->facilities()->syncWithoutDetaching([$facility->id]);
-                        }
+                    if ($facility) {
+                        // Attach the facility to this hospital room type
+                        $hospitalRoomType->facilities()->syncWithoutDetaching([$facility->id]);
                     }
                 }
             }

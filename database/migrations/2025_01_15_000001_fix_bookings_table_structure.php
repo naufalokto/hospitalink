@@ -9,6 +9,11 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // Only run if bookings table exists
+        if (!Schema::hasTable('bookings')) {
+            return;
+        }
+        
         Schema::table('bookings', function (Blueprint $table) {
             // Add foreign key constraint if room_type_id exists but doesn't have constraint
             if (Schema::hasColumn('bookings', 'room_type_id')) {

@@ -70,18 +70,44 @@ class AdditionalHospitalSeeder extends Seeder
                     continue;
                 }
 
+                // Set prices based on hospital and room type
+                $price = $this->getPriceForHospitalRoomType($hospital->slug, $roomType->code);
+                
                 HospitalRoomType::create([
                     'hospital_id' => $hospital->id,
                     'room_type_id' => $roomType->id,
                     'rooms_count' => 0, // Default empty - to be filled by team
-                    'price_per_day' => 0, // Default empty - to be filled by team
+                    'price_per_day' => $price,
                 ]);
                 
-                $this->command->info("  - Created room type: {$roomType->name} (Default: 0 rooms, 0 price)");
+                $this->command->info("  - Created room type: {$roomType->name} (Price: Rp " . number_format($price) . "/day)");
             }
         }
 
-        $this->command->info('✅ Successfully created 2 additional hospitals with empty data');
-        $this->command->info('📝 Note: Room counts and prices are set to 0 - to be filled by development team');
+        $this->command->info('✅ Successfully created 2 additional hospitals with correct pricing');
+        $this->command->info('📝 Note: Room counts are set to 0 - to be filled by development team');
+    }
+
+    /**
+     * Get price for specific hospital and room type
+     */
+    private function getPriceForHospitalRoomType(string $hospitalSlug, string $roomTypeCode): int
+    {
+        $prices = [
+            'rumahsakit-islam-surabaya' => [
+                'vvip' => 750000,
+                'class1' => 235000,
+                'class2' => 167000,
+                'class3' => 115000,
+            ],
+            'mayapada-hospital-surabaya' => [
+                'vvip' => 1345000,
+                'class1' => 750000,
+                'class2' => 530000,
+                'class3' => 267000,
+            ],
+        ];
+
+        return $prices[$hospitalSlug][$roomTypeCode] ?? 0;
     }
 }

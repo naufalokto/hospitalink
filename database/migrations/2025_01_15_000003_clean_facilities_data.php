@@ -9,14 +9,21 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // Only run if facilities table exists
+        if (!Schema::hasTable('facilities')) {
+            return;
+        }
+        
         // Remove incorrect facility entries (VVIP Facility, Class 1 Facility, Class 2/3 Facility)
         // These are not individual facilities but room type descriptions
         DB::table('facilities')->whereIn('id', [1, 2, 3])->delete();
         
         // Remove the items column as it's not needed in the normalized design
-        Schema::table('facilities', function (Blueprint $table) {
-            $table->dropColumn('items');
-        });
+        if (Schema::hasColumn('facilities', 'items')) {
+            Schema::table('facilities', function (Blueprint $table) {
+                $table->dropColumn('items');
+            });
+        }
         
         // Reset auto increment to start from 1
         DB::statement('ALTER TABLE facilities AUTO_INCREMENT = 1');
