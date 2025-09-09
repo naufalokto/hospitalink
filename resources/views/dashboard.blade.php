@@ -98,46 +98,61 @@
                 <div class="space-y-4">
                     <a href="{{ route('news.detail', ['slug' => 'flu-singapura-indonesia']) }}" class="block">
                         <div
-                            class="bg-[#9AC1D6] rounded-2xl p-4 shadow-md max-w-[360px] mx-auto hover:bg-[#8BB5CD] transition-colors">
-                            <div class="flex gap-8">
-                                <div class="flex-1 max-w-[55%]">
-                                    <h3 class="font-bold text-sm text-gray-800 mb-2 leading-tight">Kasus FLU Singapura
+                            class="bg-[#9AC1D6] rounded-2xl p-4 shadow-md mx-auto hover:bg-[#8BB5CD] transition-colors">
+                            <div class="flex items-center justify-between">
+                                <div class="flex-1 pr-6">
+                                    <h3 class="font-bold text-sm text-gray-800 mb-2 leading-tight line-clamp-3">Kasus
+                                        FLU Singapura
                                         di
                                         Indonesia Meroket, Tembus hingga 5 Ribu</h3>
                                     <p class="text-xs text-gray-600">SINDONEWS.com</p>
                                 </div>
-                                <img src="{{ asset('images/news/news-card1.png') }}" alt="Flu Singapura"
-                                    class="w-28 h-22 object-cover rounded-lg flex-shrink-0">
+                                <div class="flex-shrink-0 w-28">
+                                    <div class="aspect-[4/3] bg-gray-200 rounded-lg overflow-hidden">
+                                        <img src="{{ asset('images/news/news-card1.png') }}" alt="Flu Singapura"
+                                            class="w-full h-full object-cover">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </a>
 
                     <a href="{{ route('news.detail', ['slug' => 'kanker-usia-muda']) }}" class="block">
                         <div
-                            class="bg-[#9AC1D6] rounded-2xl p-4 shadow-md max-w-[360px] mx-auto hover:bg-[#8BB5CD] transition-colors">
-                            <div class="flex gap-8">
-                                <div class="flex-1 max-w-[55%]">
-                                    <h3 class="font-bold text-sm text-gray-800 mb-2 leading-tight">Kebiasaan yang Tak
+                            class="bg-[#9AC1D6] rounded-2xl p-4 shadow-md mx-auto hover:bg-[#8BB5CD] transition-colors">
+                            <div class="flex items-center justify-between">
+                                <div class="flex-1 pr-6">
+                                    <h3 class="font-bold text-sm text-gray-800 mb-2 leading-tight line-clamp-3">
+                                        Kebiasaan yang Tak
                                         Disadari Picu Kanker Usus Besar di Usia Muda</h3>
                                     <p class="text-xs text-gray-600">Detikhealth.com</p>
                                 </div>
-                                <img src="{{ asset('images/news/news-card2.jpg') }}" alt="Kanker Usus"
-                                    class="w-28 h-22 object-cover rounded-lg flex-shrink-0">
+                                <div class="flex-shrink-0 w-28">
+                                    <div class="aspect-[4/3] bg-gray-200 rounded-lg overflow-hidden">
+                                        <img src="{{ asset('images/news/news-card2.jpg') }}" alt="Kanker Usus"
+                                            class="w-full h-full object-cover">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </a>
 
                     <a href="{{ route('news.detail', ['slug' => 'olahraga-kanker']) }}" class="block">
                         <div
-                            class="bg-[#9AC1D6] rounded-2xl p-4 shadow-md max-w-[360px] mx-auto hover:bg-[#8BB5CD] transition-colors">
-                            <div class="flex gap-8">
-                                <div class="flex-1 max-w-[55%]">
-                                    <h3 class="font-bold text-sm text-gray-800 mb-2 leading-tight">Olahraga Lari Bisa
+                            class="bg-[#9AC1D6] rounded-2xl p-4 shadow-md mx-auto hover:bg-[#8BB5CD] transition-colors">
+                            <div class="flex items-center justify-between">
+                                <div class="flex-1 pr-6">
+                                    <h3 class="font-bold text-sm text-gray-800 mb-2 leading-tight line-clamp-3">Olahraga
+                                        Lari Bisa
                                         Turunkan Risiko Kanker dan Kematian Dini</h3>
                                     <p class="text-xs text-gray-600">KOMPAS.com</p>
                                 </div>
-                                <img src="{{ asset('images/news/news-card3.jpg') }}" alt="Olahraga Lari"
-                                    class="w-28 h-22 object-cover rounded-lg flex-shrink-0">
+                                <div class="flex-shrink-0 w-28">
+                                    <div class="aspect-[4/3] bg-gray-200 rounded-lg overflow-hidden">
+                                        <img src="{{ asset('images/news/news-card3.jpg') }}" alt="Olahraga Lari"
+                                            class="w-full h-full object-cover">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </a>
@@ -231,53 +246,53 @@
                 <img src="{{ asset('images/logo-hospitalink.png') }}" alt="HOSPITALINK"
                     class="mx-auto h-32 xl:h-40 2xl:h-48 mb-3 xl:mb-4">
 
-            <!-- Enhanced Carousel Section with better responsive design -->
-            <div class="px-8 xl:px-12 2xl:px-16 mb-8 xl:mb-12" x-data="carousel()">
-                <!-- Enhanced Carousel Container with better styling -->
-                <div
-                    class="bg-gradient-to-r from-teal-600 to-teal-700 rounded-2xl p-4 md:p-6 lg:p-8 mb-4 max-w-3xl mx-auto shadow-lg">
-                    <div class="flex transition-transform duration-500 ease-in-out"
-                        :style="`transform: translateX(-${currentSlide * 100}%)`">
+                <!-- Enhanced Carousel Section with better responsive design -->
+                <div class="px-8 xl:px-12 2xl:px-16 mb-8 xl:mb-12" x-data="carousel()">
+                    <!-- Enhanced Carousel Container with better styling -->
+                    <div
+                        class="bg-gradient-to-r from-teal-600 to-teal-700 rounded-2xl p-4 md:p-6 lg:p-8 mb-4 max-w-3xl mx-auto shadow-lg">
+                        <div class="flex transition-transform duration-500 ease-in-out"
+                            :style="`transform: translateX(-${currentSlide * 100}%)`">
 
-                        <!-- Slide 1 -->
-                        <div class="w-full flex-shrink-0 flex items-center justify-between">
-                            <div class="text-white">
-                                
-                                <h3 class="font-bold text-sm md:text-base mb-1"></h3>
-                                <h2 class="font-bold text-xl md:text-2xl mb-2"></h2>
-                                <p class="text-xs md:text-sm leading-snug">
-                                    
-                                </p>
-                            </div>
-        
-                        </div>
+                            <!-- Slide 1 -->
+                            <div class="w-full flex-shrink-0 flex items-center justify-between">
+                                <div class="text-white">
 
-                        <!-- Slide 2 -->
-                        <div class="w-full flex-shrink-0 flex items-center justify-between">
-                            <div class="text-white">
-                                <h3 class="font-bold text-sm md:text-base mb-1"></h3>
-                                <h2 class="font-bold text-xl md:text-2xl mb-2"></h2>
-                                <p class="text-xs md:text-sm leading-snug">
-                                   
-                                </p>
-                            </div>
-                            
-                        </div>
+                                    <h3 class="font-bold text-sm md:text-base mb-1"></h3>
+                                    <h2 class="font-bold text-xl md:text-2xl mb-2"></h2>
+                                    <p class="text-xs md:text-sm leading-snug">
 
-                        <!-- Slide 3 -->
-                        <div class="w-full flex-shrink-0 flex items-center justify-between">
-                            <div class="text-white">
-                                <h3 class="font-bold text-sm md:text-base mb-1"></h3>
-                                <h2 class="font-bold text-xl md:text-2xl mb-2"></h2>
-                                <p class="text-xs md:text-sm leading-snug">
-                                    
-                                </p>
+                                    </p>
+                                </div>
+
                             </div>
-                            
+
+                            <!-- Slide 2 -->
+                            <div class="w-full flex-shrink-0 flex items-center justify-between">
+                                <div class="text-white">
+                                    <h3 class="font-bold text-sm md:text-base mb-1"></h3>
+                                    <h2 class="font-bold text-xl md:text-2xl mb-2"></h2>
+                                    <p class="text-xs md:text-sm leading-snug">
+
+                                    </p>
+                                </div>
+
+                            </div>
+
+                            <!-- Slide 3 -->
+                            <div class="w-full flex-shrink-0 flex items-center justify-between">
+                                <div class="text-white">
+                                    <h3 class="font-bold text-sm md:text-base mb-1"></h3>
+                                    <h2 class="font-bold text-xl md:text-2xl mb-2"></h2>
+                                    <p class="text-xs md:text-sm leading-snug">
+
+                                    </p>
+                                </div>
+
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
 
                 <!-- Enhanced Pagination Dots -->
@@ -299,8 +314,7 @@
                 <div class="flex items-center justify-between mb-8 xl:mb-12 max-w-7xl mx-auto">
                     <h2 class="text-4xl xl:text-5xl 2xl:text-6xl font-bold text-gray-800">HEALTH NEWS</h2>
                     <div class="relative group cursor-pointer">
-                        <div
-                            class="p-2 xl:p-3 rounded-xl">
+                        <div class="p-2 xl:p-3 rounded-xl">
                             <img src="{{ asset('images/icons/icon-notif.png') }}" alt="Notifications"
                                 class="w-8 h-8 xl:w-10 xl:h-10">
                         </div>

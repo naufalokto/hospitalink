@@ -24,7 +24,7 @@
         </div>
 
         <div class="px-6 mb-4" x-data="carousel()">
-            <div class="flex-1 bg-[#B4DBF1] rounded-t-3xl px-6 pt-6 pb-24 -mx-6">
+            <div class="flex-1 bg-[#B4DBF1] rounded-t-3xl px-6 pt-6 pb-56  -mx-6">
                 <div class="w-full max-w-md mx-auto">
                     <div class="flex items-center justify-between mb-5">
                         <h2 class="text-2xl font-bold text-gray-800">HELP CENTER</h2>

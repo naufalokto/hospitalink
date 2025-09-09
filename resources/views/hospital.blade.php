@@ -23,7 +23,7 @@
         </div>
 
         <div class="px-6 mb-4" x-data="carousel()">
-            <div class="flex-1 bg-[#B4DBF1] rounded-t-3xl px-6 pt-6 pb-20 -mx-6">
+            <div class="flex-1 bg-[#B4DBF1] rounded-t-3xl px-6 pt-6 pb-40 -mx-6 ">
                 <div class="flex items-center justify-between mb-5">
                     <h2 class="text-2xl font-bold text-gray-800 pl-4">HOSPITAL INFORMATION</h2>
                     <a href="{{ route('my-bookings') }}" class="block">
@@ -35,17 +35,21 @@
                     @foreach ($hospitals as $hospital)
                         <a href="{{ route('hospital.detail', ['slug' => $hospital->slug]) }}" class="block">
                             <div
-                                class="bg-[#9AC1D6] rounded-2xl p-4 shadow-md max-w-[360px] mx-auto hover:bg-[#8BB5CD] transition-colors">
-                                <div class="flex gap-8">
-                                    <div class="flex-1 max-w-[55%]">
-                                        <h3 class="font-bold text-sm text-gray-800 mb-2 leading-tight">
+                                class="bg-[#9AC1D6] rounded-2xl p-4 shadow-md mx-auto hover:bg-[#8BB5CD] transition-colors">
+                                <div class="flex items-center gap-4 h-full">
+                                    <div class="flex-1 min-w-0">
+                                        <h3 class="font-bold text-sm text-gray-800 mb-2 leading-tight line-clamp-2">
                                             {{ $hospital->name }}</h3>
-                                        <p class="text-xs text-gray-600">{{ Str::limit($hospital->address, 50) }}</p>
-                                        <p class="text-xs text-blue-600 mb-1 truncate">{{ $hospital->website_url }}</p>
+                                        <p class="text-xs text-gray-600 mb-1 line-clamp-2">
+                                            {{ Str::limit($hospital->address, 50) }}</p>
+                                        <p class="text-xs text-blue-600 truncate">{{ $hospital->website_url }}</p>
                                     </div>
-                                    <img src="{{ \Illuminate\Support\Str::startsWith($hospital->image_url, ['http://', 'https://']) ? $hospital->image_url : (\Illuminate\Support\Str::startsWith($hospital->image_url, ['storage/', 'images/']) ? asset($hospital->image_url) : asset('storage/' . $hospital->image_url)) }}"
-                                        alt="{{ $hospital->name }}"
-                                        class="w-28 h-22 object-cover rounded-lg flex-shrink-0">
+                                    <div class="flex-shrink-0 w-28">
+                                        <div class="aspect-[4/3] bg-gray-200 rounded-lg overflow-hidden">
+                                            <img src="{{ \Illuminate\Support\Str::startsWith($hospital->image_url, ['http://', 'https://']) ? $hospital->image_url : (\Illuminate\Support\Str::startsWith($hospital->image_url, ['storage/', 'images/']) ? asset($hospital->image_url) : asset('storage/' . $hospital->image_url)) }}"
+                                                alt="{{ $hospital->name }}" class="w-full h-full object-cover">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </a>
@@ -167,7 +171,7 @@
                             class="relative p-2 hover:bg-gray-200 rounded-full transition-colors">
                             <img src="{{ asset('images/icons/icon-notif.png') }}" alt="Notifications"
                                 class="w-7 h-9 xl:w-7 xl:h-7">
-                            
+
                         </a>
                     </div>
 

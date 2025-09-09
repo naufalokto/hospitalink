@@ -52,9 +52,9 @@
                     @foreach ($hospitalsData as $hospital)
                         <a href="{{ route('checking', ['hospital_id' => $hospital['slug']]) }}" class="block">
                             <div
-                                class="bg-[#9AC1D6] rounded-2xl p-4 shadow-md hover:shadow-lg h-[120px] transition-all duration-200 hover:bg-[#8BB5CD] cursor-pointer">
-                                <div class="flex justify-between items-start h-full">
-                                    <div class="flex-1 pr-4 flex flex-col">
+                                class="bg-[#9AC1D6] rounded-2xl p-4 shadow-md hover:shadow-lg transition-all duration-200 hover:bg-[#8BB5CD] cursor-pointer">
+                                <div class="flex items-center gap-4 h-full">
+                                    <div class="flex-1 min-w-0">
                                         <h3 class="font-bold text-gray-800 mb-1 line-clamp-1">{{ $hospital['name'] }}
                                         </h3>
                                         <div
@@ -62,9 +62,9 @@
                                             {{ $hospital['status'] }}</div>
                                         <p class="text-xs text-blue-600 mb-1 truncate">
                                             {{ Str::limit($hospital['website_url'], 28) }}</p>
-                                        <p class="text-xs text-gray-500 mt-auto">{{ date('l, d F Y') }}</p>
+                                        <p class="text-xs text-gray-500">{{ date('l, d F Y') }}</p>
                                     </div>
-                                    <div class="relative w-28 flex-shrink-0">
+                                    <div class="flex-shrink-0 w-28">
                                         <div class="aspect-[4/3] bg-gray-200 rounded-lg overflow-hidden">
                                             <img src="{{ asset($hospital['image_url']) }}"
                                                 alt="{{ $hospital['name'] }}" class="w-full h-full object-cover">
