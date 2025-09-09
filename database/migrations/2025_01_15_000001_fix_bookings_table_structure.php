@@ -43,8 +43,16 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('bookings', function (Blueprint $table) {
-            // Drop the unique constraint
+            // First drop foreign key constraints that depend on the unique index
+            $table->dropForeign(['user_id']);
+            $table->dropForeign(['hospital_id']);
+            
+            // Now we can safely drop the unique constraint
             $table->dropUnique('user_hospital_unique_booking');
+            
+            // Re-add foreign key constraints
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('hospital_id')->references('id')->on('hospitals')->onDelete('cascade');
             
             // Add back room_name column
             $table->string('room_name')->after('room_type');
