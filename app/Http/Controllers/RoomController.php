@@ -10,7 +10,7 @@ class RoomController extends Controller
     public function checking($hospital_id)
     {
         // Get hospital data from database
-        $hospital = Hospital::where('slug', $hospital_id)->with('room')->first();
+        $hospital = Hospital::where('slug', $hospital_id)->with('roomTypes.roomType')->first();
         
         if (!$hospital) {
             abort(404, 'Hospital not found');
@@ -65,7 +65,7 @@ class RoomController extends Controller
     public function checkingDetail($hospital_id, $room_id)
     {
         // Get hospital data from database
-        $hospital = Hospital::where('slug', $hospital_id)->with('room')->first();
+        $hospital = Hospital::where('slug', $hospital_id)->with('roomTypes.roomType')->first();
         
         if (!$hospital) {
             abort(404, 'Hospital not found');

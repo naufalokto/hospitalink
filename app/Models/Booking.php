@@ -13,8 +13,8 @@ class Booking extends Model
         'booking_number',
         'user_id',
         'hospital_id',
-        'room_type',
-        'room_name',
+        'room_type_id',
+        'room_type', // Keep for backward compatibility during migration
         'patient_name',
         'patient_phone',
         'patient_email',
@@ -60,6 +60,22 @@ class Booking extends Model
     public function hospital(): BelongsTo
     {
         return $this->belongsTo(Hospital::class);
+    }
+
+    /**
+     * Get the room type for this booking
+     */
+    public function roomType(): BelongsTo
+    {
+        return $this->belongsTo(RoomType::class);
+    }
+
+    /**
+     * Get the room name from room type
+     */
+    public function getRoomNameAttribute(): string
+    {
+        return $this->roomType ? $this->roomType->name : $this->room_type;
     }
 
     /**

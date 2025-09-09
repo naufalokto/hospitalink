@@ -10,12 +10,12 @@ class RoomViewController extends Controller
     public function index()
     {
         // Get all hospitals with their room data
-        $hospitals = Hospital::with('room')->get();
+        $hospitals = Hospital::with('roomTypes.roomType')->get();
         
         // Transform data for the view
         $hospitalsData = $hospitals->map(function ($hospital) {
             $roomData = $hospital->room_data;
-            $totalRooms = $hospital->room ? $hospital->room->total_rooms : 0;
+            $totalRooms = array_sum($roomData);
             
             return [
                 'id' => $hospital->id,

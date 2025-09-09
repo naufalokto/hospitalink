@@ -25,6 +25,7 @@ Route::get('/login', function () {
 })->name('login');
 
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+Route::post('/register', [AuthController::class, 'registerWeb'])->name('register.post');
 
 Route::post('/logout', function () {
     Auth::logout();
@@ -396,22 +397,40 @@ Route::get('/debug/create-test-booking', function () {
             return response()->json(['error' => 'No hospital found'], 404);
         }
 
-        // Create test booking
-        $booking = \App\Models\Booking::create([
-            'user_id' => $user->id,
-            'hospital_id' => $hospital->id,
-            'room_type' => 'vvip',
-            'room_name' => 'VVIP Room',
-            'patient_name' => 'Test Patient Payment',
-            'patient_phone' => '081234567890',
-            'patient_email' => 'test@payment.com',
-            'check_in_date' => now()->addDays(1),
-            'check_out_date' => now()->addDays(6),
-            'duration_days' => 5,
-            'price_per_day' => 300000,
-            'total_price' => 1500000,
-            'status' => 'pending'
-        ]);
+        // Check if user already has a booking in this hospital
+        $existingBooking = \App\Models\Booking::where('user_id', $user->id)
+            ->where('hospital_id', $hospital->id)
+            ->first();
+
+        if ($existingBooking) {
+            // Update existing booking
+            $existingBooking->update([
+                'room_type' => 'vvip',
+                'check_in_date' => now()->addDays(1),
+                'check_out_date' => now()->addDays(6),
+                'duration_days' => 5,
+                'price_per_day' => 300000,
+                'total_price' => 1500000,
+                'status' => 'pending'
+            ]);
+            $booking = $existingBooking;
+        } else {
+            // Create test booking
+            $booking = \App\Models\Booking::create([
+                'user_id' => $user->id,
+                'hospital_id' => $hospital->id,
+                'room_type' => 'vvip',
+                'patient_name' => 'Test Patient Payment',
+                'patient_phone' => '081234567890',
+                'patient_email' => 'test@payment.com',
+                'check_in_date' => now()->addDays(1),
+                'check_out_date' => now()->addDays(6),
+                'duration_days' => 5,
+                'price_per_day' => 300000,
+                'total_price' => 1500000,
+                'status' => 'pending'
+            ]);
+        }
 
         return response()->json([
             'status' => 'success',
@@ -504,24 +523,31 @@ Route::post('/debug/test-payment-creation', function (Request $request) {
 // API to get room prices for a hospital
 Route::get('/api/hospital/{hospital_id}/room-prices', function ($hospital_id) {
     try {
-        $hospitalRoom = \App\Models\HospitalRoom::where('hospital_id', $hospital_id)->first();
-        $hospital = \App\Models\Hospital::find($hospital_id);
+        $hospital = \App\Models\Hospital::with('roomTypes.roomType')->find($hospital_id);
         
-        if (!$hospitalRoom) {
+        if (!$hospital) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Hospital room data not found'
+                'message' => 'Hospital not found'
             ], 404);
+        }
+        
+        $roomPrices = [];
+        $availableRooms = $hospital->actual_room_data;
+        
+        foreach ($hospital->roomTypes as $hospitalRoomType) {
+            $roomType = $hospitalRoomType->roomType;
+            $roomPrices[$roomType->code] = $hospitalRoomType->price_per_day;
         }
         
         return response()->json([
             'status' => 'success',
             'data' => [
                 'hospital_id' => $hospital_id,
-                'hospital_name' => $hospital?->name,
-                'hospital_slug' => $hospital?->slug,
-                'room_prices' => $hospitalRoom->room_prices,
-                'available_rooms' => $hospitalRoom->actual_available_rooms
+                'hospital_name' => $hospital->name,
+                'hospital_slug' => $hospital->slug,
+                'room_prices' => $roomPrices,
+                'available_rooms' => $availableRooms
             ]
         ]);
     } catch (\Exception $e) {
@@ -539,12 +565,20 @@ Route::get('/api/debug/create-booking/{hospital_id}/{room_type}', function ($hos
             return response()->json(['status' => 'error', 'message' => 'Invalid room type'], 422);
         }
 
-        $hospital = \App\Models\Hospital::findOrFail($hospital_id);
-        $room = \App\Models\HospitalRoom::where('hospital_id', $hospital->id)->firstOrFail();
-
-        // Determine price per day from hospital rooms
-        $priceMap = $room->room_prices;
-        $pricePerDay = (float) ($priceMap[$room_type] ?? 0);
+        $hospital = \App\Models\Hospital::with('roomTypes.roomType')->findOrFail($hospital_id);
+        
+        // Get room type and price from database
+        $roomTypeModel = \App\Models\RoomType::where('code', $room_type)->first();
+        if (!$roomTypeModel) {
+            return response()->json(['status' => 'error', 'message' => 'Invalid room type'], 422);
+        }
+        
+        $hospitalRoomType = $hospital->roomTypes()->where('room_type_id', $roomTypeModel->id)->first();
+        if (!$hospitalRoomType) {
+            return response()->json(['status' => 'error', 'message' => 'Room type not available for this hospital'], 422);
+        }
+        
+        $pricePerDay = $hospitalRoomType->price_per_day;
 
         // Create a test user if not exists
         $user = \App\Models\User::firstOrCreate(
@@ -559,21 +593,42 @@ Route::get('/api/debug/create-booking/{hospital_id}/{room_type}', function ($hos
         $now = now();
         $durationDays = 5;
 
-        $booking = \App\Models\Booking::create([
-            'user_id' => $user->id,
-            'hospital_id' => $hospital->id,
-            'room_type' => $room_type,
-            'room_name' => strtoupper($room_type) . ' Room',
-            'patient_name' => 'Test Patient Payment',
-            'patient_phone' => '081234567890',
-            'patient_email' => 'test@payment.com',
-            'check_in_date' => $now->copy()->addDay(),
-            'check_out_date' => $now->copy()->addDays(1 + $durationDays),
-            'duration_days' => $durationDays,
-            'price_per_day' => $pricePerDay,
-            'total_price' => $pricePerDay * $durationDays,
-            'status' => 'pending'
-        ]);
+        // Check if user already has a booking in this hospital
+        $existingBooking = \App\Models\Booking::where('user_id', $user->id)
+            ->where('hospital_id', $hospital->id)
+            ->first();
+
+        if ($existingBooking) {
+            // Update existing booking instead of creating new one
+            $existingBooking->update([
+                'room_type_id' => $roomTypeModel->id,
+                'room_type' => $room_type,
+                'check_in_date' => $now->copy()->addDay(),
+                'check_out_date' => $now->copy()->addDays(1 + $durationDays),
+                'duration_days' => $durationDays,
+                'price_per_day' => $pricePerDay,
+                'total_price' => $pricePerDay * $durationDays,
+                'status' => 'pending'
+            ]);
+            $booking = $existingBooking;
+        } else {
+            // Create new booking
+            $booking = \App\Models\Booking::create([
+                'user_id' => $user->id,
+                'hospital_id' => $hospital->id,
+                'room_type_id' => $roomTypeModel->id,
+                'room_type' => $room_type, // Keep for backward compatibility
+                'patient_name' => 'Test Patient Payment',
+                'patient_phone' => '081234567890',
+                'patient_email' => 'test@payment.com',
+                'check_in_date' => $now->copy()->addDay(),
+                'check_out_date' => $now->copy()->addDays(1 + $durationDays),
+                'duration_days' => $durationDays,
+                'price_per_day' => $pricePerDay,
+                'total_price' => $pricePerDay * $durationDays,
+                'status' => 'pending'
+            ]);
+        }
 
         return response()->json([
             'status' => 'success',

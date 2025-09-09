@@ -40,7 +40,10 @@ class HospitalSeeder extends Seeder
         ];
 
         foreach ($hospitals as $hospital) {
-            Hospital::create($hospital);
+            \App\Models\Hospital::updateOrCreate(
+                ['slug' => $hospital['slug']],
+                $hospital
+            );
         }
     }
 }

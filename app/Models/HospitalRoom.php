@@ -9,6 +9,7 @@ class HospitalRoom extends Model
 {
     protected $fillable = [
         'hospital_id',
+        'facility_id',
         'vvip_rooms',
         'class1_rooms',
         'class2_rooms',
@@ -36,6 +37,14 @@ class HospitalRoom extends Model
     public function hospital(): BelongsTo
     {
         return $this->belongsTo(Hospital::class);
+    }
+
+    /**
+     * Get the facility assigned to this hospital room
+     */
+    public function facility(): BelongsTo
+    {
+        return $this->belongsTo(Facility::class);
     }
 
     /**

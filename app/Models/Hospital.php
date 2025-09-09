@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 class Hospital extends Model
@@ -31,41 +32,48 @@ class Hospital extends Model
             }
         });
 
-        // Create room data when hospital is created
+        // Create room types when hospital is created
         static::created(function ($hospital) {
-            $hospital->room()->create([
-                'vvip_rooms' => 10,
-                'class1_rooms' => 10,
-                'class2_rooms' => 10,
-                'class3_rooms' => 10,
-            ]);
+            $roomTypes = RoomType::all();
+            foreach ($roomTypes as $roomType) {
+                $hospital->roomTypes()->create([
+                    'room_type_id' => $roomType->id,
+                    'rooms_count' => 10, // Default room count
+                    'price_per_day' => 0, // Will be set later
+                ]);
+            }
         });
     }
 
     /**
-     * Get the room data for the hospital
-     */
-    public function room(): HasOne
-    {
-        return $this->hasOne(HospitalRoom::class);
-    }
-
-    /**
-     * Get room data with fallback
+     * Get the room data for the hospital (from room types)
      */
     public function getRoomDataAttribute(): array
     {
-        $room = $this->room;
-        if (!$room) {
-            return [
-                'vvip' => 0,
-                'class1' => 0,
-                'class2' => 0,
-                'class3' => 0,
-            ];
+        $roomTypes = $this->roomTypes;
+        $roomData = [
+            'vvip' => 0,
+            'class1' => 0,
+            'class2' => 0,
+            'class3' => 0,
+        ];
+        
+        foreach ($roomTypes as $roomType) {
+            $code = $roomType->roomType->code;
+            if (isset($roomData[$code])) {
+                $roomData[$code] = $roomType->rooms_count;
+            }
         }
         
-        return $room->room_data;
+        return $roomData;
+    }
+
+    /**
+     * Normalized: room types for this hospital
+     */
+    public function roomTypes(): HasMany
+    {
+        return $this->hasMany(HospitalRoomType::class);
     }
 
     /**
@@ -73,16 +81,26 @@ class Hospital extends Model
      */
     public function getActualRoomDataAttribute(): array
     {
-        $room = $this->room;
-        if (!$room) {
-            return [
-                'vvip' => 0,
-                'class1' => 0,
-                'class2' => 0,
-                'class3' => 0,
-            ];
+        $roomData = $this->room_data;
+        $bookings = $this->bookings()
+            ->whereIn('status', ['pending', 'confirmed'])
+            ->get();
+        
+        foreach ($bookings as $booking) {
+            $roomType = $booking->roomType;
+            if ($roomType && isset($roomData[$roomType->code])) {
+                $roomData[$roomType->code] = max(0, $roomData[$roomType->code] - 1);
+            }
         }
         
-        return $room->actual_available_rooms;
+        return $roomData;
+    }
+
+    /**
+     * Get bookings for this hospital
+     */
+    public function bookings(): HasMany
+    {
+        return $this->hasMany(Booking::class);
     }
 }

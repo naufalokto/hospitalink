@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\Hospital;
-use App\Models\HospitalRoom;
+use App\Models\HospitalRoomType;
+use App\Models\RoomType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +16,7 @@ class BookingController extends Controller
     public function showBookingForm($hospital_id, $room_id)
     {
         // Get hospital data from database
-        $hospital = Hospital::where('slug', $hospital_id)->with('room')->first();
+        $hospital = Hospital::where('slug', $hospital_id)->with('roomTypes.roomType')->first();
         
         if (!$hospital) {
             abort(404, 'Hospital not found');
@@ -24,45 +25,20 @@ class BookingController extends Controller
         // Get actual available room data from database (considering bookings)
         $roomData = $hospital->actual_room_data;
         
-        // Define room types with their details
-        $roomTypes = [
-            1 => [
-                'id' => 1,
-                'name' => 'VVIP ROOM',
-                'type' => 'vvip',
-                'location' => 'Gedung Utama Lt. 3',
-                'available' => $roomData['vvip'],
-                'price' => 825000,
-                'image' => 'images/rooms/vvip-room.jpg'
-            ],
-            2 => [
-                'id' => 2,
-                'name' => 'CLASS 1 ROOM',
-                'type' => 'class1',
-                'location' => 'Gedung Teratai Lt. 1 & 2',
-                'available' => $roomData['class1'],
-                'price' => 200000,
-                'image' => 'images/rooms/class1-room.jpg'
-            ],
-            3 => [
-                'id' => 3,
-                'name' => 'CLASS 2 ROOM',
-                'type' => 'class2',
-                'location' => 'Gedung MMP Lt. 1 & 2',
-                'available' => $roomData['class2'],
-                'price' => 150000,
-                'image' => 'images/rooms/class2-room.jpg'
-            ],
-            4 => [
-                'id' => 4,
-                'name' => 'CLASS 3 ROOM',
-                'type' => 'class3',
-                'location' => 'Gedung Tulip Lt. 2 & 3',
-                'available' => $roomData['class3'],
-                'price' => 100000,
-                'image' => 'images/rooms/class3-room.jpg'
-            ]
-        ];
+        // Get room types from database
+        $roomTypes = [];
+        foreach ($hospital->roomTypes as $hospitalRoomType) {
+            $roomType = $hospitalRoomType->roomType;
+            $roomTypes[$roomType->id] = [
+                'id' => $roomType->id,
+                'name' => $roomType->name,
+                'type' => $roomType->code,
+                'location' => 'Gedung Utama',
+                'available' => $roomData[$roomType->code] ?? 0,
+                'price' => $hospitalRoomType->price_per_day,
+                'image' => 'images/rooms/' . $roomType->code . '-room.jpg'
+            ];
+        }
 
         // Get the specific room type
         if (!isset($roomTypes[$room_id])) {
@@ -95,7 +71,7 @@ class BookingController extends Controller
         ]);
 
         // Get hospital data
-        $hospital = Hospital::where('slug', $hospital_id)->with('room')->first();
+        $hospital = Hospital::where('slug', $hospital_id)->with('roomTypes.roomType')->first();
         
         if (!$hospital) {
             return redirect()->back()->with('error', 'Hospital not found');
@@ -104,19 +80,18 @@ class BookingController extends Controller
         // Get actual available room data
         $roomData = $hospital->actual_room_data;
         
-        // Define room types with their details
-        $roomTypes = [
-            1 => ['name' => 'VVIP ROOM', 'type' => 'vvip', 'price' => 825000],
-            2 => ['name' => 'CLASS 1 ROOM', 'type' => 'class1', 'price' => 200000],
-            3 => ['name' => 'CLASS 2 ROOM', 'type' => 'class2', 'price' => 150000],
-            4 => ['name' => 'CLASS 3 ROOM', 'type' => 'class3', 'price' => 100000]
-        ];
-
-        if (!isset($roomTypes[$room_id])) {
+        // Get room type from database
+        $hospitalRoomType = $hospital->roomTypes()->where('room_type_id', $room_id)->first();
+        if (!$hospitalRoomType) {
             return redirect()->back()->with('error', 'Room type not found');
         }
 
-        $room = $roomTypes[$room_id];
+        $roomType = $hospitalRoomType->roomType;
+        $room = [
+            'name' => $roomType->name,
+            'type' => $roomType->code,
+            'price' => $hospitalRoomType->price_per_day
+        ];
 
         // Check room availability
         if ($roomData[$room['type']] <= 0) {
@@ -137,8 +112,8 @@ class BookingController extends Controller
             $booking = Booking::create([
                 'user_id' => Auth::id(),
                 'hospital_id' => $hospital->id,
-                'room_type' => $room['type'],
-                'room_name' => $room['name'],
+                'room_type_id' => $roomType->id,
+                'room_type' => $room['type'], // Keep for backward compatibility
                 'patient_name' => $request->patient_name,
                 'patient_phone' => $request->patient_phone,
                 'patient_email' => $request->patient_email,
@@ -152,24 +127,7 @@ class BookingController extends Controller
                 'notes' => $request->notes
             ]);
 
-            // Reduce room count
-            $hospitalRoom = $hospital->room;
-            if ($hospitalRoom) {
-                switch ($room['type']) {
-                    case 'vvip':
-                        $hospitalRoom->decrement('vvip_rooms');
-                        break;
-                    case 'class1':
-                        $hospitalRoom->decrement('class1_rooms');
-                        break;
-                    case 'class2':
-                        $hospitalRoom->decrement('class2_rooms');
-                        break;
-                    case 'class3':
-                        $hospitalRoom->decrement('class3_rooms');
-                        break;
-                }
-            }
+            // Room availability is now calculated dynamically based on bookings
 
             DB::commit();
 

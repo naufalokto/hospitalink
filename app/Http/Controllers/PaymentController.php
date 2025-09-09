@@ -47,16 +47,17 @@ class PaymentController extends Controller
 
             $booking = Booking::findOrFail($request->booking_id);
             
-            // Validate room availability for this hospital and room type before creating payment
-            $hospitalRoom = \App\Models\HospitalRoom::where('hospital_id', $booking->hospital_id)->first();
-            if (!$hospitalRoom) {
+            // Get hospital data
+            $hospital = \App\Models\Hospital::with('roomTypes.roomType')->find($booking->hospital_id);
+            if (!$hospital) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Data kamar untuk rumah sakit tidak ditemukan.'
+                    'message' => 'Data rumah sakit tidak ditemukan.'
                 ], 404);
             }
+            
             // Compute available rooms considering active bookings (pending/confirmed)
-            $available = $hospitalRoom->actual_available_rooms[$booking->room_type] ?? 0;
+            $available = $hospital->actual_room_data[$booking->room_type] ?? 0;
             if ($available <= 0) {
                 return response()->json([
                     'success' => false,
@@ -70,11 +71,38 @@ class PaymentController extends Controller
                 ->first();
 
             if ($existingPayment) {
+                // Generate new snap token for existing payment
+                $params = [
+                    'transaction_details' => [
+                        'order_id' => $existingPayment->order_id,
+                        'gross_amount' => $existingPayment->amount,
+                    ],
+                    'customer_details' => [
+                        'first_name' => $booking->patient_name,
+                        'email' => $booking->patient_email ?? 'patient@example.com',
+                        'phone' => $booking->patient_phone,
+                    ],
+                    'expiry' => [
+                        'start_time' => date('Y-m-d H:i:s O'),
+                        'unit' => 'hour',
+                        'duration' => 24
+                    ],
+                    'callbacks' => [
+                        'finish' => route('payment.success'),
+                        'unfinish' => route('payment.failed'),
+                        'error' => route('payment.failed')
+                    ]
+                ];
+                
+                $snapToken = Snap::getSnapToken($params);
+                
                 return response()->json([
                     'success' => true,
-                    'payment_url' => $existingPayment->midtrans_response['redirect_url'] ?? null,
-                    'va_number' => $existingPayment->va_number,
-                    'order_id' => $existingPayment->order_id
+                    'snap_token' => $snapToken,
+                    'order_id' => $existingPayment->order_id,
+                    'amount' => $existingPayment->amount,
+                    'redirect_url' => 'https://app.sandbox.midtrans.com/snap/v2/vtweb/' . $snapToken,
+                    'payment_id' => $existingPayment->id
                 ]);
             }
 
@@ -133,7 +161,8 @@ class PaymentController extends Controller
                 'snap_token' => $snapToken,
                 'order_id' => $payment->order_id,
                 'amount' => $payment->amount,
-                'redirect_url' => 'https://app.sandbox.midtrans.com/snap/v2/vtweb/' . $snapToken
+                'redirect_url' => 'https://app.sandbox.midtrans.com/snap/v2/vtweb/' . $snapToken,
+                'payment_id' => $payment->id
             ]);
 
         } catch (\Exception $e) {
@@ -473,35 +502,26 @@ class PaymentController extends Controller
     private function decreaseRoomAvailability(Booking $booking)
     {
         \DB::transaction(function () use ($booking) {
-            $hospitalRoom = \App\Models\HospitalRoom::where('hospital_id', $booking->hospital_id)
+            // Get room type model
+            $roomType = \App\Models\RoomType::where('code', $booking->room_type)->first();
+            
+            if (!$roomType) {
+                return; // No room type found
+            }
+
+            // Find or create hospital room type record
+            $hospitalRoomType = \App\Models\HospitalRoomType::where('hospital_id', $booking->hospital_id)
+                ->where('room_type_id', $roomType->id)
                 ->lockForUpdate()
                 ->first();
 
-            if (!$hospitalRoom) {
-                return; // No room record for this hospital; nothing to decrement
+            if (!$hospitalRoomType) {
+                return; // No room record for this hospital and room type
             }
 
-            switch ($booking->room_type) {
-                case 'vvip':
-                    if ($hospitalRoom->vvip_rooms > 0) {
-                        $hospitalRoom->decrement('vvip_rooms');
-                    }
-                    break;
-                case 'class1':
-                    if ($hospitalRoom->class1_rooms > 0) {
-                        $hospitalRoom->decrement('class1_rooms');
-                    }
-                    break;
-                case 'class2':
-                    if ($hospitalRoom->class2_rooms > 0) {
-                        $hospitalRoom->decrement('class2_rooms');
-                    }
-                    break;
-                case 'class3':
-                    if ($hospitalRoom->class3_rooms > 0) {
-                        $hospitalRoom->decrement('class3_rooms');
-                    }
-                    break;
+            // Decrease available rooms count
+            if ($hospitalRoomType->rooms_count > 0) {
+                $hospitalRoomType->decrement('rooms_count');
             }
         });
     }

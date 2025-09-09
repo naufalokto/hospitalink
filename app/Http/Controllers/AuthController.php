@@ -329,7 +329,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Register user with email and password
+     * Register user with email and password (API)
      */
     public function register(Request $request)
     {
@@ -354,6 +354,33 @@ class AuthController extends Controller
             'user' => $user,
             'token' => $user->createToken('auth-token')->plainTextToken ?? null,
         ]);
+    }
+
+    /**
+     * Register user with email and password (Web)
+     */
+    public function registerWeb(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => 'patient', // Default role for registered users
+        ]);
+
+        Auth::login($user);
+
+        // Redirect based on user role
+        if ($user->isAdmin()) {
+            return redirect()->route('admin-dashboard')->with('success', 'Registration successful!');
+        }
+        return redirect()->route('dashboard')->with('success', 'Registration successful!');
     }
 
     /**

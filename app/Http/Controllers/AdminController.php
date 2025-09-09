@@ -14,7 +14,7 @@ class AdminController extends Controller
      */
     public function dashboard()
     {
-        $hospitals = Hospital::with('room')->get();
+        $hospitals = Hospital::with('roomTypes.roomType')->get();
         
         $hospitalsData = $hospitals->map(function ($hospital) {
             return [
@@ -33,7 +33,7 @@ class AdminController extends Controller
      */
     public function getHospitals(): JsonResponse
     {
-        $hospitals = Hospital::with('room')->get();
+        $hospitals = Hospital::with('roomTypes.roomType')->get();
         
         $data = $hospitals->map(function ($hospital) {
             return [
@@ -61,24 +61,30 @@ class AdminController extends Controller
             'quantity' => 'required|integer|min:0|max:999',
         ]);
 
-        $hospital = Hospital::findOrFail($request->hospital_id);
-        $room = $hospital->room;
-
-        if (!$room) {
-            // Create room data if it doesn't exist
-            $room = $hospital->room()->create([
-                'vvip_rooms' => 10,
-                'class1_rooms' => 10,
-                'class2_rooms' => 10,
-                'class3_rooms' => 10,
-            ]);
+        $hospital = Hospital::with('roomTypes.roomType')->findOrFail($request->hospital_id);
+        
+        // Get room type from database
+        $roomTypeModel = \App\Models\RoomType::where('code', $request->room_type)->first();
+        if (!$roomTypeModel) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid room type'
+            ], 422);
         }
 
-        // Update the specific room type
-        $roomType = $request->room_type . '_rooms';
-        $room->update([
-            $roomType => $request->quantity
-        ]);
+        // Update or create hospital room type
+        $hospitalRoomType = $hospital->roomTypes()->where('room_type_id', $roomTypeModel->id)->first();
+        if (!$hospitalRoomType) {
+            $hospitalRoomType = $hospital->roomTypes()->create([
+                'room_type_id' => $roomTypeModel->id,
+                'rooms_count' => $request->quantity,
+                'price_per_day' => 0, // Will be set later
+            ]);
+        } else {
+            $hospitalRoomType->update([
+                'rooms_count' => $request->quantity
+            ]);
+        }
 
         return response()->json([
             'success' => true,
@@ -88,7 +94,7 @@ class AdminController extends Controller
                 'hospital_name' => $hospital->name,
                 'room_type' => $request->room_type,
                 'quantity' => $request->quantity,
-                'updated_rooms' => $room->room_data
+                'updated_rooms' => $hospital->room_data
             ]
         ]);
     }
@@ -107,18 +113,26 @@ class AdminController extends Controller
             'rooms.class3' => 'required|integer|min:0|max:999',
         ]);
 
-        $hospital = Hospital::findOrFail($request->hospital_id);
-        $room = $hospital->room;
-
-        if (!$room) {
-            $room = $hospital->room()->create($request->rooms);
-        } else {
-            $room->update([
-                'vvip_rooms' => $request->rooms['vvip'],
-                'class1_rooms' => $request->rooms['class1'],
-                'class2_rooms' => $request->rooms['class2'],
-                'class3_rooms' => $request->rooms['class3'],
-            ]);
+        $hospital = Hospital::with('roomTypes.roomType')->findOrFail($request->hospital_id);
+        
+        // Get all room types
+        $roomTypes = \App\Models\RoomType::all();
+        
+        foreach ($roomTypes as $roomType) {
+            $hospitalRoomType = $hospital->roomTypes()->where('room_type_id', $roomType->id)->first();
+            $quantity = $request->rooms[$roomType->code] ?? 0;
+            
+            if (!$hospitalRoomType) {
+                $hospital->roomTypes()->create([
+                    'room_type_id' => $roomType->id,
+                    'rooms_count' => $quantity,
+                    'price_per_day' => 0, // Will be set later
+                ]);
+            } else {
+                $hospitalRoomType->update([
+                    'rooms_count' => $quantity
+                ]);
+            }
         }
 
         return response()->json([
@@ -127,7 +141,7 @@ class AdminController extends Controller
             'data' => [
                 'hospital_id' => $hospital->id,
                 'hospital_name' => $hospital->name,
-                'rooms' => $room->room_data
+                'rooms' => $hospital->room_data
             ]
         ]);
     }
@@ -137,7 +151,7 @@ class AdminController extends Controller
      */
     public function getPublicRoomData(): JsonResponse
     {
-        $hospitals = Hospital::with('room')->get();
+        $hospitals = Hospital::with('roomTypes.roomType')->get();
         
         $data = $hospitals->map(function ($hospital) {
             return [
@@ -149,7 +163,7 @@ class AdminController extends Controller
                 'image_url' => $hospital->image_url,
                 'website_url' => $hospital->website_url,
                 'rooms' => $hospital->room_data,
-                'total_rooms' => $hospital->room ? $hospital->room->total_rooms : 0,
+                'total_rooms' => array_sum($hospital->room_data),
             ];
         });
 
@@ -171,22 +185,30 @@ class AdminController extends Controller
                 'quantity' => 'required|integer|min:0|max:999',
             ]);
 
-            $hospital = Hospital::findOrFail($request->hospital_id);
-            $room = $hospital->room;
-
-            if (!$room) {
-                $room = $hospital->room()->create([
-                    'vvip_rooms' => 10,
-                    'class1_rooms' => 10,
-                    'class2_rooms' => 10,
-                    'class3_rooms' => 10,
-                ]);
+            $hospital = Hospital::with('roomTypes.roomType')->findOrFail($request->hospital_id);
+            
+            // Get room type from database
+            $roomTypeModel = \App\Models\RoomType::where('code', $request->room_type)->first();
+            if (!$roomTypeModel) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid room type'
+                ], 422);
             }
 
-            $roomType = $request->room_type . '_rooms';
-            $room->update([
-                $roomType => $request->quantity
-            ]);
+            // Update or create hospital room type
+            $hospitalRoomType = $hospital->roomTypes()->where('room_type_id', $roomTypeModel->id)->first();
+            if (!$hospitalRoomType) {
+                $hospitalRoomType = $hospital->roomTypes()->create([
+                    'room_type_id' => $roomTypeModel->id,
+                    'rooms_count' => $request->quantity,
+                    'price_per_day' => 0, // Will be set later
+                ]);
+            } else {
+                $hospitalRoomType->update([
+                    'rooms_count' => $request->quantity
+                ]);
+            }
 
             return response()->json([
                 'success' => true,
@@ -196,7 +218,7 @@ class AdminController extends Controller
                     'hospital_name' => $hospital->name,
                     'room_type' => $request->room_type,
                     'quantity' => $request->quantity,
-                    'updated_rooms' => $room->room_data
+                    'updated_rooms' => $hospital->room_data
                 ]
             ]);
         } catch (\Exception $e) {
@@ -244,23 +266,26 @@ class AdminController extends Controller
                 $validatedRooms[$type] = $quantity;
             }
 
-            $hospital = Hospital::findOrFail($request->hospital_id);
-            $room = $hospital->room;
-
-            if (!$room) {
-                $room = $hospital->room()->create([
-                    'vvip_rooms' => $validatedRooms['vvip'],
-                    'class1_rooms' => $validatedRooms['class1'],
-                    'class2_rooms' => $validatedRooms['class2'],
-                    'class3_rooms' => $validatedRooms['class3'],
-                ]);
-            } else {
-                $room->update([
-                    'vvip_rooms' => $validatedRooms['vvip'],
-                    'class1_rooms' => $validatedRooms['class1'],
-                    'class2_rooms' => $validatedRooms['class2'],
-                    'class3_rooms' => $validatedRooms['class3'],
-                ]);
+            $hospital = Hospital::with('roomTypes.roomType')->findOrFail($request->hospital_id);
+            
+            // Get all room types
+            $roomTypes = \App\Models\RoomType::all();
+            
+            foreach ($roomTypes as $roomType) {
+                $hospitalRoomType = $hospital->roomTypes()->where('room_type_id', $roomType->id)->first();
+                $quantity = $validatedRooms[$roomType->code] ?? 0;
+                
+                if (!$hospitalRoomType) {
+                    $hospital->roomTypes()->create([
+                        'room_type_id' => $roomType->id,
+                        'rooms_count' => $quantity,
+                        'price_per_day' => 0, // Will be set later
+                    ]);
+                } else {
+                    $hospitalRoomType->update([
+                        'rooms_count' => $quantity
+                    ]);
+                }
             }
 
             return redirect()->route('admin-dashboard')->with('success', $hospital->name . ' updated successfully!');

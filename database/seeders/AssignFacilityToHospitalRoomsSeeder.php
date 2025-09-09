@@ -2,23 +2,22 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Hospital;
 use App\Models\HospitalRoom;
 
-class HospitalRoomSeeder extends Seeder
+class AssignFacilityToHospitalRoomsSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Map first three hospitals to facility IDs 1..3.
      */
     public function run(): void
     {
-        // Get all existing hospitals
-        $hospitals = Hospital::all();
+        $hospitals = Hospital::orderBy('id')->take(3)->get();
 
-        foreach ($hospitals as $hospital) {
-            HospitalRoom::updateOrCreate(
+        foreach ($hospitals as $index => $hospital) {
+            $facilityId = $index + 1; // 1,2,3
+            $room = HospitalRoom::firstOrCreate(
                 ['hospital_id' => $hospital->id],
                 [
                     'vvip_rooms' => 10,
@@ -31,6 +30,11 @@ class HospitalRoomSeeder extends Seeder
                     'class3_price_per_day' => 200000,
                 ]
             );
+
+            $room->facility_id = $facilityId;
+            $room->save();
         }
     }
 }
+
+

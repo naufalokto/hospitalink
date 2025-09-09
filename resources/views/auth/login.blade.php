@@ -470,25 +470,29 @@
                     }
                     
                     try {
-                        const response = await fetch('/api/auth/register', {
+                        const formData = new FormData();
+                        formData.append('name', this.signupForm.name);
+                        formData.append('email', this.signupForm.email);
+                        formData.append('password', this.signupForm.password);
+                        formData.append('password_confirmation', this.signupForm.password_confirmation);
+                        formData.append('_token', document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '');
+                        
+                        const response = await fetch('/register', {
                             method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
-                            },
-                            body: JSON.stringify(this.signupForm)
+                            body: formData
                         });
                         
-                        const data = await response.json();
-                        
-                        if (data.success) {
-                            this.signupSuccess = 'Registrasi berhasil!';
-                            // Store token
-                            localStorage.setItem('auth_token', data.token);
-                            // Redirect to dashboard immediately
-                            window.location.href = '/dashboard';
+                        if (response.ok) {
+                            // Check if redirected to admin dashboard
+                            if (response.url.includes('/admin-dashboard')) {
+                                window.location.href = '/admin-dashboard';
+                            } else {
+                                window.location.href = '/dashboard';
+                            }
                         } else {
-                            this.signupError = data.message || 'Registrasi gagal';
+                            // Handle validation errors
+                            const responseText = await response.text();
+                            this.signupError = 'Registrasi gagal. Silakan periksa data yang dimasukkan.';
                         }
                     } catch (error) {
                         this.signupError = 'Terjadi kesalahan saat registrasi';
