@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
         // $this->call(HospitalRoomSeeder::class); // Table hospital_rooms has been removed
         $this->call(HospitalRoomTypeSeeder::class);
         $this->call(HospitalRoomTypeFacilitySeeder::class);
+        $this->call(HospitalDataSeeder::class); // Update hospital data with additional information
         $this->call(NewsSeeder::class);
         $this->call(AdminUserSeeder::class);
 

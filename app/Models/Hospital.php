@@ -18,6 +18,10 @@ class Hospital extends Model
         'address',
         'description',
         'public_service',
+        'admission_requirements',
+        'room_prices',
+        'phone_number',
+        'facilities',
         'image_url',
         'website_url'
     ];
