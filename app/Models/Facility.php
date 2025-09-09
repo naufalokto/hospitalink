@@ -13,6 +13,11 @@ class Facility extends Model
 
     protected $fillable = [
         'facility',
+        'items',
+    ];
+
+    protected $casts = [
+        'items' => 'array',
     ];
 
     /**
