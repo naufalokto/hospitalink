@@ -24,14 +24,22 @@ class PaymentController extends Controller
 
     public function showDetailBooking()
     {
-        // Nanti bisa ditambahkan logic untuk mengambil data booking
-        return view('payment.detail-booking');
+        // Get current user data
+        $user = auth()->user();
+        
+        return view('payment.detail-booking', [
+            'user' => $user
+        ]);
     }
 
     public function showPayment()
     {
-        // Nanti bisa ditambahkan logic untuk mengambil data pembayaran
-        return view('payment.payment');
+        // Get current user data
+        $user = auth()->user();
+        
+        return view('payment.payment', [
+            'user' => $user
+        ]);
     }
 
     /**

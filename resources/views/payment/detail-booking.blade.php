@@ -104,7 +104,7 @@
                 <div class="divide-y divide-gray-500">
                     <div class="py-4">
                         <h3 class="text-white text-sm mb-1">Nama Pasien</h3>
-                        <p class="text-white font-semibold">Naufal Oktora Siswanto</p>
+                        <p class="text-white font-semibold">{{ $user->name ?? 'Guest User' }}</p>
                     </div>
                     <div class="py-4">
                         <h3 class="text-white text-sm mb-1">Nama Rumah Sakit</h3>
@@ -197,7 +197,7 @@
                 // In real app, fetch from backend
                 return {
                     id: parseInt(bookingId),
-                    patient_name: 'Test Patient Payment',
+                    patient_name: '{{ $user->name ?? "Guest User" }}',
                     total_price: 1500000,
                     booking_number: 'BK20250908Dx8uXK'
                 };
