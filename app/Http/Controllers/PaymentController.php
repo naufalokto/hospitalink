@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Booking;
 use App\Models\Payment;
+use App\Models\TransactionDetail;
+use App\Models\BookingRoom;
 use Midtrans\Config;
 use Midtrans\Snap;
 use Midtrans\Transaction;
@@ -27,8 +29,34 @@ class PaymentController extends Controller
         // Get current user data
         $user = auth()->user();
         
+        // Get hospital and room data from URL parameters
+        $hospitalId = request('hospital_id');
+        $roomId = request('room_id');
+        
+        $hospital = null;
+        $roomType = null;
+        $hospitalRoomType = null;
+        
+        if ($hospitalId && $roomId) {
+            // Get hospital data
+            $hospital = \App\Models\Hospital::with('roomTypes.roomType')->find($hospitalId);
+            
+            // Get room type data
+            $roomType = \App\Models\RoomType::find($roomId);
+            
+            // Get hospital room type data (price)
+            if ($hospital && $roomType) {
+                $hospitalRoomType = \App\Models\HospitalRoomType::where('hospital_id', $hospital->id)
+                    ->where('room_type_id', $roomType->id)
+                    ->first();
+            }
+        }
+        
         return view('payment.detail-booking', [
-            'user' => $user
+            'user' => $user,
+            'hospital' => $hospital,
+            'roomType' => $roomType,
+            'hospitalRoomType' => $hospitalRoomType
         ]);
     }
 
@@ -48,12 +76,38 @@ class PaymentController extends Controller
     public function createPayment(Request $request)
     {
         try {
-            $request->validate([
-                'booking_id' => 'required|exists:bookings,id',
-                'amount' => 'nullable|numeric|min:1'
+            // Log incoming request for debugging
+            Log::info('Payment creation request received', [
+                'request_data' => $request->all(),
+                'user_id' => auth()->id(),
+                'ip' => $request->ip()
             ]);
+            
+            try {
+                $request->validate([
+                    'booking_id' => 'required|exists:bookings,id',
+                    'amount' => 'nullable|numeric|min:1'
+                ]);
+            } catch (\Illuminate\Validation\ValidationException $e) {
+                Log::error('Payment validation failed', [
+                    'errors' => $e->errors(),
+                    'request_data' => $request->all()
+                ]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $e->errors()
+                ], 422);
+            }
 
-            $booking = Booking::findOrFail($request->booking_id);
+            try {
+                $booking = Booking::findOrFail($request->booking_id);
+            } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Booking tidak ditemukan.'
+                ], 404);
+            }
             
             // Get hospital data
             $hospital = \App\Models\Hospital::with('roomTypes.roomType')->find($booking->hospital_id);
@@ -102,16 +156,25 @@ class PaymentController extends Controller
                     ]
                 ];
                 
-                $snapToken = Snap::getSnapToken($params);
+                try {
+                    $snapToken = Snap::getSnapToken($params);
+                } catch (\Exception $e) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Gagal membuat Snap token untuk payment yang sudah ada: ' . $e->getMessage()
+                    ], 500);
+                }
                 
-                return response()->json([
+                $response = [
                     'success' => true,
                     'snap_token' => $snapToken,
                     'order_id' => $existingPayment->order_id,
                     'amount' => $existingPayment->amount,
                     'redirect_url' => 'https://app.sandbox.midtrans.com/snap/v2/vtweb/' . $snapToken,
                     'payment_id' => $existingPayment->id
-                ]);
+                ];
+                
+                return response()->json($response);
             }
 
             // Use amount from request (calculated from duration) or fallback to booking total
@@ -141,40 +204,64 @@ class PaymentController extends Controller
             ];
 
             // Create Snap token
-            $snapToken = Snap::getSnapToken($params);
+            try {
+                $snapToken = Snap::getSnapToken($params);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal membuat Snap token: ' . $e->getMessage()
+                ], 500);
+            }
             
             // Create payment record first
-            $payment = Payment::create([
-                'order_id' => $params['transaction_details']['order_id'],
-                'booking_id' => $booking->id,
-                'payment_type' => 'snap',
-                'bank_code' => null,
-                'va_number' => null, // Will be filled by Midtrans
-                'amount' => $request->amount ?? $booking->total_price,
-                'status' => 'pending',
-                'transaction_id' => null,
-                'midtrans_response' => $params,
-                'expired_at' => now()->addHours(24),
-            ]);
+            try {
+                $payment = Payment::create([
+                    'order_id' => $params['transaction_details']['order_id'],
+                    'booking_id' => $booking->id,
+                    'payment_type' => 'snap',
+                    'bank_code' => null,
+                    'va_number' => null, // Will be filled by Midtrans
+                    'amount' => $request->amount ?? $booking->total_price,
+                    'status' => 'pending',
+                    'transaction_id' => null,
+                    'midtrans_response' => $params,
+                    'expired_at' => now()->addHours(24),
+                ]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal membuat record pembayaran: ' . $e->getMessage()
+                ], 500);
+            }
             
-            Log::info('Payment created, redirecting to Midtrans', [
-                'order_id' => $params['transaction_details']['order_id'],
-                'bank_code' => null,
-                'amount' => $payment->amount,
-                'snap_token' => $snapToken
-            ]);
-
-            return response()->json([
+            $response = [
                 'success' => true,
                 'snap_token' => $snapToken,
                 'order_id' => $payment->order_id,
                 'amount' => $payment->amount,
                 'redirect_url' => 'https://app.sandbox.midtrans.com/snap/v2/vtweb/' . $snapToken,
                 'payment_id' => $payment->id
+            ];
+            
+            // Log successful payment creation
+            Log::info('Payment created successfully', [
+                'payment_id' => $payment->id,
+                'order_id' => $payment->order_id,
+                'amount' => $payment->amount,
+                'redirect_url' => $response['redirect_url'],
+                'booking_id' => $booking->id
             ]);
+            
+            return response()->json($response);
 
         } catch (\Exception $e) {
-            Log::error('Payment creation failed: ' . $e->getMessage());
+            Log::error('Payment creation failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all(),
+                'user_id' => auth()->id()
+            ]);
+            
             return response()->json([
                 'success' => false,
                 'message' => 'Payment creation failed: ' . $e->getMessage()
@@ -231,8 +318,30 @@ class PaymentController extends Controller
             if (in_array($transactionStatus, ['settlement', 'capture'])) {
                 $payment->booking->update(['status' => 'confirmed']);
                 
+                // Create transaction detail
+                $this->createTransactionDetail($payment);
+                
                 // Decrease room availability
                 $this->decreaseRoomAvailability($payment->booking);
+
+                // Mark booking room snapshot as paid
+                try {
+                    BookingRoom::where('booking_id', $payment->booking->id)
+                        ->latest('id')
+                        ->first()?->update([
+                            'payment_id' => $payment->id,
+                            'payment_status' => $transactionStatus,
+                            'payment_method' => $payment->payment_type,
+                            'bank_code' => $payment->bank_code,
+                            'va_number' => $payment->va_number,
+                            'transaction_id' => $payment->transaction_id,
+                        ]);
+                } catch (\Exception $e) {
+                    Log::warning('Failed to update BookingRoom after payment', [
+                        'error' => $e->getMessage(),
+                        'booking_id' => $payment->booking->id,
+                    ]);
+                }
             } elseif (in_array($transactionStatus, ['deny', 'cancel', 'expire', 'failure'])) {
                 $payment->booking->update(['status' => 'cancelled']);
             }
@@ -311,6 +420,9 @@ class PaymentController extends Controller
 
             // Update booking status
             $payment->booking->update(['status' => 'confirmed']);
+            
+            // Create transaction detail
+            $this->createTransactionDetail($payment);
             
             // Decrease room availability
             $this->decreaseRoomAvailability($payment->booking);
@@ -399,6 +511,10 @@ class PaymentController extends Controller
 
                         if (in_array($transactionStatus, ['settlement', 'capture'])) {
                             $payment->booking->update(['status' => 'confirmed']);
+                            
+                            // Create transaction detail
+                            $this->createTransactionDetail($payment);
+                            
                             $this->decreaseRoomAvailability($payment->booking);
                         }
                     } catch (\Exception $inner) {
@@ -410,6 +526,10 @@ class PaymentController extends Controller
                             ])
                         ]);
                         $payment->booking->update(['status' => 'confirmed']);
+                        
+                        // Create transaction detail
+                        $this->createTransactionDetail($payment);
+                        
                         $this->decreaseRoomAvailability($payment->booking);
                     }
                 }
@@ -502,6 +622,74 @@ class PaymentController extends Controller
         $suffix = str_pad(rand(1000, 9999), 4, '0', STR_PAD_LEFT);
         
         return $prefix . $suffix;
+    }
+
+    /**
+     * Create transaction detail after successful payment
+     */
+    private function createTransactionDetail(Payment $payment)
+    {
+        try {
+            $booking = $payment->booking;
+            $hospital = $booking->hospital;
+            $roomType = $booking->roomType;
+            
+            // Check if transaction detail already exists
+            $existingTransaction = TransactionDetail::where('payment_id', $payment->id)->first();
+            if ($existingTransaction) {
+                return $existingTransaction;
+            }
+
+            // Get user data for transaction detail
+            $user = $booking->user;
+            
+            // Create transaction detail
+            $transactionDetail = TransactionDetail::create([
+                'payment_id' => $payment->id,
+                'booking_id' => $booking->id,
+                'user_id' => $booking->user_id,
+                'hospital_id' => $booking->hospital_id,
+                'room_type_id' => $booking->room_type_id,
+                'patient_name' => $user->name, // Use real user name
+                'patient_phone' => $booking->patient_phone,
+                'patient_email' => $user->email, // Use real user email
+                'patient_address' => $booking->patient_address,
+                'hospital_name' => $hospital->name,
+                'room_type_name' => $roomType ? $roomType->name : $booking->room_name,
+                'room_type_code' => $booking->room_type,
+                'check_in_date' => $booking->check_in_date,
+                'check_out_date' => $booking->check_out_date,
+                'duration_days' => $booking->duration_days,
+                'price_per_day' => $booking->price_per_day,
+                'subtotal' => $booking->total_price,
+                'total_amount' => $booking->total_price,
+                'payment_method' => $payment->payment_type,
+                'bank_code' => $payment->bank_code,
+                'va_number' => $payment->va_number,
+                'transaction_id' => $payment->transaction_id,
+                'status' => 'completed',
+                'payment_completed_at' => now(),
+                'additional_data' => [
+                    'booking_number' => $booking->booking_number,
+                    'order_id' => $payment->order_id,
+                    'midtrans_response' => $payment->midtrans_response
+                ],
+                'notes' => $booking->notes
+            ]);
+
+            Log::info('Transaction detail created', [
+                'transaction_number' => $transactionDetail->transaction_number,
+                'payment_id' => $payment->id,
+                'booking_id' => $booking->id,
+                'total_amount' => $transactionDetail->total_amount
+            ]);
+
+            return $transactionDetail;
+
+        } catch (\Exception $e) {
+            Log::error('Failed to create transaction detail: ' . $e->getMessage());
+            return null;
+        }
     }
 
     /**

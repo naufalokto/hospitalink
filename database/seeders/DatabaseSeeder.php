@@ -20,16 +20,10 @@ class DatabaseSeeder extends Seeder
         $this->call(HospitalRoomTypeSeeder::class);
         $this->call(HospitalRoomTypeFacilitySeeder::class);
         $this->call(HospitalDataSeeder::class); // Update hospital data with additional information
+        $this->call(UpdateHospitalRoomPricesSeeder::class); // Update room prices with real data
         $this->call(NewsSeeder::class);
         $this->call(AdminUserSeeder::class);
 
-        User::updateOrCreate(
-            ['email' => 'test@example.com'],
-            [
-                'name' => 'Test User',
-                'email' => 'test@example.com',
-                'password' => bcrypt('password'),
-            ]
-        );
+        // Test user removed - system now works with real users who signup and login
     }
 }

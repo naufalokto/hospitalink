@@ -63,6 +63,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/booking/{booking_id}/invoice', [App\Http\Controllers\BookingController::class, 'showInvoice'])->name('booking.invoice');
     Route::get('/booking/{booking_id}/download', [App\Http\Controllers\BookingController::class, 'downloadInvoice'])->name('booking.download');
     Route::get('/my-bookings', [App\Http\Controllers\BookingController::class, 'myBookings'])->name('my-bookings');
+    Route::get('/invoice', [App\Http\Controllers\BookingController::class, 'invoice'])->name('invoice');
 });
 
 // Payment Routes (require authentication)
@@ -177,34 +178,6 @@ Route::get('/debug/news-test', function () {
     }
 });
 
-// Debug User Model and Database
-Route::get('/debug/user-test', function () {
-    try {
-        // Test database connection
-        $userCount = \App\Models\User::count();
-        
-        // Test creating a test user
-        $testUser = \App\Models\User::create([
-            'name' => 'Test Facebook User',
-            'email' => 'test@facebook.local',
-            'facebook_id' => 'test_facebook_id_123',
-            'password' => \Illuminate\Support\Facades\Hash::make('password'),
-        ]);
-        
-        return response()->json([
-            'database_connection' => 'OK',
-            'user_count' => $userCount,
-            'test_user_created' => true,
-            'test_user_id' => $testUser->id,
-            'test_user_facebook_id' => $testUser->facebook_id,
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
-        ], 500);
-    }
-});
 
 // Test Facebook Callback Simulation
 Route::get('/debug/test-facebook-callback', function () {
@@ -378,385 +351,45 @@ Route::get('/debug/midtrans-connection', function () {
     }
 });
 
-// Create Test Booking for Payment Testing
-Route::get('/debug/create-test-booking', function () {
+// Debug Payment Flow
+Route::get('/debug/payment-flow', function () {
     try {
-        // Create a test user if not exists
-        $user = \App\Models\User::firstOrCreate(
-            ['email' => 'test@payment.com'],
-            [
-                'name' => 'Test User Payment',
-                'password' => \Illuminate\Support\Facades\Hash::make('password'),
-                'role' => 'patient'
-            ]
-        );
-
-        // Get first hospital
-        $hospital = \App\Models\Hospital::first();
-        if (!$hospital) {
-            return response()->json(['error' => 'No hospital found'], 404);
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['error' => 'User not authenticated'], 401);
         }
-
-        // Check if user already has a booking in this hospital
-        $existingBooking = \App\Models\Booking::where('user_id', $user->id)
-            ->where('hospital_id', $hospital->id)
+        
+        // Get latest booking for user
+        $latestBooking = \App\Models\Booking::where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
             ->first();
-
-        if ($existingBooking) {
-            // Update existing booking
-            $existingBooking->update([
-                'room_type' => 'vvip',
-                'check_in_date' => now()->addDays(1),
-                'check_out_date' => now()->addDays(6),
-                'duration_days' => 5,
-                'price_per_day' => 300000,
-                'total_price' => 1500000,
-                'status' => 'pending'
-            ]);
-            $booking = $existingBooking;
-        } else {
-            // Create test booking
-            $booking = \App\Models\Booking::create([
-                'user_id' => $user->id,
-                'hospital_id' => $hospital->id,
-                'room_type' => 'vvip',
-                'patient_name' => 'Test Patient Payment',
-                'patient_phone' => '081234567890',
-                'patient_email' => 'test@payment.com',
-                'check_in_date' => now()->addDays(1),
-                'check_out_date' => now()->addDays(6),
-                'duration_days' => 5,
-                'price_per_day' => 300000,
-                'total_price' => 1500000,
-                'status' => 'pending'
-            ]);
-        }
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Test booking created successfully',
-            'booking' => [
-                'id' => $booking->id,
-                'booking_number' => $booking->booking_number,
-                'patient_name' => $booking->patient_name,
-                'total_price' => $booking->total_price,
-                'status' => $booking->status,
-                'hospital_name' => $hospital->name
-            ],
-            'payment_url' => route('payment.detail-booking') . '?booking_id=' . $booking->id
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Failed to create test booking: ' . $e->getMessage()
-        ], 500);
-    }
-});
-
-// Test All Payment Methods
-Route::get('/debug/test-payment-methods', function () {
-    $banks = ['BCA', 'BRI', 'BNI', 'Mandiri', 'CIMB', 'BSI'];
-    $results = [];
-    
-    foreach ($banks as $bank) {
-        try {
-            // Test bank code validation
-            $validator = \Illuminate\Support\Facades\Validator::make(
-                ['bank_code' => $bank],
-                ['bank_code' => 'required|in:BCA,BRI,BNI,Mandiri,CIMB,BSI']
-            );
             
-            $results[$bank] = [
-                'valid' => !$validator->fails(),
-                'errors' => $validator->errors()->toArray()
-            ];
-        } catch (\Exception $e) {
-            $results[$bank] = [
-                'valid' => false,
-                'error' => $e->getMessage()
-            ];
-        }
-    }
-    
-    return response()->json([
-        'status' => 'success',
-        'message' => 'Payment methods validation test',
-        'results' => $results,
-        'supported_banks' => $banks,
-        'total_banks' => count($banks)
-    ]);
-});
-
-// Test Payment Creation
-Route::post('/debug/test-payment-creation', function (Request $request) {
-    try {
-        $request->validate([
-            'booking_id' => 'required|exists:bookings,id',
-            'bank_code' => 'required|in:BCA,BRI,BNI,Mandiri,CIMB,BSI'
-        ]);
-
-        $booking = \App\Models\Booking::findOrFail($request->booking_id);
-        
-        // Simulate payment creation without Midtrans
-        $orderId = $booking->booking_number . '-' . time();
-        
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Payment creation test successful',
-            'data' => [
-                'booking_id' => $booking->id,
-                'booking_number' => $booking->booking_number,
-                'bank_code' => $bank_code,
-                'order_id' => $orderId,
-                'amount' => $booking->total_price,
-                'patient_name' => $booking->patient_name
-            ]
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Payment creation test failed: ' . $e->getMessage()
-        ], 500);
-    }
-});
-
-// API to get room prices for a hospital
-Route::get('/api/hospital/{hospital_id}/room-prices', function ($hospital_id) {
-    try {
-        $hospital = \App\Models\Hospital::with('roomTypes.roomType')->find($hospital_id);
-        
-        if (!$hospital) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Hospital not found'
-            ], 404);
+        if (!$latestBooking) {
+            return response()->json(['error' => 'No booking found for user'], 404);
         }
         
-        $roomPrices = [];
-        $availableRooms = $hospital->actual_room_data;
-        
-        foreach ($hospital->roomTypes as $hospitalRoomType) {
-            $roomType = $hospitalRoomType->roomType;
-            $roomPrices[$roomType->code] = $hospitalRoomType->price_per_day;
-        }
-        
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'hospital_id' => $hospital_id,
-                'hospital_name' => $hospital->name,
-                'hospital_slug' => $hospital->slug,
-                'room_prices' => $roomPrices,
-                'available_rooms' => $availableRooms
-            ]
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Failed to get room prices: ' . $e->getMessage()
-        ], 500);
-    }
-});
-
-// Debug API: create a pending booking for a specific hospital and room type
-Route::get('/api/debug/create-booking/{hospital_id}/{room_type}', function ($hospital_id, $room_type) {
-    try {
-        if (!in_array($room_type, ['vvip', 'class1', 'class2', 'class3'])) {
-            return response()->json(['status' => 'error', 'message' => 'Invalid room type'], 422);
-        }
-
-        $hospital = \App\Models\Hospital::with('roomTypes.roomType')->findOrFail($hospital_id);
-        
-        // Get room type and price from database
-        $roomTypeModel = \App\Models\RoomType::where('code', $room_type)->first();
-        if (!$roomTypeModel) {
-            return response()->json(['status' => 'error', 'message' => 'Invalid room type'], 422);
-        }
-        
-        $hospitalRoomType = $hospital->roomTypes()->where('room_type_id', $roomTypeModel->id)->first();
-        if (!$hospitalRoomType) {
-            return response()->json(['status' => 'error', 'message' => 'Room type not available for this hospital'], 422);
-        }
-        
-        $pricePerDay = $hospitalRoomType->price_per_day;
-
-        // Create a test user if not exists
-        $user = \App\Models\User::firstOrCreate(
-            ['email' => 'test@payment.com'],
-            [
-                'name' => 'Test User Payment',
-                'password' => \Illuminate\Support\Facades\Hash::make('password'),
-                'role' => 'patient'
-            ]
-        );
-
-        $now = now();
-        $durationDays = 5;
-
-        // Check if user already has a booking in this hospital
-        $existingBooking = \App\Models\Booking::where('user_id', $user->id)
-            ->where('hospital_id', $hospital->id)
-            ->first();
-
-        if ($existingBooking) {
-            // Update existing booking instead of creating new one
-            $existingBooking->update([
-                'room_type_id' => $roomTypeModel->id,
-                'room_type' => $room_type,
-                'check_in_date' => $now->copy()->addDay(),
-                'check_out_date' => $now->copy()->addDays(1 + $durationDays),
-                'duration_days' => $durationDays,
-                'price_per_day' => $pricePerDay,
-                'total_price' => $pricePerDay * $durationDays,
-                'status' => 'pending'
-            ]);
-            $booking = $existingBooking;
-        } else {
-            // Create new booking
-            $booking = \App\Models\Booking::create([
-                'user_id' => $user->id,
-                'hospital_id' => $hospital->id,
-                'room_type_id' => $roomTypeModel->id,
-                'room_type' => $room_type, // Keep for backward compatibility
-                'patient_name' => 'Test Patient Payment',
-                'patient_phone' => '081234567890',
-                'patient_email' => 'test@payment.com',
-                'check_in_date' => $now->copy()->addDay(),
-                'check_out_date' => $now->copy()->addDays(1 + $durationDays),
-                'duration_days' => $durationDays,
-                'price_per_day' => $pricePerDay,
-                'total_price' => $pricePerDay * $durationDays,
-                'status' => 'pending'
-            ]);
-        }
-
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'booking_id' => $booking->id,
-                'booking_number' => $booking->booking_number,
-                'hospital_id' => $hospital->id,
-                'room_type' => $room_type,
-                'price_per_day' => $pricePerDay,
-                'total_price' => $booking->total_price,
-            ]
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Failed to create booking: ' . $e->getMessage()
-        ], 500);
-    }
-});
-
-// Debug Payment Creation (No Auth Required) - GET for testing
-Route::get('/debug/payment-create/{booking_id}/{bank_code}/{amount}/{room_type?}/{days?}/{price_per_day?}', function ($booking_id, $bank_code, $amount, $room_type = 'class2', $days = 5, $price_per_day = 300000) {
-    try {
-        // Validate parameters
-        if (!in_array($bank_code, ['BCA', 'BRI', 'BNI', 'Mandiri', 'CIMB', 'BSI'])) {
-            return response()->json(['status' => 'error', 'message' => 'Invalid bank code'], 400);
-        }
-        
-        if (!in_array($room_type, ['vvip', 'class1', 'class2', 'class3'])) {
-            $room_type = 'class2';
-        }
-
-        $booking = \App\Models\Booking::findOrFail($booking_id);
-        
-        // Log received data for debugging
-        \Log::info('Payment creation request', [
-            'booking_id' => $booking_id,
-            'bank_code' => $bank_code,
-            'amount' => $amount,
-            'room_type' => $room_type,
-            'days' => $days,
-            'price_per_day' => $price_per_day
-        ]);
-        
-        // Set Midtrans configuration
-        \Midtrans\Config::$serverKey = config('midtrans.server_key');
-        \Midtrans\Config::$isProduction = config('midtrans.is_production');
-        \Midtrans\Config::$isSanitized = true;
-        \Midtrans\Config::$is3ds = config('midtrans.is_3ds');
-        
-        // midtrans parameter lek jare faler
+        // Test payment creation
         $params = [
             'transaction_details' => [
-                'order_id' => $booking->booking_number . '-' . time(),
-                'gross_amount' => $amount,
+                'order_id' => $latestBooking->booking_number . '-' . time(),
+                'gross_amount' => $latestBooking->total_price,
             ],
             'customer_details' => [
-                'first_name' => $booking->patient_name,
-                'email' => $booking->patient_email ?? 'patient@example.com',
-                'phone' => $booking->patient_phone,
-            ],
-            'payment_type' => 'bank_transfer',
-            'bank_transfer' => [
-                'bank' => strtolower($bank_code),
+                'first_name' => $latestBooking->patient_name,
+                'email' => $latestBooking->patient_email ?? 'patient@example.com',
+                'phone' => $latestBooking->patient_phone,
             ],
             'expiry' => [
                 'start_time' => date('Y-m-d H:i:s O'),
                 'unit' => 'hour',
                 'duration' => 24
             ],
-            // uri buat callback lah intie
             'callbacks' => [
                 'finish' => route('payment.success'),
                 'unfinish' => route('payment.failed'),
-                'error' => route('payment.failed'),
+                'error' => route('payment.failed')
             ]
         ];
-        
-        // Test Snap token creation
-        $snapToken = \Midtrans\Snap::getSnapToken($params);
-        
-        // Create payment record
-        $payment = \App\Models\Payment::create([
-            'order_id' => $params['transaction_details']['order_id'],
-            'booking_id' => $booking->id,
-            'payment_type' => 'bank_transfer',
-            'bank_code' => $bank_code,
-            'va_number' => null,
-            'amount' => $amount,
-            'status' => 'pending',
-            'transaction_id' => null,
-            'midtrans_response' => $params,
-            'expired_at' => now()->addHours(24),
-        ]);
-        
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Payment created successfully',
-            'data' => [
-                'order_id' => $payment->order_id,
-                'amount' => $payment->amount,
-                'bank_code' => $payment->bank_code,
-                'snap_token' => $snapToken,
-                'redirect_url' => 'https://app.sandbox.midtrans.com/snap/v2/vtweb/' . $snapToken
-            ]
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Payment creation failed: ' . $e->getMessage(),
-            'error_details' => [
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
-            ]
-        ], 500);
-    }
-});
-
-// Test Payment Creation with Midtrans (simplified) - No Auth Required
-Route::post('/debug/test-midtrans-payment', function (Request $request) {
-    try {
-        $request->validate([
-            'booking_id' => 'required|exists:bookings,id',
-            'bank_code' => 'required|in:BCA,BRI,BNI,Mandiri,CIMB,BSI'
-        ]);
-
-        $booking = \App\Models\Booking::findOrFail($request->booking_id);
         
         // Set Midtrans configuration
         \Midtrans\Config::$serverKey = config('midtrans.server_key');
@@ -764,53 +397,32 @@ Route::post('/debug/test-midtrans-payment', function (Request $request) {
         \Midtrans\Config::$isSanitized = true;
         \Midtrans\Config::$is3ds = config('midtrans.is_3ds');
         
-        // Prepare Midtrans parameters
-        $params = [
-            'transaction_details' => [
-                'order_id' => $booking->booking_number . '-' . time(),
-                'gross_amount' => $booking->total_price,
-            ],
-            'customer_details' => [
-                'first_name' => $booking->patient_name,
-                'email' => $booking->patient_email ?? 'patient@example.com',
-                'phone' => $booking->patient_phone,
-            ],
-            'payment_type' => 'bank_transfer',
-            'bank_transfer' => [
-                'bank' => strtolower($bank_code),
-            ],
-            'expiry' => [
-                'start_time' => date('Y-m-d H:i:s O'),
-                'unit' => 'hour',
-                'duration' => 24
-            ]
-        ];
-        
-        // Test Snap token creation
         $snapToken = \Midtrans\Snap::getSnapToken($params);
+        $redirectUrl = 'https://app.sandbox.midtrans.com/snap/v2/vtweb/' . $snapToken;
         
         return response()->json([
             'status' => 'success',
-            'message' => 'Midtrans payment test successful',
-            'data' => [
-                'booking_id' => $booking->id,
-                'booking_number' => $booking->booking_number,
-                'bank_code' => $bank_code,
-                'order_id' => $params['transaction_details']['order_id'],
-                'amount' => $booking->total_price,
-                'snap_token' => $snapToken,
-                'patient_name' => $booking->patient_name
-            ]
+            'booking' => [
+                'id' => $latestBooking->id,
+                'booking_number' => $latestBooking->booking_number,
+                'total_price' => $latestBooking->total_price,
+                'status' => $latestBooking->status,
+                'patient_name' => $latestBooking->patient_name,
+                'patient_email' => $latestBooking->patient_email,
+                'patient_phone' => $latestBooking->patient_phone,
+            ],
+            'payment_params' => $params,
+            'snap_token' => $snapToken,
+            'redirect_url' => $redirectUrl,
+            'test_redirect' => true
         ]);
+        
     } catch (\Exception $e) {
         return response()->json([
             'status' => 'error',
-            'message' => 'Midtrans payment test failed: ' . $e->getMessage(),
-            'error_details' => [
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
-            ]
+            'message' => 'Payment flow test failed: ' . $e->getMessage(),
+            'trace' => $e->getTraceAsString()
         ], 500);
     }
-});
+})->middleware('auth');
+

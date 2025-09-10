@@ -33,27 +33,8 @@ class AuthController extends Controller
                 if (app()->environment('local') && request('code') === 'test') {
                     \Log::info('Using test mode for Google OAuth');
                     
-                    // Create a test user for development
-                    $testUser = User::firstOrCreate(
-                        ['email' => 'test@example.com'],
-                        [
-                            'name' => 'Test User',
-                            'google_id' => 'test_google_id',
-                            'password' => Hash::make('password'),
-                            'email_verified_at' => now(),
-                        ]
-                    );
-                    
-                    Auth::login($testUser);
-                    
-                    // Store token in session for API access
-                    session(['auth_token' => $testUser->createToken('auth-token')->plainTextToken]);
-                    
-                    // Redirect based on user role
-                    if ($testUser->isAdmin()) {
-                        return redirect()->route('admin-dashboard')->with('success', 'Test login successful!');
-                    }
-                    return redirect()->route('dashboard')->with('success', 'Test login successful!');
+                    // User not found, redirect to login with error
+                    return redirect()->route('login')->with('error', 'User not found. Please register first.');
                 }
                 
                 $googleUser = Socialite::driver('google')->stateless()->user();

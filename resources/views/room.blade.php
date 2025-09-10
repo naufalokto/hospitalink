@@ -68,7 +68,7 @@
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-xl font-bold text-gray-800">CHECKING AND BOOKING ROOM</h2>
                     <div class="relative pr-1 pt-1">
-                        <a href="{{ route('my-bookings') }}" class="block">
+                        <a href="{{ route('invoice') }}" class="block">
                             <img src="{{ asset('images/icons/icon-notif.png') }}" alt="Notifications" class="w-7 h-9">
                         </a>
                     </div>

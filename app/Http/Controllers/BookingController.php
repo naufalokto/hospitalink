@@ -6,6 +6,7 @@ use App\Models\Booking;
 use App\Models\Hospital;
 use App\Models\HospitalRoomType;
 use App\Models\RoomType;
+use App\Models\BookingRoom;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,8 +16,11 @@ class BookingController extends Controller
 {
     public function showBookingForm($hospital_id, $room_id)
     {
-        // Get hospital data from database
+        // Get hospital by slug or numeric ID
         $hospital = Hospital::where('slug', $hospital_id)->with('roomTypes.roomType')->first();
+        if (!$hospital && is_numeric($hospital_id)) {
+            $hospital = Hospital::where('id', (int)$hospital_id)->with('roomTypes.roomType')->first();
+        }
         
         if (!$hospital) {
             abort(404, 'Hospital not found');
@@ -70,8 +74,11 @@ class BookingController extends Controller
             'notes' => 'nullable|string'
         ]);
 
-        // Get hospital data
+        // Get hospital by slug or numeric ID
         $hospital = Hospital::where('slug', $hospital_id)->with('roomTypes.roomType')->first();
+        if (!$hospital && is_numeric($hospital_id)) {
+            $hospital = Hospital::where('id', (int)$hospital_id)->with('roomTypes.roomType')->first();
+        }
         
         if (!$hospital) {
             return redirect()->back()->with('error', 'Hospital not found');
@@ -123,17 +130,50 @@ class BookingController extends Controller
                 'duration_days' => $durationDays,
                 'price_per_day' => $room['price'],
                 'total_price' => $totalPrice,
-                'status' => 'confirmed',
+                // Mark as pending until user completes payment
+                'status' => 'pending',
                 'notes' => $request->notes
             ]);
+
+            // Create booking room snapshot for payment processing table
+            try {
+                BookingRoom::create([
+                    'booking_id' => $booking->id,
+                    'user_id' => Auth::id(),
+                    'hospital_id' => $hospital->id,
+                    'room_type_id' => $roomType->id,
+                    'patient_name' => $request->patient_name,
+                    'patient_phone' => $request->patient_phone,
+                    'patient_email' => $request->patient_email,
+                    'patient_address' => $request->patient_address,
+                    'check_in_date' => $checkIn,
+                    'check_out_date' => $checkOut,
+                    'duration_days' => $durationDays,
+                    'price_per_day' => $room['price'],
+                    'subtotal' => $totalPrice,
+                    'total_amount' => $totalPrice,
+                    'payment_status' => 'pending',
+                    'notes' => $request->notes,
+                    'additional_data' => [
+                        'booking_number' => $booking->booking_number,
+                        'room_type_code' => $roomType->code,
+                    ]
+                ]);
+            } catch (\Exception $e) {
+                // Do not fail booking if snapshot fails, but log
+                \Log::warning('Failed to create BookingRoom snapshot', [
+                    'error' => $e->getMessage(),
+                    'booking_id' => $booking->id,
+                ]);
+            }
 
             // Room availability is now calculated dynamically based on bookings
 
             DB::commit();
 
-            // Redirect to invoice page
+            // Redirect to invoice page (pending payment)
             return redirect()->route('booking.invoice', $booking->id)
-                ->with('success', 'Booking berhasil! Silakan lihat invoice Anda.');
+                ->with('success', 'Booking berhasil! Silakan lanjutkan ke pembayaran.');
 
         } catch (\Exception $e) {
             DB::rollback();
@@ -181,6 +221,20 @@ class BookingController extends Controller
 
         return view('my-bookings', [
             'bookings' => $bookings
+        ]);
+    }
+
+    public function invoice()
+    {
+        // Get transaction details for the authenticated user
+        $transactionDetails = \App\Models\TransactionDetail::with(['booking', 'hospital', 'roomType'])
+            ->where('user_id', Auth::id())
+            ->where('status', 'completed') // Only show completed transactions
+            ->orderBy('payment_completed_at', 'desc')
+            ->paginate(10);
+
+        return view('invoice', [
+            'transactionDetails' => $transactionDetails
         ]);
     }
 }

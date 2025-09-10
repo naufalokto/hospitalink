@@ -28,7 +28,7 @@
                 <div class="w-full max-w-md mx-auto">
                     <div class="flex items-center justify-between mb-5">
                         <h2 class="text-2xl font-bold text-gray-800">HELP CENTER</h2>
-                        <a href="{{ route('my-bookings') }}" class="block">
+                        <a href="{{ route('invoice') }}" class="block">
                             <img src="{{ asset('images/icons/icon-notif.png') }}" alt="Notifications" class="w-7 h-9">
                         </a>
                     </div>
