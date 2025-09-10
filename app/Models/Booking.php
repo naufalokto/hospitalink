@@ -109,4 +109,12 @@ class Booking extends Model
     {
         return $this->belongsTo(Payment::class, 'id', 'booking_id')->latest();
     }
+
+    /**
+     * Get the transaction detail for this booking
+     */
+    public function transactionDetail(): HasOne
+    {
+        return $this->hasOne(TransactionDetail::class);
+    }
 }

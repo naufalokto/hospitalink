@@ -42,26 +42,30 @@
             <img src="{{ asset('images/rooms/vvip-room.jpg') }}" alt="Hospital"
                 class="w-48 h-24 object-cover rounded-lg">
             <div>
-                <h2 class="text-black font-bold text-lg" id="hospitalName">Rumah Sakit</h2>
-                <p class="text-black text-sm" id="hospitalMeta"></p>
+                <h2 class="text-black font-bold text-lg" id="hospitalName">
+                    {{ $hospital ? $hospital->name : 'Rumah Sakit' }}
+                </h2>
+                <p class="text-black text-sm" id="hospitalMeta">
+                    {{ $hospital ? $hospital->address : '' }}
+                </p>
             </div>
         </div>
 
         <!-- Main Container with Alpine.js -->
         <div x-data="{ 
             days: 5, 
-            pricePerDay: 300000, 
+            pricePerDay: {{ $hospitalRoomType ? $hospitalRoomType->price_per_day : 300000 }}, 
             selected: '',
             roomPrices: {
-                vvip: 800000,
-                class1: 500000,
-                class2: 300000,
-                class3: 200000
+                vvip: {{ $hospital && $hospital->roomTypes->where('roomType.code', 'vvip')->first() ? $hospital->roomTypes->where('roomType.code', 'vvip')->first()->price_per_day : 300000 }},
+                class1: {{ $hospital && $hospital->roomTypes->where('roomType.code', 'class1')->first() ? $hospital->roomTypes->where('roomType.code', 'class1')->first()->price_per_day : 200000 }},
+                class2: {{ $hospital && $hospital->roomTypes->where('roomType.code', 'class2')->first() ? $hospital->roomTypes->where('roomType.code', 'class2')->first()->price_per_day : 150000 }},
+                class3: {{ $hospital && $hospital->roomTypes->where('roomType.code', 'class3')->first() ? $hospital->roomTypes->where('roomType.code', 'class3')->first()->price_per_day : 100000 }}
             },
-            selectedRoomType: 'class2',
+            selectedRoomType: '{{ $roomType ? $roomType->code : 'class2' }}',
             get totalPrice() { return this.days * this.pricePerDay; },
             async init() {
-                // Load room prices from API
+                // Load room prices from API as fallback
                 await this.loadRoomPrices();
                 // Set initial price based on selected room type
                 this.updatePricePerDay();
@@ -72,23 +76,19 @@
                     const response = await fetch(`/api/hospital/${hospitalId}/room-prices`);
                     const data = await response.json();
                     if (data.status === 'success') {
+                        // Update room prices from API
                         this.roomPrices = data.data.room_prices;
                         this.updatePricePerDay();
-                        // Fill hospital info from API
-                        const name = data.data.hospital_name ? data.data.hospital_name : `Hospital ID ${hospitalId}`;
-                        document.getElementById('hospitalName').textContent = name;
-                        const center = document.getElementById('hospitalNameCenter');
-                        if (center) center.textContent = name;
-                        document.getElementById('hospitalMeta').textContent = '';
                     }
                 } catch (error) {
                     console.error('Failed to load room prices:', error);
+                    // Keep the server-side prices as fallback
                 }
             },
             getHospitalId() {
-                // Extract hospital ID from URL or use default
+                // Extract hospital ID from URL or use hospital ID from server
                 const urlParams = new URLSearchParams(window.location.search);
-                return urlParams.get('hospital_id') || 1;
+                return urlParams.get('hospital_id') || {{ $hospital ? $hospital->id : 1 }};
             },
             updatePricePerDay() {
                 this.pricePerDay = this.roomPrices[this.selectedRoomType] || 300000;
@@ -108,7 +108,9 @@
                     </div>
                     <div class="py-4">
                         <h3 class="text-white text-sm mb-1">Nama Rumah Sakit</h3>
-                        <p class="text-white font-semibold" id="hospitalNameCenter">-</p>
+                        <p class="text-white font-semibold" id="hospitalNameCenter">
+                            {{ $hospital ? $hospital->name : '-' }}
+                        </p>
                     </div>
                     <div class="py-4">
                         <h3 class="text-white text-sm mb-1">Waktu Inap</h3>
@@ -175,15 +177,14 @@
 
         
 
-        <!-- Pay Button -->
-        <div class="mt-6 flex justify-center">
-            <button id="payButton" 
+        <!-- Booking Button -->
+        <div class="mt-6 flex flex-col items-center space-y-3">
+            <button id="bookButton" 
                 class="block w-[320px] bg-gray-900 text-white font-bold py-3 rounded-3xl text-lg 
           transition-transform duration-300 hover:scale-105 hover:shadow-md text-center"
-                onclick="processPayment()">
-                Bayar
+                onclick="bookNow()">
+                Booking
             </button>
-            </div>
         </div>
     </div>
 
@@ -198,7 +199,7 @@
                 return {
                     id: parseInt(bookingId),
                     patient_name: '{{ $user->name ?? "Guest User" }}',
-                    total_price: 1500000,
+                    total_price: {{ $hospitalRoomType ? $hospitalRoomType->price_per_day * 5 : 1500000 }},
                     booking_number: 'BK20250908Dx8uXK'
                 };
             }
@@ -212,8 +213,8 @@
         async function processPayment() {
             let totalPrice = 0;
             let days = 5;
-            let pricePerDay = 300000;
-            let selectedRoomType = 'class2';
+            let pricePerDay = {{ $hospitalRoomType ? $hospitalRoomType->price_per_day : 300000 }};
+            let selectedRoomType = '{{ $roomType ? $roomType->code : 'class2' }}';
             
             try {
                 // Get Alpine.js data from the main container
@@ -222,8 +223,8 @@
                     const alpineData = Alpine.$data(alpineElement);
                     totalPrice = alpineData ? alpineData.totalPrice : 0;
                     days = alpineData ? alpineData.days : 5;
-                    pricePerDay = alpineData ? alpineData.pricePerDay : 300000;
-                    selectedRoomType = alpineData ? alpineData.selectedRoomType : 'class2';
+                    pricePerDay = alpineData ? alpineData.pricePerDay : {{ $hospitalRoomType ? $hospitalRoomType->price_per_day : 300000 }};
+                    selectedRoomType = alpineData ? alpineData.selectedRoomType : '{{ $roomType ? $roomType->code : 'class2' }}';
                 }
                 
                 // Fallback: calculate manually if Alpine.js data not available
@@ -235,7 +236,7 @@
             } catch (error) {
                 console.error('Error getting Alpine.js data:', error);
                 // Use fallback values
-                totalPrice = 5 * 300000; // Default 5 days
+                totalPrice = 5 * {{ $hospitalRoomType ? $hospitalRoomType->price_per_day : 300000 }}; // Default 5 days
             }
             
             console.log('Final values:', { totalPrice });
@@ -247,13 +248,34 @@
             try {
                 // Ensure we have a booking id for the selected hospital and room type
                 const hospitalId = new URLSearchParams(window.location.search).get('hospital_id');
-                if (!bookingData.id && hospitalId) {
-                    const createRes = await fetch(`/api/debug/create-booking/${hospitalId}/${selectedRoomType}`);
-                    const createJson = await createRes.json();
-                    if (createJson.status === 'success') {
-                        bookingData.id = createJson.data.booking_id;
+                const roomId = new URLSearchParams(window.location.search).get('room_id');
+                
+                if (!bookingData.id && hospitalId && roomId) {
+                    // Create booking through normal booking process
+                    const createRes = await fetch(`/booking/${hospitalId}/room/${roomId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: JSON.stringify({
+                            patient_name: '{{ $user->name ?? "Guest User" }}',
+                            patient_phone: '081234567890',
+                            patient_email: '{{ $user->email ?? "guest@example.com" }}',
+                            check_in_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Tomorrow
+                            check_out_date: new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 6 days from now
+                            notes: 'Booking from payment page',
+                            room_type: '{{ $roomType ? $roomType->code : 'class2' }}',
+                            price_per_day: {{ $hospitalRoomType ? $hospitalRoomType->price_per_day : 300000 }}
+                        })
+                    });
+                    
+                    if (createRes.ok) {
+                        // If booking is successful, redirect to booking invoice
+                        window.location.href = createRes.url;
+                        return;
                     } else {
-                        throw new Error(createJson.message || 'Gagal membuat booking');
+                        throw new Error('Gagal membuat booking. Silakan coba lagi.');
                     }
                 }
 
@@ -262,8 +284,17 @@
                     amount: totalPrice,
                     room_type: selectedRoomType,
                     days: days,
-                    price_per_day: pricePerDay
+                    price_per_day: pricePerDay,
+                    hospital_id: {{ $hospital ? $hospital->id : 'null' }},
+                    room_id: {{ $roomType ? $roomType->id : 'null' }}
                 });
+                
+                // If no booking ID, we need to create one first
+                if (!bookingData.id) {
+                    console.log('No booking ID, need to create booking first');
+                    alert('Silakan buat booking terlebih dahulu');
+                    return;
+                }
 
                 // Call real create payment endpoint
                 const response = await fetch(`{{ route('payment.create') }}`, {
@@ -274,24 +305,72 @@
                     },
                     body: JSON.stringify({
                         booking_id: bookingData.id,
-                        amount: totalPrice
+                        amount: totalPrice,
+                        hospital_id: {{ $hospital ? $hospital->id : 'null' }},
+                        room_id: {{ $roomType ? $roomType->id : 'null' }},
+                        room_type: selectedRoomType,
+                        price_per_day: pricePerDay
                     })
                 });
 
                 console.log('Response status:', response.status);
-                console.log('Response headers:', response.headers);
+                console.log('Response URL:', response.url);
+                console.log('Response headers:', Object.fromEntries(response.headers.entries()));
 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    let errorText;
+                    try {
+                        errorText = await response.text();
+                        console.error('Error response text:', errorText);
+                        
+                        // Try to parse as JSON for better error handling
+                        try {
+                            const errorJson = JSON.parse(errorText);
+                            console.error('Error response JSON:', errorJson);
+                            throw new Error(`HTTP error! status: ${response.status}, message: ${errorJson.message || errorText}`);
+                        } catch (parseError) {
+                            throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+                        }
+                    } catch (textError) {
+                        throw new Error(`HTTP error! status: ${response.status}, message: Failed to read error response`);
+                    }
                 }
 
-                const result = await response.json();
-                console.log('Payment response:', result);
+                let result;
+                try {
+                    const responseText = await response.text();
+                    console.log('Raw response text:', responseText);
+                    result = JSON.parse(responseText);
+                    console.log('Parsed payment response:', result);
+                } catch (parseError) {
+                    console.error('Failed to parse response as JSON:', parseError);
+                    throw new Error('Invalid response format from server');
+                }
 
-                if ((result.success === true) && result.redirect_url) {
+                if (result.success === true && result.redirect_url) {
                     console.log('Redirecting to Midtrans:', result.redirect_url);
-                    window.location.href = result.redirect_url;
+                    console.log('Redirect URL validation:', {
+                        hasProtocol: result.redirect_url.startsWith('http'),
+                        isMidtrans: result.redirect_url.includes('midtrans.com'),
+                        urlLength: result.redirect_url.length
+                    });
+                    
+                    // Try multiple redirect methods
+                    try {
+                        // Force redirect with timeout
+                        setTimeout(() => {
+                            window.location.href = result.redirect_url;
+                        }, 100);
+                    } catch (e) {
+                        console.log('window.location.href failed, trying window.open');
+                        window.open(result.redirect_url, '_blank');
+                    }
                 } else {
+                    console.error('Payment failed:', result);
+                    console.error('Success value:', result.success);
+                    console.error('Success type:', typeof result.success);
+                    console.error('Redirect URL:', result.redirect_url);
+                    console.error('Redirect URL type:', typeof result.redirect_url);
                     alert('Gagal membuat pembayaran: ' + (result.message || 'Unknown error'));
                 }
             } catch (error) {
@@ -300,6 +379,8 @@
                     message: error.message,
                     stack: error.stack
                 });
+                console.error('Error name:', error.name);
+                console.error('Error constructor:', error.constructor.name);
                 alert('Terjadi kesalahan saat memproses pembayaran: ' + error.message);
             } finally {
                 payButton.disabled = false;
@@ -307,15 +388,120 @@
             }
         }
 
-        // Debug function to check Alpine.js data
-        function debugAlpineData() {
-            const alpineData = Alpine.$data(document.querySelector('[x-data]'));
-            console.log('Alpine.js data:', alpineData);
-            console.log('Selected bank:', alpineData ? alpineData.selected : 'No data');
-            console.log('Days:', alpineData ? alpineData.days : 'No data');
-            console.log('Price per day:', alpineData ? alpineData.pricePerDay : 'No data');
-            console.log('Total price:', alpineData ? alpineData.totalPrice : 'No data');
+        function bookNow() {
+            try {
+                const serverHospitalSlug = '{{ $hospital ? ($hospital->slug ?? '') : '' }}';
+                const urlParams = new URLSearchParams(window.location.search);
+                const hospitalParam = serverHospitalSlug || urlParams.get('hospital_id');
+                const roomId = urlParams.get('room_id');
+                if (!hospitalParam || !roomId) {
+                    alert('Parameter rumah sakit atau tipe kamar tidak valid');
+                    return;
+                }
+
+                // Get Alpine data if available
+                let days = 5;
+                try {
+                    const alpineElement = document.querySelector('[x-data]');
+                    if (alpineElement && Alpine.$data) {
+                        const alpineData = Alpine.$data(alpineElement);
+                        days = alpineData ? alpineData.days : 5;
+                    }
+                } catch (e) {}
+
+                // Use existing data on the page (no extra inputs)
+                const patientName = '{{ $user->name ?? "Guest User" }}';
+                const patientPhone = '{{ $user->phone ?? '081234567890' }}';
+                const patientEmail = '{{ $user->email ?? 'guest@example.com' }}';
+                const patientAddress = '';
+
+                const today = new Date();
+                const checkIn = new Date(today);
+                checkIn.setDate(checkIn.getDate() + 1);
+                const checkOut = new Date(checkIn);
+                checkOut.setDate(checkOut.getDate() + days);
+
+                // Build and submit a real form so browser follows redirects
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/booking/${hospitalParam}/room/${roomId}`;
+
+                const csrf = document.createElement('input');
+                csrf.type = 'hidden';
+                csrf.name = '_token';
+                csrf.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                form.appendChild(csrf);
+
+                const fields = {
+                    patient_name: patientName,
+                    patient_phone: patientPhone,
+                    patient_email: patientEmail,
+                    patient_address: patientAddress,
+                    check_in_date: checkIn.toISOString().split('T')[0],
+                    check_out_date: checkOut.toISOString().split('T')[0],
+                    notes: 'Booking dari halaman detail booking',
+                };
+
+                Object.entries(fields).forEach(([name, value]) => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = name;
+                    input.value = value;
+                    form.appendChild(input);
+                });
+
+                document.body.appendChild(form);
+                const btn = document.getElementById('bookButton');
+                if (btn) { btn.disabled = true; btn.textContent = 'Memproses...'; }
+                form.submit();
+            } catch (error) {
+                alert('Terjadi kesalahan saat membuat booking: ' + error.message);
+            }
         }
+
+        // Debug function for testing payment flow
+        async function debugPaymentFlow() {
+            console.log('=== DEBUG PAYMENT FLOW ===');
+            
+            try {
+                // Test debug endpoint
+                const debugResponse = await fetch('/debug/payment-flow', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                });
+                
+                console.log('Debug response status:', debugResponse.status);
+                
+                if (debugResponse.ok) {
+                    const debugResult = await debugResponse.json();
+                    console.log('Debug result:', debugResult);
+                    
+                    if (debugResult.status === 'success' && debugResult.redirect_url) {
+                        console.log('Debug redirect URL:', debugResult.redirect_url);
+                        alert('Debug: Payment flow test successful! Check console for details.');
+                        
+                        // Optionally redirect to test URL
+                        if (confirm('Do you want to test redirect to Midtrans?')) {
+                            window.location.href = debugResult.redirect_url;
+                        }
+                    } else {
+                        console.error('Debug failed:', debugResult);
+                        alert('Debug: Payment flow test failed - ' + (debugResult.message || 'Unknown error'));
+                    }
+                } else {
+                    const errorText = await debugResponse.text();
+                    console.error('Debug request failed:', errorText);
+                    alert('Debug: Request failed - ' + errorText);
+                }
+            } catch (error) {
+                console.error('Debug error:', error);
+                alert('Debug: Error - ' + error.message);
+            }
+        }
+
     </script>
 </body>
 

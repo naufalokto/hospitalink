@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Invoice Booking - HOSPITALINK</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -25,7 +26,7 @@
     <div class="max-w-4xl mx-auto p-4">
         <!-- Header Actions -->
         <div class="no-print flex justify-between items-center mb-6">
-            <a href="{{ route('my-bookings') }}" 
+            <a href="{{ route('invoice') }}" 
                class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
                 ← Kembali ke Daftar Booking
             </a>
@@ -38,6 +39,12 @@
                    class="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition-colors">
                     📄 Download PDF
                 </a>
+                @if($booking->status === 'pending')
+                <button id="payButton"
+                        class="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors">
+                    💳 Bayar Sekarang
+                </button>
+                @endif
             </div>
         </div>
 
@@ -197,6 +204,44 @@
         window.addEventListener('load', function () {
             const m = document.getElementById('paidModal');
             if (m) m.classList.remove('hidden');
+        });
+    </script>
+    @endif
+
+    @if($booking->status === 'pending')
+    <script>
+        document.getElementById('payButton')?.addEventListener('click', async function () {
+            const btn = this;
+            btn.disabled = true;
+            btn.textContent = 'Memproses...';
+            try {
+                const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '{{ csrf_token() }}';
+                const res = await fetch(`{{ route('payment.create') }}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({ booking_id: {{ $booking->id }}, amount: {{ $booking->total_price }} })
+                });
+                if (!res.ok) {
+                    const txt = await res.text();
+                    alert('Gagal membuat pembayaran: ' + txt);
+                    btn.disabled = false; btn.textContent = '💳 Bayar Sekarang';
+                    return;
+                }
+                const json = await res.json();
+                if (json.success && json.redirect_url) {
+                    window.location.href = json.redirect_url;
+                } else {
+                    alert('Gagal membuat pembayaran: ' + (json.message || 'Unknown error'));
+                    btn.disabled = false; btn.textContent = '💳 Bayar Sekarang';
+                }
+            } catch (e) {
+                alert('Terjadi kesalahan: ' + e.message);
+                btn.disabled = false; btn.textContent = '💳 Bayar Sekarang';
+            }
         });
     </script>
     @endif

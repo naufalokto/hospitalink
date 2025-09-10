@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\HospitalController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,6 +30,7 @@ Route::post('/auth/logout', [AuthController::class, 'logout'])->middleware('auth
 
 // Public API Routes (for patient side)
 Route::get('/hospitals/rooms', [AdminController::class, 'getPublicRoomData']);
+Route::get('/hospital/{hospitalId}/room-prices', [HospitalController::class, 'getRoomPrices']);
 
 // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {

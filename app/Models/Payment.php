@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Payment extends Model
 {
@@ -56,6 +57,14 @@ class Payment extends Model
     public function isFailed(): bool
     {
         return in_array($this->status, ['deny', 'cancel', 'expire', 'failure']);
+    }
+
+    /**
+     * Get the transaction detail for this payment
+     */
+    public function transactionDetail(): HasOne
+    {
+        return $this->hasOne(TransactionDetail::class);
     }
 
     /**
