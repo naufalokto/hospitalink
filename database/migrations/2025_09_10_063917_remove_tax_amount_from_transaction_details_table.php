@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('transaction_details', function (Blueprint $table) {
-            $table->dropColumn('tax_amount');
-        });
+        // Check if tax_amount column exists before trying to drop it
+        if (Schema::hasTable('transaction_details') && Schema::hasColumn('transaction_details', 'tax_amount')) {
+            Schema::table('transaction_details', function (Blueprint $table) {
+                $table->dropColumn('tax_amount');
+            });
+        }
     }
 
     /**
@@ -21,8 +24,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('transaction_details', function (Blueprint $table) {
-            $table->decimal('tax_amount', 10, 2)->default(0)->after('subtotal');
-        });
+        // Check if tax_amount column doesn't exist before trying to add it
+        if (Schema::hasTable('transaction_details') && !Schema::hasColumn('transaction_details', 'tax_amount')) {
+            Schema::table('transaction_details', function (Blueprint $table) {
+                $table->decimal('tax_amount', 10, 2)->default(0)->after('subtotal');
+            });
+        }
     }
 };
