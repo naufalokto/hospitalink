@@ -219,7 +219,9 @@
                     const slugMap = {
                         'RSUD Sidoarjo': 'rsud_sidoarjo',
                         'RSUD Dr. Mohammad Soewandhie': 'rsud_soewandhie',
-                        'RSUD Dr Wahidin Sudiro Husodo': 'rsud_wahidin'
+                        'RSUD Dr Wahidin Sudiro Husodo': 'rsud_wahidin',
+                        'Rumah Sakit Islam Surabaya (RSIS A. Yani)': 'rumah_sakit_islam_surabaya',
+                        'Mayapada Hospital Surabaya (MHSB)': 'mayapada_hospital_surabaya',
                     };
                     return slugMap[hospital.name] || hospital.slug;
                 }
