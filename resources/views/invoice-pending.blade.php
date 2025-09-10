@@ -128,7 +128,7 @@
             const payButton = this;
             payButton.disabled = true;
             payButton.textContent = 'Memproses...';
-            
+
             try {
                 const response = await fetch(`{{ route('payment.create') }}`, {
                     method: 'POST',
@@ -141,21 +141,30 @@
                         amount: {{ $booking->total_price }}
                     })
                 });
-                
-                if (response.ok) {
-                    const result = await response.json();
-                    if (result.success && result.redirect_url) {
-                        // Redirect to Midtrans
-                        window.location.href = result.redirect_url;
-                    } else {
-                        alert('Gagal membuat pembayaran: ' + (result.message || 'Unknown error'));
-                    }
-                } else {
+
+                if (!response.ok) {
                     const errorText = await response.text();
-                    alert('Error: ' + errorText);
+                    throw new Error(errorText || ('HTTP ' + response.status));
                 }
+
+                const result = await response.json();
+
+                // Prefer direct redirect_url from backend
+                if (result.success && result.redirect_url) {
+                    window.location.href = result.redirect_url;
+                    return;
+                }
+
+                // Fallback: build VT-Web URL from snap_token
+                if (result.success && result.snap_token) {
+                    const base = {{ config('midtrans.is_production') ? "'https://app.midtrans.com'" : "'https://app.sandbox.midtrans.com'" }};
+                    window.location.href = base + '/snap/v2/vtweb/' + result.snap_token;
+                    return;
+                }
+
+                throw new Error(result.message || 'Gagal membuat pembayaran');
             } catch (error) {
-                alert('Terjadi kesalahan: ' + error.message);
+                alert('Terjadi kesalahan: ' + (error.message || error));
             } finally {
                 payButton.disabled = false;
                 payButton.textContent = 'Bayar Sekarang';
