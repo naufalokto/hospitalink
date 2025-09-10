@@ -56,6 +56,9 @@ Route::get('/room', [RoomViewController::class, 'index'])->name('room');
 Route::get('/checking/{hospital_id}', [App\Http\Controllers\RoomController::class, 'checking'])->name('checking');
 Route::get('/checking/{hospital_id}/room/{room_id}', [App\Http\Controllers\RoomController::class, 'checkingDetail'])->name('checking-detail');
 
+// API route for real-time room availability
+Route::get('/api/room-availability/{hospital_id}', [App\Http\Controllers\RoomController::class, 'getRoomAvailability'])->name('api.room-availability');
+
 // Booking routes
 Route::middleware('auth')->group(function () {
     Route::get('/booking/{hospital_id}/room/{room_id}', [App\Http\Controllers\BookingController::class, 'showBookingForm'])->name('booking.form');

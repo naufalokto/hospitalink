@@ -201,6 +201,103 @@
             </div>
         </div>
     </div>
+
+    <!-- Real-time Room Availability Updates -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const hospitalId = '{{ $hospital_id }}';
+            let lastUpdateTime = null;
+            
+            // Function to update room availability
+            async function updateRoomAvailability() {
+                try {
+                    const response = await fetch(`/api/room-availability/${hospitalId}`);
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        const roomTypes = data.data.room_types;
+                        const currentTime = data.data.last_updated;
+                        
+                        // Only update if data has changed
+                        if (lastUpdateTime !== currentTime) {
+                            lastUpdateTime = currentTime;
+                            
+                            // Update mobile layout
+                            updateMobileLayout(roomTypes);
+                            
+                            // Update desktop layout
+                            updateDesktopLayout(roomTypes);
+                            
+                            console.log('Room availability updated:', currentTime);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Failed to update room availability:', error);
+                }
+            }
+            
+            // Update mobile layout
+            function updateMobileLayout(roomTypes) {
+                const mobileCards = document.querySelectorAll('.lg\\:hidden .bg-\\[\\#99C1D6\\]');
+                roomTypes.forEach((room, index) => {
+                    if (mobileCards[index]) {
+                        const availableText = mobileCards[index].querySelector('.text-sm.text-black.font-medium');
+                        if (availableText) {
+                            availableText.textContent = room.available;
+                        }
+                    }
+                });
+            }
+            
+            // Update desktop layout
+            function updateDesktopLayout(roomTypes) {
+                const desktopCards = document.querySelectorAll('.hidden.lg\\:flex .bg-white\\/90');
+                roomTypes.forEach((room, index) => {
+                    if (desktopCards[index]) {
+                        const availableSpan = desktopCards[index].querySelector('.text-green-600, .text-red-600');
+                        if (availableSpan) {
+                            availableSpan.textContent = room.available;
+                            // Update status class
+                            if (room.status === 'Available') {
+                                availableSpan.className = 'text-green-600 font-semibold';
+                            } else {
+                                availableSpan.className = 'text-red-600 font-semibold';
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Update room availability every 30 seconds
+            setInterval(updateRoomAvailability, 30000);
+            
+            // Initial update after 5 seconds
+            setTimeout(updateRoomAvailability, 5000);
+            
+            // Add visual indicator for real-time updates
+            const updateIndicator = document.createElement('div');
+            updateIndicator.id = 'update-indicator';
+            updateIndicator.className = 'fixed top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm opacity-0 transition-opacity duration-300 z-50';
+            updateIndicator.textContent = 'Updated';
+            document.body.appendChild(updateIndicator);
+            
+            // Show update indicator when data is refreshed
+            function showUpdateIndicator() {
+                const indicator = document.getElementById('update-indicator');
+                indicator.style.opacity = '1';
+                setTimeout(() => {
+                    indicator.style.opacity = '0';
+                }, 2000);
+            }
+            
+            // Override the update function to show indicator
+            const originalUpdate = updateRoomAvailability;
+            updateRoomAvailability = async function() {
+                await originalUpdate();
+                showUpdateIndicator();
+            };
+        });
+    </script>
 </body>
 
 </html>
