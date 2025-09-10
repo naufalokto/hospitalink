@@ -72,7 +72,7 @@
          <!-- Invoice Card -->
             <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-20 md:mb-6">
                 <!-- Invoice Header -->
-                <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 md:p-6">
+                <div class="bg-gradient-to-r from-[#02293E] to-[#034C74] text-white p-4 md:p-6">
                     <div class="flex flex-col md:flex-row justify-between md:items-start gap-4 md:gap-0">
                         <div class="text-left">
                             <h2 class="text-xl md:text-2xl font-bold">INVOICE</h2>
@@ -113,7 +113,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div class="bg-gray-50 p-4 rounded-lg">
                             <h3 class="text-lg font-bold text-gray-900 mb-3 flex items-center">
-                                <span class="mr-2">👤</span>
+                                
                                 Informasi Pasien
                             </h3>
                             <div class="space-y-3">
@@ -132,7 +132,7 @@
 
                         <div class="bg-gray-50 p-4 rounded-lg">
                             <h3 class="text-lg font-bold text-gray-900 mb-3 flex items-center">
-                                <span class="mr-2">🏥</span>
+                                
                                 Informasi Booking
                             </h3>
                             <div class="space-y-3">
@@ -163,7 +163,7 @@
                     <!-- Price Breakdown -->
                     <div class="bg-gray-50 rounded-lg p-4 mb-6">
                         <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
-                            <span class="mr-2">💰</span>
+                           
                             Rincian Pembayaran
                         </h3>
                         <div class="space-y-3">
@@ -189,7 +189,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="bg-gray-50 p-4 rounded-lg">
                                 <h4 class="font-bold text-gray-900 mb-3 flex items-center">
-                                    <span class="mr-2">🏥</span>
+                                   
                                     Kontak Rumah Sakit
                                 </h4>
                                 <p class="text-gray-600 mb-2">{{ $booking->hospital->name }}</p>
@@ -199,16 +199,16 @@
                             </div>
                             <div class="bg-gray-50 p-4 rounded-lg">
                                 <h4 class="font-bold text-gray-900 mb-3 flex items-center">
-                                    <span class="mr-2">📞</span>
+                                   
                                     Kontak HOSPITALINK
                                 </h4>
                                 <p class="text-gray-600 flex items-center mb-2">
                                     <span class="mr-2">📧</span>
-                                    info@hospitalink.com
+                                    ehospital.app@gmail.com
                                 </p>
                                 <p class="text-gray-600 flex items-center">
                                     <span class="mr-2">📞</span>
-                                    +62 123 456 7890
+                                    081-354-011
                                 </p>
                             </div>
                         </div>
@@ -307,9 +307,9 @@
 
         <!-- Mobile Pay Button -->
     @if ($booking->status === 'pending')
-        <div class="md:hidden fixed bottom-0 left-0 right-0 p-2 bg-white shadow-lg">
+        <div class="md:hidden fixed bottom-0 left-0 right-0 p-2 mb-4">
             <button id="payButton-mobile"
-                class="w-full bg-emerald-600 text-white px-3 py-2.5 rounded-lg hover:bg-emerald-700 transition-colors text-base font-medium">
+                class="w-full bg-[#02293E] text-white px-3 py-2.5 rounded-2xl hover:bg-[#034C74] transition-colors text-base font-medium">
                 Bayar
             </button>
         </div>
