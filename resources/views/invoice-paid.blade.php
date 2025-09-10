@@ -38,17 +38,9 @@
                         <p class="font-semibold">{{ $booking->patient_name }}</p>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-600">No. Telepon</p>
-                        <p class="font-semibold">{{ $booking->patient_phone }}</p>
-                    </div>
-                    <div>
                         <p class="text-sm text-gray-600">Email</p>
                         <p class="font-semibold">{{ $booking->patient_email ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-600">Alamat</p>
-                        <p class="font-semibold">{{ $booking->patient_address ?? '-' }}</p>
-                    </div>
+                    </div>    
                 </div>
             </div>
 

@@ -16,7 +16,7 @@
     </style>
 </head>
 
-<body class="bg-[#00A2FA] min-h-screen">
+<body class="bg-[#00A2FA] min-h-screen ">
     @if(request()->boolean('paid'))
     <div id="successOverlay" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
         <div id="successModal" class="relative" style="width:254px; height:359px; background:#D9D9D9; border-radius:10px;">
@@ -109,49 +109,51 @@
     <!-- Desktop Layout -->
     <div class="hidden lg:flex min-h-screen">
         <!-- Sidebar -->
-        <div class="w-64 bg-white shadow-lg">
-            <div class="p-6">
-                <img src="/images/logo-hospitalink.png" alt="HOSPITALINK" class="h-8 mb-8">
-
-                <nav class="space-y-2">
-                    <a href="{{ route('home') }}"
-                        class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path
-                                d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z">
-                            </path>
-                        </svg>
-                        Home
-                    </a>
-                    <a href="#"
-                        class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-                                clip-rule="evenodd"></path>
-                        </svg>
-                        Hospital
-                    </a>
-                    <a href="{{ route('room') }}"
-                        class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-600 rounded-lg">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm3 5a1 1 0 011-1h4a1 1 0 110 2H8a1 1 0 01-1-1z"
-                                clip-rule="evenodd"></path>
-                        </svg>
-                        Room
-                    </a>
-                    <a href="#"
-                        class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-2 0c0 .993-.241 1.929-.668 2.754l-1.524-1.525a3.997 3.997 0 00.078-2.183l1.562-1.562C15.802 8.249 16 9.1 16 10zm-5.165 3.913l1.58 1.58A5.98 5.98 0 0110 16a5.976 5.976 0 01-2.516-.552l1.562-1.562a4.006 4.006 0 001.789.027zm-4.677-2.796a4.002 4.002 0 01-.041-2.08l-1.106-1.106A6.003 6.003 0 004 10c0 .639.1 1.255.283 1.836l1.875-1.875zM15.493 6.344a6.003 6.003 0 00-8.835 1.843l1.474 1.474a3.98 3.98 0 012.252-.763 4.01 4.01 0 013.161-.763l1.948-1.791z"
-                                clip-rule="evenodd"></path>
-                        </svg>
-                        Help
-                    </a>
-                </nav>
+        <div class="w-64 xl:w-72 bg-white shadow-lg flex flex-col">
+            <!-- Logo Section -->
+            <div class="p-6 xl:p-8 border-b border-gray-200">
+                <img src="{{ asset('images/Logo-Hospitalink3.png') }}" alt="HOSPITALINK"
+                    class="h-12 xl:h-16 mx-auto">
             </div>
+
+            <!-- Navigation Menu -->
+            <nav class="flex-1 p-4 xl:p-6">
+                <ul class="space-y-3">
+                    <li>
+                        <a href="{{ route('dashboard') }}"
+                            class="flex items-center px-4 py-3 xl:py-4 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors group">
+                            <img src="{{ asset('images/icons/icon-home.png') }}" alt="Home"
+                                class="w-6 h-6 xl:w-7 xl:h-7 mr-3 opacity-60 group-hover:opacity-100">
+                            <span class="font-medium">Home</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('hospital') }}"
+                            class="flex items-center px-4 py-3 xl:py-4 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors group">
+                            <img src="{{ asset('images/icons/icon-hospital.png') }}" alt="Hospital"
+                                class="w-6 h-6 xl:w-7 xl:h-7 mr-3 opacity-60 group-hover:opacity-100">
+                            <span class="font-medium">Hospital</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('room') }}"
+                            class="flex items-center px-4 py-3 xl:py-4 text-[#00A2FA] bg-blue-50 rounded-lg">
+                            <img src="{{ asset('images/icons/icon-room.png') }}" alt="Room"
+                                class="w-6 h-6 xl:w-7 xl:h-7 mr-3">
+                            <span class="font-medium">Room</span>
+                            <div class="ml-auto w-2 h-2 bg-[#00A2FA] rounded-full"></div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('help') }}"
+                            class="flex items-center px-4 py-3 xl:py-4 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors group">
+                            <img src="{{ asset('images/icons/icon-help.png') }}" alt="Help"
+                                class="w-6 h-6 xl:w-7 xl:h-7 mr-3 opacity-60 group-hover:opacity-100">
+                            <span class="font-medium">Help</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </div>
 
         <!-- Main Content -->

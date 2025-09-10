@@ -238,18 +238,15 @@
                             <div class="section-title font-satoshi mb-2">INVOICE TO:</div>
                             <div class="patient-name font-satoshi mb-1">{{ $transaction->patient_name }}</div>
                             <div class="patient-detail font-satoshi">{{ $transaction->hospital_name }}</div>
-                            @if($transaction->patient_address)
+                            @if ($transaction->patient_address)
                                 <div class="patient-detail font-satoshi">{{ $transaction->patient_address }}</div>
                             @endif
                         </div>
 
                         <!-- Contact Information -->
                         <div class="mb-4">
-                            <div class="flex items-center mb-1">
-                                <span class="contact-label font-satoshi">P:</span>
-                                <span class="contact-value font-satoshi ml-1">{{ $transaction->patient_phone }}</span>
-                            </div>
-                            @if($transaction->patient_email)
+
+                            @if ($transaction->patient_email)
                                 <div class="flex items-center">
                                     <span class="email-label font-satoshi">E:</span>
                                     <span class="email-value font-satoshi ml-1">{{ $transaction->patient_email }}</span>
@@ -261,7 +258,7 @@
                         <div class="mb-4">
                             <div class="section-title font-satoshi mb-2">ADDRESS</div>
                             <div class="patient-name font-satoshi mb-1">{{ $transaction->hospital_name }}</div>
-                            @if($transaction->hospital->address)
+                            @if ($transaction->hospital->address)
                                 <div class="patient-detail font-satoshi">{{ $transaction->hospital->address }}</div>
                             @endif
                             <div class="address-detail font-satoshi">Indonesia</div>
@@ -272,27 +269,30 @@
                             <div class="section-title font-satoshi mb-2">CONTACT</div>
                             <div class="mb-2">
                                 <div class="patient-name font-satoshi mb-1">Phone</div>
-                                <div class="contact-value font-satoshi">{{ $transaction->hospital->phone ?? '+62 123 456 7890' }}</div>
+                                <div class="contact-value font-satoshi">{{ $transaction->hospital->phone_number }}</div>
                             </div>
                             <div class="mb-2">
                                 <div class="patient-name font-satoshi mb-1">Email</div>
-                                <div class="contact-value font-satoshi">{{ $transaction->hospital->email ?? 'info@hospitalink.com' }}</div>
+                                <div class="contact-value font-satoshi">
+                                    {{ $transaction->hospital->email ?? 'ehospital.app@gmail.com' }}</div>
                             </div>
                         </div>
 
                         <!-- Bank Details -->
                         <div class="mb-4">
                             <div class="patient-name font-satoshi mb-2">Bank Details</div>
-                            @if($transaction->va_number)
+                            @if ($transaction->va_number)
                                 <div class="flex items-center mb-1">
                                     <span class="bank-detail-label font-satoshi">Account No. :</span>
-                                    <span class="bank-detail-value font-satoshi ml-1">{{ $transaction->va_number }}</span>
+                                    <span
+                                        class="bank-detail-value font-satoshi ml-1">{{ $transaction->va_number }}</span>
                                 </div>
                             @endif
-                            @if($transaction->bank_code)
+                            @if ($transaction->bank_code)
                                 <div class="flex items-center">
                                     <span class="bank-detail-label font-satoshi">Code :</span>
-                                    <span class="bank-detail-value font-satoshi ml-1 uppercase">{{ $transaction->bank_code }}</span>
+                                    <span
+                                        class="bank-detail-value font-satoshi ml-1 uppercase">{{ $transaction->bank_code }}</span>
                                 </div>
                             @endif
                         </div>
@@ -301,15 +301,18 @@
                         <div class="mb-4">
                             <div class="flex justify-between items-center mb-1">
                                 <span class="invoice-info-label font-satoshi">Invoice No.:</span>
-                                <span class="invoice-info-value font-satoshi">{{ $transaction->transaction_number }}</span>
+                                <span
+                                    class="invoice-info-value font-satoshi">{{ $transaction->transaction_number }}</span>
                             </div>
                             <div class="flex justify-between items-center mb-1">
                                 <span class="invoice-info-label font-satoshi">Invoice Date :</span>
-                                <span class="invoice-info-value font-satoshi">{{ $transaction->payment_completed_at->format('d M Y') }}</span>
+                                <span
+                                    class="invoice-info-value font-satoshi">{{ $transaction->payment_completed_at->format('d M Y') }}</span>
                             </div>
                             <div class="flex justify-between items-center">
                                 <span class="invoice-info-label font-satoshi">Due Date :</span>
-                                <span class="invoice-info-value font-satoshi uppercase">{{ $transaction->check_in_date->format('d M Y') }}</span>
+                                <span
+                                    class="invoice-info-value font-satoshi uppercase">{{ $transaction->check_in_date->format('d M Y') }}</span>
                             </div>
                         </div>
 
@@ -323,43 +326,35 @@
                                     <div class="flex-1 p-2">QTY</div>
                                     <div class="flex-1 p-2">Total</div>
                                 </div>
-                                
+
                                 <!-- Table Rows -->
                                 <div class="bg-white">
                                     <div class="flex">
-                                        <div class="w-32 p-2 table-cell font-satoshi">{{ $transaction->room_type_name }}</div>
-                                        <div class="flex-1 p-2 table-cell-bold font-satoshi">{{ $transaction->formatted_price_per_day }}</div>
-                                        <div class="flex-1 p-2 table-cell font-satoshi">{{ $transaction->duration_days }}</div>
-                                        <div class="flex-1 p-2 table-cell-bold font-satoshi">{{ $transaction->formatted_total_amount }}</div>
+                                        <div class="w-32 p-2 table-cell font-satoshi">
+                                            {{ $transaction->room_type_name }}</div>
+                                        <div class="flex-1 p-2 table-cell-bold font-satoshi">
+                                            {{ $transaction->formatted_price_per_day }}</div>
+                                        <div class="flex-1 p-2 table-cell font-satoshi">
+                                            {{ $transaction->duration_days }}</div>
+                                        <div class="flex-1 p-2 table-cell-bold font-satoshi">
+                                            {{ $transaction->formatted_total_amount }}</div>
                                     </div>
                                 </div>
-                                
+
                                 <!-- Totals -->
                                 <div class="bg-gray-100 border-t border-gray-300">
                                     <div class="flex">
                                         <div class="w-32 p-2 total-label font-satoshi">Grand Total</div>
                                         <div class="flex-1 p-2"></div>
                                         <div class="flex-1 p-2"></div>
-                                        <div class="flex-1 p-2 text-right total-value font-satoshi">{{ $transaction->formatted_total_amount }}</div>
+                                        <div class="flex-1 p-2 text-right total-value font-satoshi">
+                                            {{ $transaction->formatted_total_amount }}</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Signature -->
-                        <div class="mb-4 text-right">
-                            <div class="inline-block">
-                                <div class="w-12 h-16 border-2 border-black mb-2"></div>
-                                <div class="signature-name font-satoshi">Hospitalink Admin</div>
-                                <div class="signature-title font-satoshi">CEO</div>
-                            </div>
-                        </div>
 
-                        <!-- Terms & Conditions -->
-                        <div class="mb-4">
-                            <div class="terms-title font-satoshi mb-1">Terms & Condition</div>
-                            <div class="terms-text font-satoshi">Terms and conditions of the company can be written here</div>
-                        </div>
 
                         <!-- Action Buttons -->
                         <div class="flex gap-2 no-print">
@@ -367,8 +362,8 @@
                                 class="flex-1 bg-blue-500 text-white text-center py-2 px-3 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors">
                                 📄 Lihat Detail
                             </a>
-                            <button onclick="window.print()" 
-                                    class="bg-green-500 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-green-600 transition-colors">
+                            <button onclick="window.print()"
+                                class="bg-green-500 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-green-600 transition-colors">
                                 🖨️ Cetak
                             </button>
                         </div>
@@ -387,7 +382,7 @@
             @endforelse
 
             <!-- Pagination -->
-            @if($transactionDetails->hasPages())
+            @if ($transactionDetails->hasPages())
                 <div class="mt-6">
                     {{ $transactionDetails->links() }}
                 </div>
@@ -395,7 +390,7 @@
         </div>
 
         <!-- Thank You Message -->
-        @if($transactionDetails->count() > 0)
+        @if ($transactionDetails->count() > 0)
             <div class="text-center py-4">
                 <div class="thank-you font-satoshi">Thank You For Your Business!</div>
             </div>
@@ -427,7 +422,8 @@
                                 <div class="invoice-title font-satoshi">INVOICE</div>
                                 <div class="text-right text-white">
                                     <div class="text-lg font-bold">{{ $transaction->transaction_number }}</div>
-                                    <div class="text-sm">{{ $transaction->payment_completed_at->format('d M Y') }}</div>
+                                    <div class="text-sm">{{ $transaction->payment_completed_at->format('d M Y') }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -439,7 +435,7 @@
                                 <div class="section-title font-satoshi mb-3">INVOICE TO:</div>
                                 <div class="patient-name font-satoshi mb-2">{{ $transaction->patient_name }}</div>
                                 <div class="patient-detail font-satoshi">{{ $transaction->hospital_name }}</div>
-                                @if($transaction->patient_address)
+                                @if ($transaction->patient_address)
                                     <div class="patient-detail font-satoshi">{{ $transaction->patient_address }}</div>
                                 @endif
                             </div>
@@ -448,12 +444,14 @@
                             <div class="mb-6">
                                 <div class="flex items-center mb-2">
                                     <span class="contact-label font-satoshi">P:</span>
-                                    <span class="contact-value font-satoshi ml-2">{{ $transaction->patient_phone }}</span>
+                                    <span
+                                        class="contact-value font-satoshi ml-2">{{ $transaction->patient_phone }}</span>
                                 </div>
-                                @if($transaction->patient_email)
+                                @if ($transaction->patient_email)
                                     <div class="flex items-center">
                                         <span class="email-label font-satoshi">E:</span>
-                                        <span class="email-value font-satoshi ml-2">{{ $transaction->patient_email }}</span>
+                                        <span
+                                            class="email-value font-satoshi ml-2">{{ $transaction->patient_email }}</span>
                                     </div>
                                 @endif
                             </div>
@@ -462,8 +460,9 @@
                             <div class="mb-6">
                                 <div class="section-title font-satoshi mb-3">ADDRESS</div>
                                 <div class="patient-name font-satoshi mb-2">{{ $transaction->hospital_name }}</div>
-                                @if($transaction->hospital->address)
-                                    <div class="patient-detail font-satoshi">{{ $transaction->hospital->address }}</div>
+                                @if ($transaction->hospital->address)
+                                    <div class="patient-detail font-satoshi">{{ $transaction->hospital->address }}
+                                    </div>
                                 @endif
                                 <div class="address-detail font-satoshi">Indonesia</div>
                             </div>
@@ -473,27 +472,30 @@
                                 <div class="section-title font-satoshi mb-3">CONTACT</div>
                                 <div class="mb-3">
                                     <div class="patient-name font-satoshi mb-1">Phone</div>
-                                    <div class="contact-value font-satoshi">{{ $transaction->hospital->phone ?? '+62 123 456 7890' }}</div>
+                                    <div class="contact-value font-satoshi">{{ $transaction->hospital->phone_number }}</div>
                                 </div>
                                 <div class="mb-3">
                                     <div class="patient-name font-satoshi mb-1">Email</div>
-                                    <div class="contact-value font-satoshi">{{ $transaction->hospital->email ?? 'info@hospitalink.com' }}</div>
+                                    <div class="contact-value font-satoshi">
+                                        {{ $transaction->hospital->email ?? 'ehospital.app@gmail.com' }}</div>
                                 </div>
                             </div>
 
                             <!-- Bank Details -->
                             <div class="mb-6">
                                 <div class="patient-name font-satoshi mb-3">Bank Details</div>
-                                @if($transaction->va_number)
+                                @if ($transaction->va_number)
                                     <div class="flex items-center mb-2">
                                         <span class="bank-detail-label font-satoshi">Account No. :</span>
-                                        <span class="bank-detail-value font-satoshi ml-2">{{ $transaction->va_number }}</span>
+                                        <span
+                                            class="bank-detail-value font-satoshi ml-2">{{ $transaction->va_number }}</span>
                                     </div>
                                 @endif
-                                @if($transaction->bank_code)
+                                @if ($transaction->bank_code)
                                     <div class="flex items-center">
                                         <span class="bank-detail-label font-satoshi">Code :</span>
-                                        <span class="bank-detail-value font-satoshi ml-2 uppercase">{{ $transaction->bank_code }}</span>
+                                        <span
+                                            class="bank-detail-value font-satoshi ml-2 uppercase">{{ $transaction->bank_code }}</span>
                                     </div>
                                 @endif
                             </div>
@@ -502,15 +504,18 @@
                             <div class="mb-6">
                                 <div class="flex justify-between items-center mb-2">
                                     <span class="invoice-info-label font-satoshi">Invoice No.:</span>
-                                    <span class="invoice-info-value font-satoshi">{{ $transaction->transaction_number }}</span>
+                                    <span
+                                        class="invoice-info-value font-satoshi">{{ $transaction->transaction_number }}</span>
                                 </div>
                                 <div class="flex justify-between items-center mb-2">
                                     <span class="invoice-info-label font-satoshi">Invoice Date :</span>
-                                    <span class="invoice-info-value font-satoshi">{{ $transaction->payment_completed_at->format('d M Y') }}</span>
+                                    <span
+                                        class="invoice-info-value font-satoshi">{{ $transaction->payment_completed_at->format('d M Y') }}</span>
                                 </div>
                                 <div class="flex justify-between items-center">
                                     <span class="invoice-info-label font-satoshi">Due Date :</span>
-                                    <span class="invoice-info-value font-satoshi uppercase">{{ $transaction->check_in_date->format('d M Y') }}</span>
+                                    <span
+                                        class="invoice-info-value font-satoshi uppercase">{{ $transaction->check_in_date->format('d M Y') }}</span>
                                 </div>
                             </div>
 
@@ -524,42 +529,32 @@
                                         <div class="flex-1 p-3">QTY</div>
                                         <div class="flex-1 p-3">Total</div>
                                     </div>
-                                    
+
                                     <!-- Table Rows -->
                                     <div class="bg-white">
                                         <div class="flex">
-                                            <div class="w-40 p-3 table-cell font-satoshi">{{ $transaction->room_type_name }}</div>
-                                            <div class="flex-1 p-3 table-cell-bold font-satoshi">{{ $transaction->formatted_price_per_day }}</div>
-                                            <div class="flex-1 p-3 table-cell font-satoshi">{{ $transaction->duration_days }}</div>
-                                            <div class="flex-1 p-3 table-cell-bold font-satoshi">{{ $transaction->formatted_total_amount }}</div>
+                                            <div class="w-40 p-3 table-cell font-satoshi">
+                                                {{ $transaction->room_type_name }}</div>
+                                            <div class="flex-1 p-3 table-cell-bold font-satoshi">
+                                                {{ $transaction->formatted_price_per_day }}</div>
+                                            <div class="flex-1 p-3 table-cell font-satoshi">
+                                                {{ $transaction->duration_days }}</div>
+                                            <div class="flex-1 p-3 table-cell-bold font-satoshi">
+                                                {{ $transaction->formatted_total_amount }}</div>
                                         </div>
                                     </div>
-                                    
+
                                     <!-- Totals -->
                                     <div class="bg-gray-100 border-t border-gray-300">
                                         <div class="flex">
                                             <div class="w-40 p-3 total-label font-satoshi">Grand Total</div>
                                             <div class="flex-1 p-3"></div>
                                             <div class="flex-1 p-3"></div>
-                                            <div class="flex-1 p-3 text-right total-value font-satoshi">{{ $transaction->formatted_total_amount }}</div>
+                                            <div class="flex-1 p-3 text-right total-value font-satoshi">
+                                                {{ $transaction->formatted_total_amount }}</div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-
-                            <!-- Signature -->
-                            <div class="mb-6 text-right">
-                                <div class="inline-block">
-                                    <div class="w-16 h-20 border-2 border-black mb-3"></div>
-                                    <div class="signature-name font-satoshi">Hospitalink Admin</div>
-                                    <div class="signature-title font-satoshi">CEO</div>
-                                </div>
-                            </div>
-
-                            <!-- Terms & Conditions -->
-                            <div class="mb-6">
-                                <div class="terms-title font-satoshi mb-2">Terms & Condition</div>
-                                <div class="terms-text font-satoshi">Terms and conditions of the company can be written here</div>
                             </div>
 
                             <!-- Action Buttons -->
@@ -568,8 +563,8 @@
                                     class="flex-1 bg-blue-500 text-white text-center py-2 px-4 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors">
                                     📄 Lihat Detail
                                 </a>
-                                <button onclick="window.print()" 
-                                        class="bg-green-500 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-green-600 transition-colors">
+                                <button onclick="window.print()"
+                                    class="bg-green-500 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-green-600 transition-colors">
                                     🖨️ Cetak
                                 </button>
                             </div>
@@ -589,7 +584,7 @@
             </div>
 
             <!-- Pagination -->
-            @if($transactionDetails->hasPages())
+            @if ($transactionDetails->hasPages())
                 <div class="mt-8">
                     {{ $transactionDetails->links() }}
                 </div>
@@ -597,7 +592,7 @@
         </div>
 
         <!-- Thank You Message -->
-        @if($transactionDetails->count() > 0)
+        @if ($transactionDetails->count() > 0)
             <div class="text-center py-6">
                 <div class="thank-you font-satoshi text-lg">Thank You For Your Business!</div>
             </div>
