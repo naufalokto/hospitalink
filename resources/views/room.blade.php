@@ -220,6 +220,7 @@
                     <!-- Hospital Grid -->
                     <div class="grid gap-6">
                         @foreach ($hospitalsData as $hospital)
+                            <a href="{{ route('checking', ['hospital_id' => $hospital['slug']]) }}" class="block">
                             <div
                                 class="bg-gray-50 rounded-2xl p-6 shadow-sm hover:shadow-lg hover:scale-[1.02] transition-all duration-300 cursor-pointer">
                                 <div class="flex justify-between items-start">
@@ -245,6 +246,7 @@
                                     </div>
                                 </div>
                             </div>
+                            </a>
                         @endforeach
                     </div>
 
