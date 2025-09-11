@@ -13,7 +13,8 @@ class AdminController extends Controller
      */
     public function dashboard()
     {
-        $hospitals = Hospital::with('roomTypes.roomType')->get();
+        // Optimize query with eager loading
+        $hospitals = Hospital::with(['roomTypes.roomType'])->get();
         
         $hospitalsData = $hospitals->map(function ($hospital) {
             return [
@@ -32,7 +33,8 @@ class AdminController extends Controller
      */
     public function getHospitals(): JsonResponse
     {
-        $hospitals = Hospital::with('roomTypes.roomType')->get();
+        // Optimize query with eager loading
+        $hospitals = Hospital::with(['roomTypes.roomType'])->get();
         
         $data = $hospitals->map(function ($hospital) {
             return [
@@ -60,7 +62,7 @@ class AdminController extends Controller
             'quantity' => 'required|integer|min:0|max:999',
         ]);
 
-        $hospital = Hospital::with('roomTypes.roomType')->findOrFail($request->hospital_id);
+        $hospital = Hospital::with(['roomTypes.roomType'])->findOrFail($request->hospital_id);
         
         // Get room type from database
         $roomTypeModel = \App\Models\RoomType::where('code', $request->room_type)->first();
@@ -112,7 +114,7 @@ class AdminController extends Controller
             'rooms.class3' => 'required|integer|min:0|max:999',
         ]);
 
-        $hospital = Hospital::with('roomTypes.roomType')->findOrFail($request->hospital_id);
+        $hospital = Hospital::with(['roomTypes.roomType'])->findOrFail($request->hospital_id);
         
         // Get all room types
         $roomTypes = \App\Models\RoomType::all();
@@ -150,7 +152,7 @@ class AdminController extends Controller
      */
     public function getPublicRoomData(): JsonResponse
     {
-        $hospitals = Hospital::with('roomTypes.roomType')->get();
+        $hospitals = Hospital::with(['roomTypes.roomType'])->get();
         
         $data = $hospitals->map(function ($hospital) {
             return [
@@ -184,7 +186,7 @@ class AdminController extends Controller
                 'quantity' => 'required|integer|min:0|max:999',
             ]);
 
-            $hospital = Hospital::with('roomTypes.roomType')->findOrFail($request->hospital_id);
+            $hospital = Hospital::with(['roomTypes.roomType'])->findOrFail($request->hospital_id);
             
             // Get room type from database
             $roomTypeModel = \App\Models\RoomType::where('code', $request->room_type)->first();
@@ -265,7 +267,7 @@ class AdminController extends Controller
                 $validatedRooms[$type] = $quantity;
             }
 
-            $hospital = Hospital::with('roomTypes.roomType')->findOrFail($request->hospital_id);
+            $hospital = Hospital::with(['roomTypes.roomType'])->findOrFail($request->hospital_id);
             
             // Get all room types
             $roomTypes = \App\Models\RoomType::all();

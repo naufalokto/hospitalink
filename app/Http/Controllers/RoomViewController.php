@@ -9,9 +9,6 @@ class RoomViewController extends Controller
 {
     public function index(Request $request)
     {
-        // Get all hospitals with their room data
-        $hospitals = Hospital::with('roomTypes.roomType')->get();
-        
         // Get selected service from query parameter
         $selectedService = $request->query('service', 'ALL');
         
@@ -22,12 +19,16 @@ class RoomViewController extends Controller
             'Farmasi 24 Jam' => ['mayapada-hospital-surabaya', 'rumahsakit-islam-surabaya']
         ];
         
+        // Optimize query with eager loading and conditional filtering
+        $query = Hospital::with(['roomTypes.roomType']);
+        
         // Filter hospitals if a specific service is selected
         if ($selectedService !== 'all' && isset($recommendedHospitals[$selectedService])) {
-            $hospitals = $hospitals->filter(function($hospital) use ($recommendedHospitals, $selectedService) {
-                return in_array($hospital->slug, $recommendedHospitals[$selectedService]);
-            });
+            $query->whereIn('slug', $recommendedHospitals[$selectedService]);
         }
+        
+        // Execute optimized query
+        $hospitals = $query->get();
         
         // Transform data for the view
         $hospitalsData = $hospitals->map(function ($hospital) {

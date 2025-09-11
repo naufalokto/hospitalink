@@ -16,11 +16,11 @@ class BookingController extends Controller
 {
     public function showBookingForm($hospital_id, $room_id)
     {
-        // Get hospital by slug or numeric ID
-        $hospital = Hospital::where('slug', $hospital_id)->with('roomTypes.roomType')->first();
-        if (!$hospital && is_numeric($hospital_id)) {
-            $hospital = Hospital::where('id', (int)$hospital_id)->with('roomTypes.roomType')->first();
-        }
+        // Optimize query with eager loading and fallback for numeric ID
+        $hospital = Hospital::where('slug', $hospital_id)
+            ->orWhere('id', $hospital_id)
+            ->with(['roomTypes.roomType'])
+            ->first();
         
         if (!$hospital) {
             abort(404, 'Hospital not found');
@@ -74,11 +74,11 @@ class BookingController extends Controller
             'notes' => 'nullable|string'
         ]);
 
-        // Get hospital by slug or numeric ID
-        $hospital = Hospital::where('slug', $hospital_id)->with('roomTypes.roomType')->first();
-        if (!$hospital && is_numeric($hospital_id)) {
-            $hospital = Hospital::where('id', (int)$hospital_id)->with('roomTypes.roomType')->first();
-        }
+        // Optimize query with eager loading and fallback for numeric ID
+        $hospital = Hospital::where('slug', $hospital_id)
+            ->orWhere('id', $hospital_id)
+            ->with(['roomTypes.roomType'])
+            ->first();
         
         if (!$hospital) {
             return redirect()->back()->with('error', 'Hospital not found');
@@ -214,7 +214,8 @@ class BookingController extends Controller
 
     public function myBookings()
     {
-        $bookings = Booking::with('hospital')
+        // Optimize query with eager loading and pagination
+        $bookings = Booking::with(['hospital', 'roomType'])
             ->where('user_id', Auth::id())
             ->orderBy('created_at', 'desc')
             ->paginate(10);
@@ -226,8 +227,8 @@ class BookingController extends Controller
 
     public function invoice()
     {
-        // Get transaction details for the authenticated user
-        $transactionDetails = \App\Models\TransactionDetail::with(['booking', 'hospital', 'roomType'])
+        // Optimize query with eager loading and pagination
+        $transactionDetails = \App\Models\TransactionDetail::with(['booking', 'hospital', 'roomType', 'payment'])
             ->where('user_id', Auth::id())
             ->where('status', 'completed') // Only show completed transactions
             ->orderBy('payment_completed_at', 'desc')
