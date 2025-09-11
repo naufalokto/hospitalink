@@ -491,27 +491,52 @@
                         console.log('Login response status:', response.status);
                         console.log('Login response URL:', response.url);
                         
-                        if (response.status === 0 || response.ok) {
-                            // Check if redirected to admin dashboard
-                            if (response.url && response.url.includes('/admin-dashboard')) {
-                                console.log('Redirecting to admin dashboard');
-                                window.location.href = '/admin-dashboard';
-                            } else {
-                                console.log('Redirecting to dashboard');
-                                window.location.href = '/dashboard';
-                            }
-                        } else if (response.status === 302) {
+                        if (response.status === 302) {
                             // Handle redirect response
                             const location = response.headers.get('Location');
+                            console.log('Redirect location:', location);
                             if (location) {
                                 if (location.includes('/admin-dashboard')) {
+                                    console.log('Redirecting to admin dashboard');
                                     window.location.href = '/admin-dashboard';
                                 } else if (location.includes('/dashboard')) {
+                                    console.log('Redirecting to dashboard');
                                     window.location.href = '/dashboard';
                                 } else {
                                     window.location.href = location;
                                 }
+                            } else {
+                                // Fallback to dashboard if no location header
+                                window.location.href = '/dashboard';
                             }
+                        } else if (response.status === 0 || response.ok) {
+                            // Handle successful response without redirect
+                            // Check if we can determine user role from response
+                            console.log('Login successful, checking user role...');
+                            
+                            // Try to get user info to determine redirect
+                            fetch('/api/user', {
+                                method: 'GET',
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                                }
+                            })
+                            .then(userResponse => userResponse.json())
+                            .then(userData => {
+                                if (userData.user && userData.user.role === 'admin') {
+                                    console.log('User is admin, redirecting to admin dashboard');
+                                    window.location.href = '/admin-dashboard';
+                                } else {
+                                    console.log('User is patient, redirecting to dashboard');
+                                    window.location.href = '/dashboard';
+                                }
+                            })
+                            .catch(error => {
+                                console.log('Could not determine user role, redirecting to dashboard');
+                                window.location.href = '/dashboard';
+                            });
                         } else {
                             // Handle error response
                             const responseText = await response.text();
@@ -571,27 +596,28 @@
                         console.log('Signup response status:', response.status);
                         console.log('Signup response URL:', response.url);
                         
-                        if (response.status === 0 || response.ok) {
-                            // Check if redirected to admin dashboard
-                            if (response.url && response.url.includes('/admin-dashboard')) {
-                                console.log('Redirecting to admin dashboard');
-                                window.location.href = '/admin-dashboard';
-                            } else {
-                                console.log('Redirecting to dashboard');
-                                window.location.href = '/dashboard';
-                            }
-                        } else if (response.status === 302) {
+                        if (response.status === 302) {
                             // Handle redirect response
                             const location = response.headers.get('Location');
+                            console.log('Redirect location:', location);
                             if (location) {
                                 if (location.includes('/admin-dashboard')) {
+                                    console.log('Redirecting to admin dashboard');
                                     window.location.href = '/admin-dashboard';
                                 } else if (location.includes('/dashboard')) {
+                                    console.log('Redirecting to dashboard');
                                     window.location.href = '/dashboard';
                                 } else {
                                     window.location.href = location;
                                 }
+                            } else {
+                                // Fallback to dashboard if no location header
+                                window.location.href = '/dashboard';
                             }
+                        } else if (response.status === 0 || response.ok) {
+                            // Handle successful response without redirect
+                            console.log('Signup successful, redirecting to dashboard');
+                            window.location.href = '/dashboard';
                         } else {
                             // Handle error response
                             const responseText = await response.text();

@@ -186,7 +186,7 @@ class BookingController extends Controller
         $booking = Booking::with(['hospital', 'user'])->findOrFail($booking_id);
 
         // Check if user owns this booking or is admin
-        if (Auth::id() !== $booking->user_id && !Auth::user()->hasRole('admin')) {
+        if (Auth::id() !== $booking->user_id && !Auth::user()->isAdmin()) {
             abort(403, 'Unauthorized access');
         }
 
@@ -200,7 +200,7 @@ class BookingController extends Controller
         $booking = Booking::with(['hospital', 'user'])->findOrFail($booking_id);
 
         // Check if user owns this booking or is admin
-        if (Auth::id() !== $booking->user_id && !Auth::user()->hasRole('admin')) {
+        if (Auth::id() !== $booking->user_id && !Auth::user()->isAdmin()) {
             abort(403, 'Unauthorized access');
         }
 

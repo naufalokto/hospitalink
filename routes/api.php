@@ -23,6 +23,20 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+// Web session user route
+Route::middleware('web')->get('/user', function (Request $request) {
+    if (auth()->check()) {
+        return response()->json([
+            'success' => true,
+            'user' => auth()->user()
+        ]);
+    }
+    return response()->json([
+        'success' => false,
+        'message' => 'Not authenticated'
+    ], 401);
+});
+
 // Authentication Routes
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
