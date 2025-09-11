@@ -7,6 +7,20 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
+     * Check if an index exists on a table
+     */
+    private function indexExists($table, $index)
+    {
+        $indexes = \DB::select("SHOW INDEX FROM {$table}");
+        foreach ($indexes as $idx) {
+            if ($idx->Key_name === $index) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Run the migrations.
      */
     public function up(): void
@@ -14,13 +28,25 @@ return new class extends Migration
         // Add indexes to users table
         if (Schema::hasTable('users')) {
             Schema::table('users', function (Blueprint $table) {
-                // Add indexes for common queries
-                $table->index('email'); // For login queries
-                $table->index('role'); // For admin/patient filtering
-                $table->index('google_id'); // For OAuth queries
-                $table->index('facebook_id'); // For OAuth queries
-                $table->index('twitter_id'); // For OAuth queries
-                $table->index(['role', 'created_at']); // For user management queries
+                // Add indexes for common queries (only if they don't exist)
+                if (!$this->indexExists('users', 'users_email_index')) {
+                    $table->index('email'); // For login queries
+                }
+                if (!$this->indexExists('users', 'users_role_index')) {
+                    $table->index('role'); // For admin/patient filtering
+                }
+                if (!$this->indexExists('users', 'users_google_id_index')) {
+                    $table->index('google_id'); // For OAuth queries
+                }
+                if (!$this->indexExists('users', 'users_facebook_id_index')) {
+                    $table->index('facebook_id'); // For OAuth queries
+                }
+                if (!$this->indexExists('users', 'users_twitter_id_index')) {
+                    $table->index('twitter_id'); // For OAuth queries
+                }
+                if (!$this->indexExists('users', 'users_role_created_at_index')) {
+                    $table->index(['role', 'created_at']); // For user management queries
+                }
             });
         }
 
@@ -80,40 +106,54 @@ return new class extends Migration
         // Add indexes to transaction_details table
         if (Schema::hasTable('transaction_details')) {
             Schema::table('transaction_details', function (Blueprint $table) {
-                // Add indexes for common queries
-                $table->index('transaction_number'); // For transaction lookup
-                $table->index('payment_id'); // For payment-transaction relationship
-                $table->index('user_id'); // For user's transactions
-                $table->index('hospital_id'); // For hospital's transactions
-                $table->index('room_type_id'); // For room type filtering
-                $table->index('status'); // For status filtering
-                $table->index('payment_completed_at'); // For completed transactions
-                $table->index('created_at'); // For sorting by creation date
+                // Add indexes for common queries (only if they don't exist)
+                if (!$this->indexExists('transaction_details', 'transaction_details_room_type_id_index')) {
+                    $table->index('room_type_id'); // For room type filtering
+                }
+                if (!$this->indexExists('transaction_details', 'transaction_details_status_index')) {
+                    $table->index('status'); // For status filtering
+                }
+                if (!$this->indexExists('transaction_details', 'transaction_details_payment_completed_at_index')) {
+                    $table->index('payment_completed_at'); // For completed transactions
+                }
+                if (!$this->indexExists('transaction_details', 'transaction_details_created_at_index')) {
+                    $table->index('created_at'); // For sorting by creation date
+                }
                 
-                // Composite indexes
-                $table->index(['user_id', 'status']); // User's transactions by status
-                $table->index(['hospital_id', 'status']); // Hospital's transactions by status
-                $table->index(['status', 'payment_completed_at']); // Completed transactions by date
-                $table->index(['user_id', 'payment_completed_at']); // User's completed transactions
+                // Composite indexes (only if they don't exist)
+                if (!$this->indexExists('transaction_details', 'transaction_details_status_payment_completed_at_index')) {
+                    $table->index(['status', 'payment_completed_at']); // Completed transactions by date
+                }
+                if (!$this->indexExists('transaction_details', 'transaction_details_user_id_payment_completed_at_index')) {
+                    $table->index(['user_id', 'payment_completed_at']); // User's completed transactions
+                }
             });
         }
 
         // Add indexes to booking_rooms table
         if (Schema::hasTable('booking_rooms')) {
             Schema::table('booking_rooms', function (Blueprint $table) {
-                // Add indexes for common queries
-                $table->index('booking_id'); // For booking relationship
-                $table->index('user_id'); // For user's booking rooms
-                $table->index('hospital_id'); // For hospital's booking rooms
-                $table->index('room_type_id'); // For room type filtering
-                $table->index('payment_status'); // For payment status filtering
-                $table->index('payment_id'); // For payment relationship
-                $table->index('created_at'); // For sorting by creation date
+                // Add indexes for common queries (only if they don't exist)
+                if (!$this->indexExists('booking_rooms', 'booking_rooms_room_type_id_index')) {
+                    $table->index('room_type_id'); // For room type filtering
+                }
+                if (!$this->indexExists('booking_rooms', 'booking_rooms_payment_id_index')) {
+                    $table->index('payment_id'); // For payment relationship
+                }
+                if (!$this->indexExists('booking_rooms', 'booking_rooms_created_at_index')) {
+                    $table->index('created_at'); // For sorting by creation date
+                }
                 
-                // Composite indexes
-                $table->index(['user_id', 'payment_status']); // User's booking rooms by payment status
-                $table->index(['hospital_id', 'payment_status']); // Hospital's booking rooms by payment status
-                $table->index(['payment_status', 'created_at']); // Recent booking rooms by payment status
+                // Composite indexes (only if they don't exist)
+                if (!$this->indexExists('booking_rooms', 'booking_rooms_user_id_payment_status_index')) {
+                    $table->index(['user_id', 'payment_status']); // User's booking rooms by payment status
+                }
+                if (!$this->indexExists('booking_rooms', 'booking_rooms_hospital_id_payment_status_index')) {
+                    $table->index(['hospital_id', 'payment_status']); // Hospital's booking rooms by payment status
+                }
+                if (!$this->indexExists('booking_rooms', 'booking_rooms_payment_status_created_at_index')) {
+                    $table->index(['payment_status', 'created_at']); // Recent booking rooms by payment status
+                }
             });
         }
 
@@ -153,12 +193,18 @@ return new class extends Migration
         // Add indexes to hospital_room_type_facility table
         if (Schema::hasTable('hospital_room_type_facility')) {
             Schema::table('hospital_room_type_facility', function (Blueprint $table) {
-                // Add indexes for common queries
-                $table->index('hospital_room_type_id'); // For hospital room type relationship
-                $table->index('facility_id'); // For facility relationship
+                // Add indexes for common queries (only if they don't exist)
+                if (!$this->indexExists('hospital_room_type_facility', 'hrtf_hospital_room_type_id_index')) {
+                    $table->index('hospital_room_type_id', 'hrtf_hospital_room_type_id_index'); // For hospital room type relationship
+                }
+                if (!$this->indexExists('hospital_room_type_facility', 'hrtf_facility_id_index')) {
+                    $table->index('facility_id', 'hrtf_facility_id_index'); // For facility relationship
+                }
                 
                 // Composite index for many-to-many relationship
-                $table->index(['hospital_room_type_id', 'facility_id']); // Unique relationship
+                if (!$this->indexExists('hospital_room_type_facility', 'hrtf_hrt_facility_index')) {
+                    $table->index(['hospital_room_type_id', 'facility_id'], 'hrtf_hrt_facility_index'); // Unique relationship
+                }
             });
         }
 
@@ -239,34 +285,50 @@ return new class extends Migration
         // Drop indexes from transaction_details table
         if (Schema::hasTable('transaction_details')) {
             Schema::table('transaction_details', function (Blueprint $table) {
-                $table->dropIndex(['transaction_number']);
-                $table->dropIndex(['payment_id']);
-                $table->dropIndex(['user_id']);
-                $table->dropIndex(['hospital_id']);
-                $table->dropIndex(['room_type_id']);
-                $table->dropIndex(['status']);
-                $table->dropIndex(['payment_completed_at']);
-                $table->dropIndex(['created_at']);
-                $table->dropIndex(['user_id', 'status']);
-                $table->dropIndex(['hospital_id', 'status']);
-                $table->dropIndex(['status', 'payment_completed_at']);
-                $table->dropIndex(['user_id', 'payment_completed_at']);
+                // Only drop indexes that we added in this migration
+                if ($this->indexExists('transaction_details', 'transaction_details_room_type_id_index')) {
+                    $table->dropIndex(['room_type_id']);
+                }
+                if ($this->indexExists('transaction_details', 'transaction_details_status_index')) {
+                    $table->dropIndex(['status']);
+                }
+                if ($this->indexExists('transaction_details', 'transaction_details_payment_completed_at_index')) {
+                    $table->dropIndex(['payment_completed_at']);
+                }
+                if ($this->indexExists('transaction_details', 'transaction_details_created_at_index')) {
+                    $table->dropIndex(['created_at']);
+                }
+                if ($this->indexExists('transaction_details', 'transaction_details_status_payment_completed_at_index')) {
+                    $table->dropIndex(['status', 'payment_completed_at']);
+                }
+                if ($this->indexExists('transaction_details', 'transaction_details_user_id_payment_completed_at_index')) {
+                    $table->dropIndex(['user_id', 'payment_completed_at']);
+                }
             });
         }
 
         // Drop indexes from booking_rooms table
         if (Schema::hasTable('booking_rooms')) {
             Schema::table('booking_rooms', function (Blueprint $table) {
-                $table->dropIndex(['booking_id']);
-                $table->dropIndex(['user_id']);
-                $table->dropIndex(['hospital_id']);
-                $table->dropIndex(['room_type_id']);
-                $table->dropIndex(['payment_status']);
-                $table->dropIndex(['payment_id']);
-                $table->dropIndex(['created_at']);
-                $table->dropIndex(['user_id', 'payment_status']);
-                $table->dropIndex(['hospital_id', 'payment_status']);
-                $table->dropIndex(['payment_status', 'created_at']);
+                // Only drop indexes that we added in this migration
+                if ($this->indexExists('booking_rooms', 'booking_rooms_room_type_id_index')) {
+                    $table->dropIndex(['room_type_id']);
+                }
+                if ($this->indexExists('booking_rooms', 'booking_rooms_payment_id_index')) {
+                    $table->dropIndex(['payment_id']);
+                }
+                if ($this->indexExists('booking_rooms', 'booking_rooms_created_at_index')) {
+                    $table->dropIndex(['created_at']);
+                }
+                if ($this->indexExists('booking_rooms', 'booking_rooms_user_id_payment_status_index')) {
+                    $table->dropIndex(['user_id', 'payment_status']);
+                }
+                if ($this->indexExists('booking_rooms', 'booking_rooms_hospital_id_payment_status_index')) {
+                    $table->dropIndex(['hospital_id', 'payment_status']);
+                }
+                if ($this->indexExists('booking_rooms', 'booking_rooms_payment_status_created_at_index')) {
+                    $table->dropIndex(['payment_status', 'created_at']);
+                }
             });
         }
 
@@ -301,9 +363,16 @@ return new class extends Migration
         // Drop indexes from hospital_room_type_facility table
         if (Schema::hasTable('hospital_room_type_facility')) {
             Schema::table('hospital_room_type_facility', function (Blueprint $table) {
-                $table->dropIndex(['hospital_room_type_id']);
-                $table->dropIndex(['facility_id']);
-                $table->dropIndex(['hospital_room_type_id', 'facility_id']);
+                // Only drop indexes that we added in this migration
+                if ($this->indexExists('hospital_room_type_facility', 'hrtf_hospital_room_type_id_index')) {
+                    $table->dropIndex('hrtf_hospital_room_type_id_index');
+                }
+                if ($this->indexExists('hospital_room_type_facility', 'hrtf_facility_id_index')) {
+                    $table->dropIndex('hrtf_facility_id_index');
+                }
+                if ($this->indexExists('hospital_room_type_facility', 'hrtf_hrt_facility_index')) {
+                    $table->dropIndex('hrtf_hrt_facility_index');
+                }
             });
         }
 

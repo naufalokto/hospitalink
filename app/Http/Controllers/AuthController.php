@@ -325,6 +325,7 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => 'patient', // Default role for registered users
+            'email_verified_at' => now(), // Align with OAuth behavior
         ]);
 
         Auth::login($user);
@@ -342,26 +343,63 @@ class AuthController extends Controller
      */
     public function registerWeb(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
+        try {
+            \Log::info('Manual registration started', [
+                'email' => $request->email,
+                'name' => $request->name,
+                'ip' => $request->ip()
+            ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => 'patient', // Default role for registered users
-        ]);
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users',
+                'password' => 'required|string|min:8|confirmed',
+            ]);
 
-        Auth::login($user);
+            \Log::info('Manual registration validation passed');
 
-        // Redirect based on user role
-        if ($user->isAdmin()) {
-            return redirect()->route('admin-dashboard')->with('success', 'Registration successful!');
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => 'patient', // Default role for registered users
+            ]);
+
+            \Log::info('Manual registration user created', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'name' => $user->name
+            ]);
+
+            Auth::login($user);
+            \Log::info('Manual registration user logged in', ['user_id' => $user->id]);
+
+            // Store token in session for API access (same as OAuth)
+            session(['auth_token' => $user->createToken('auth-token')->plainTextToken]);
+            \Log::info('Manual registration auth token stored in session');
+
+            // Redirect based on user role
+            if ($user->isAdmin()) {
+                \Log::info('Manual registration redirecting to admin dashboard');
+                return redirect()->route('admin-dashboard')->with('success', 'Registration successful!');
+            }
+            \Log::info('Manual registration redirecting to dashboard');
+            return redirect()->route('dashboard')->with('success', 'Registration successful!');
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Manual registration validation failed', [
+                'errors' => $e->errors(),
+                'email' => $request->email
+            ]);
+            return redirect()->back()->withErrors($e->errors())->withInput();
+        } catch (\Exception $e) {
+            \Log::error('Manual registration failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'email' => $request->email
+            ]);
+            return redirect()->back()->with('error', 'Registration failed. Please try again.')->withInput();
         }
-        return redirect()->route('dashboard')->with('success', 'Registration successful!');
     }
 
     /**
@@ -369,30 +407,69 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-        ]);
+        try {
+            \Log::info('Manual login started', [
+                'email' => $request->email,
+                'ip' => $request->ip()
+            ]);
 
-        if (Auth::attempt($request->only('email', 'password'))) {
-            $user = Auth::user();
+            $request->validate([
+                'email' => 'required|string|email',
+                'password' => 'required|string',
+            ]);
 
-            // Redirect based on user role
-            if ($user->isAdmin()) {
-                return redirect()->route('admin-dashboard')->with('success', 'Login successful!');
+            \Log::info('Manual login validation passed');
+
+            if (Auth::attempt($request->only('email', 'password'))) {
+                $user = Auth::user();
+                \Log::info('Manual login successful', [
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                    'role' => $user->role
+                ]);
+
+                // Store token in session for API access (same as OAuth)
+                session(['auth_token' => $user->createToken('auth-token')->plainTextToken]);
+                \Log::info('Manual login auth token stored in session');
+
+                // Redirect based on user role
+                if ($user->isAdmin()) {
+                    \Log::info('Manual login redirecting to admin dashboard');
+                    return redirect()->route('admin-dashboard')->with('success', 'Login successful!');
+                }
+                \Log::info('Manual login redirecting to dashboard');
+                return redirect()->route('dashboard')->with('success', 'Login successful!');
             }
-            return redirect()->route('dashboard')->with('success', 'Login successful!');
-        }
 
-        // For web requests, redirect back with error
-        if ($request->expectsJson()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid credentials',
-            ], 401);
-        }
+            \Log::warning('Manual login failed - invalid credentials', [
+                'email' => $request->email,
+                'ip' => $request->ip()
+            ]);
 
-        return redirect()->back()->withErrors(['email' => 'Invalid credentials']);
+            // For web requests, redirect back with error
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid credentials',
+                ], 401);
+            }
+
+            return redirect()->back()->withErrors(['email' => 'Invalid credentials']);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Manual login validation failed', [
+                'errors' => $e->errors(),
+                'email' => $request->email
+            ]);
+            return redirect()->back()->withErrors($e->errors())->withInput();
+        } catch (\Exception $e) {
+            \Log::error('Manual login failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'email' => $request->email
+            ]);
+            return redirect()->back()->with('error', 'Login failed. Please try again.')->withInput();
+        }
     }
 
     /**

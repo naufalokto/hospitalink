@@ -143,13 +143,36 @@
 
                 <!-- Password Input -->
                 <div class="relative">
-                    <input :type="showPassword ? 'text' : 'password'" x-model="signupForm.password" placeholder="Password"
+                    <input :type="showPassword ? 'text' : 'password'" x-model="signupForm.password" placeholder="Password (minimal 8 karakter)"
                         class="w-full py-2 pr-10 border-0 border-b border-gray-400 focus:border-hospitalink-green focus:outline-none bg-transparent text-gray-700 placeholder-gray-400 text-sm"
                         required>
                     <button type="button" @click="showPassword = !showPassword"
                         class="absolute right-0 top-2 text-gray-400 hover:text-gray-600">
                         <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
                     </button>
+                </div>
+
+                <!-- Password Strength Indicator -->
+                <div x-show="signupForm.password.length > 0" class="space-y-1">
+                    <!-- Password Strength Bar -->
+                    <div class="flex space-x-1">
+                        <div class="h-1 flex-1 rounded-full"
+                             :class="signupForm.password.length >= 8 ? 'bg-green-500' : 'bg-gray-200'"></div>
+                        <div class="h-1 flex-1 rounded-full"
+                             :class="signupForm.password.length >= 12 ? 'bg-green-500' : 'bg-gray-200'"></div>
+                        <div class="h-1 flex-1 rounded-full"
+                             :class="signupForm.password.length >= 16 ? 'bg-green-500' : 'bg-gray-200'"></div>
+                    </div>
+                    
+                    <!-- Password Requirements -->
+                    <div class="text-xs space-y-1">
+                        <div class="flex items-center space-x-2">
+                            <i :class="signupForm.password.length >= 8 ? 'fas fa-check text-green-500' : 'fas fa-times text-red-500'"></i>
+                            <span :class="signupForm.password.length >= 8 ? 'text-green-600' : 'text-gray-500'">
+                                Minimal 8 karakter
+                            </span>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Confirm Password Input -->
@@ -315,13 +338,36 @@
 
                     <!-- Password Input -->
                     <div class="relative">
-                        <input :type="showPassword ? 'text' : 'password'" x-model="signupForm.password" placeholder="Password"
+                        <input :type="showPassword ? 'text' : 'password'" x-model="signupForm.password" placeholder="Password (minimal 8 karakter)"
                             class="w-full py-1.5 pr-8 border-0 border-b border-gray-300 focus:border-hospitalink-green focus:outline-none bg-transparent text-gray-700 placeholder-gray-400 text-xs"
                             required>
                         <button type="button" @click="showPassword = !showPassword"
                             class="absolute right-0 top-1.5 text-gray-400 hover:text-gray-600">
                             <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'" class="text-xs"></i>
                         </button>
+                    </div>
+
+                    <!-- Password Strength Indicator -->
+                    <div x-show="signupForm.password.length > 0" class="space-y-1">
+                        <!-- Password Strength Bar -->
+                        <div class="flex space-x-1">
+                            <div class="h-1 flex-1 rounded-full"
+                                 :class="signupForm.password.length >= 8 ? 'bg-green-500' : 'bg-gray-200'"></div>
+                            <div class="h-1 flex-1 rounded-full"
+                                 :class="signupForm.password.length >= 12 ? 'bg-green-500' : 'bg-gray-200'"></div>
+                            <div class="h-1 flex-1 rounded-full"
+                                 :class="signupForm.password.length >= 16 ? 'bg-green-500' : 'bg-gray-200'"></div>
+                        </div>
+                        
+                        <!-- Password Requirements -->
+                        <div class="text-xs space-y-1">
+                            <div class="flex items-center space-x-2">
+                                <i :class="signupForm.password.length >= 8 ? 'fas fa-check text-green-500' : 'fas fa-times text-red-500'" class="text-xs"></i>
+                                <span :class="signupForm.password.length >= 8 ? 'text-green-600' : 'text-gray-500'">
+                                    Minimal 8 karakter
+                                </span>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Confirm Password Input -->
@@ -434,20 +480,50 @@
                         formData.append('password', this.loginForm.password);
                         formData.append('_token', document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '');
                         
+                        console.log('Attempting login for:', this.loginForm.email);
+                        
                         const response = await fetch('/login', {
                             method: 'POST',
-                            body: formData
+                            body: formData,
+                            redirect: 'manual' // Handle redirects manually
                         });
                         
-                        if (response.ok) {
+                        console.log('Login response status:', response.status);
+                        console.log('Login response URL:', response.url);
+                        
+                        if (response.status === 0 || response.ok) {
                             // Check if redirected to admin dashboard
-                            if (response.url.includes('/admin-dashboard')) {
+                            if (response.url && response.url.includes('/admin-dashboard')) {
+                                console.log('Redirecting to admin dashboard');
                                 window.location.href = '/admin-dashboard';
                             } else {
+                                console.log('Redirecting to dashboard');
                                 window.location.href = '/dashboard';
                             }
+                        } else if (response.status === 302) {
+                            // Handle redirect response
+                            const location = response.headers.get('Location');
+                            if (location) {
+                                if (location.includes('/admin-dashboard')) {
+                                    window.location.href = '/admin-dashboard';
+                                } else if (location.includes('/dashboard')) {
+                                    window.location.href = '/dashboard';
+                                } else {
+                                    window.location.href = location;
+                                }
+                            }
                         } else {
-                            this.loginError = 'Email atau password salah';
+                            // Handle error response
+                            const responseText = await response.text();
+                            console.error('Login failed:', responseText);
+                            
+                            // Try to parse error message from response
+                            try {
+                                const errorData = JSON.parse(responseText);
+                                this.loginError = errorData.message || 'Email atau password salah';
+                            } catch (parseError) {
+                                this.loginError = 'Email atau password salah';
+                            }
                         }
                     } catch (error) {
                         this.loginError = 'Terjadi kesalahan saat login';
@@ -461,6 +537,13 @@
                     this.isLoading = true;
                     this.signupError = '';
                     this.signupSuccess = '';
+                    
+                    // Validate password length
+                    if (this.signupForm.password.length < 8) {
+                        this.signupError = 'Password harus minimal 8 karakter';
+                        this.isLoading = false;
+                        return;
+                    }
                     
                     // Validate password confirmation
                     if (this.signupForm.password !== this.signupForm.password_confirmation) {
@@ -477,22 +560,55 @@
                         formData.append('password_confirmation', this.signupForm.password_confirmation);
                         formData.append('_token', document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '');
                         
+                        console.log('Attempting signup for:', this.signupForm.email);
+                        
                         const response = await fetch('/register', {
                             method: 'POST',
-                            body: formData
+                            body: formData,
+                            redirect: 'manual' // Handle redirects manually
                         });
                         
-                        if (response.ok) {
+                        console.log('Signup response status:', response.status);
+                        console.log('Signup response URL:', response.url);
+                        
+                        if (response.status === 0 || response.ok) {
                             // Check if redirected to admin dashboard
-                            if (response.url.includes('/admin-dashboard')) {
+                            if (response.url && response.url.includes('/admin-dashboard')) {
+                                console.log('Redirecting to admin dashboard');
                                 window.location.href = '/admin-dashboard';
                             } else {
+                                console.log('Redirecting to dashboard');
                                 window.location.href = '/dashboard';
                             }
+                        } else if (response.status === 302) {
+                            // Handle redirect response
+                            const location = response.headers.get('Location');
+                            if (location) {
+                                if (location.includes('/admin-dashboard')) {
+                                    window.location.href = '/admin-dashboard';
+                                } else if (location.includes('/dashboard')) {
+                                    window.location.href = '/dashboard';
+                                } else {
+                                    window.location.href = location;
+                                }
+                            }
                         } else {
-                            // Handle validation errors
+                            // Handle error response
                             const responseText = await response.text();
-                            this.signupError = 'Registrasi gagal. Silakan periksa data yang dimasukkan.';
+                            console.error('Signup failed:', responseText);
+                            
+                            // Try to parse error message from response
+                            try {
+                                const errorData = JSON.parse(responseText);
+                                this.signupError = errorData.message || 'Registrasi gagal. Silakan periksa data yang dimasukkan.';
+                            } catch (parseError) {
+                                // Check if response contains validation errors
+                                if (responseText.includes('validation')) {
+                                    this.signupError = 'Data yang dimasukkan tidak valid. Silakan periksa kembali.';
+                                } else {
+                                    this.signupError = 'Registrasi gagal. Silakan periksa data yang dimasukkan.';
+                                }
+                            }
                         }
                     } catch (error) {
                         this.signupError = 'Terjadi kesalahan saat registrasi';
