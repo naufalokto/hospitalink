@@ -23,21 +23,25 @@
         </div>
 
         <div class="px-6 mb-4" x-data="carousel()">
-            <div class="rounded-2xl mb-3 overflow-hidden relative max-w-[340px] mx-auto">
+            <!-- Container Iklan -->
+            <div class="bg-[#0B9078] rounded-2xl mb-4 overflow-hidden max-w-md mx-auto shadow-lg">
+            <!-- Slider Container with proper overflow handling -->
+            <div class="mx-6 mt-4 rounded-2xl overflow-hidden">
                 <div class="flex transition-transform duration-500 ease-in-out"
                     :style="`transform: translateX(-${currentSlide * 100}%)`">
+
                     <!-- Slide 1 -->
                     <div class="w-full flex-shrink-0 relative rounded-2xl overflow-hidden">
                         <div class="absolute inset-0 bg-cover bg-center"
                             style="background-image: url('/images/Iklan/Iklan-Slide1.jpg');">
                             <div class="absolute inset-0 bg-black/40"></div>
                         </div>
-                        <div class="relative z-10 flex items-center justify-between p-4">
-                            <div class="text-white">
-                                <h3 class="font-bold text-sm mb-1">TURUN HARGA</h3>
-                                <h2 class="font-bold text-lg mb-1">BESAR-BESARAN</h2>
-                                <p class="text-xs leading-tight">
-                                    SEMUA PRODUK<br>TURUN HINGGA 50%<br>BURUAN SEBELUM<br>DAN KEHABISAN
+                        <div class="relative z-10 flex items-center justify-between p-3 h-32">
+                            <div class="text-white text-[10px] leading-tight">
+                                <h3 class="font-bold text-xs mb-1">TURUN HARGA</h3>
+                                <h2 class="font-bold text-sm mb-1">BESAR-BESARAN</h2>
+                                <p>
+                                    SEMUA PRODUK<br>TURUN HINGGA 50%<br>BURUAN SEBELUM<br>KEHABISAN
                                 </p>
                             </div>
                         </div>
@@ -45,15 +49,15 @@
 
                     <!-- Slide 2 -->
                     <div class="w-full flex-shrink-0 relative rounded-2xl overflow-hidden">
-                        <div class="absolute inset-0 bg-cover bg-center"
+                       <div class="absolute inset-0 bg-cover bg-center"
                             style="background-image: url('/images/Iklan/Iklan-Slide2.png');">
                             <div class="absolute inset-0 bg-black/40"></div>
                         </div>
-                        <div class="relative z-10 flex items-center justify-between p-4">
-                            <div class="text-white">
-                                <h3 class="font-bold text-sm mb-1">PROMO SPESIAL</h3>
-                                <h2 class="font-bold text-lg mb-1">ALAT KESEHATAN</h2>
-                                <p class="text-xs leading-tight">
+                        <div class="relative z-10 flex items-center justify-between p-3 h-32">
+                            <div class="text-white text-[10px] leading-tight">
+                                <h3 class="font-bold text-xs mb-1">PROMO SPESIAL</h3>
+                                <h2 class="font-bold text-sm mb-1">ALAT KESEHATAN</h2>
+                                <p>
                                     DAPATKAN DISKON<br>HINGGA 40%<br>UNTUK SEMUA<br>PRODUK PILIHAN
                                 </p>
                             </div>
@@ -66,11 +70,11 @@
                             style="background-image: url('/images/Iklan/Iklan-Slide3.jpg');">
                             <div class="absolute inset-0 bg-black/40"></div>
                         </div>
-                        <div class="relative z-10 flex items-center justify-between p-4">
-                            <div class="text-white">
-                                <h3 class="font-bold text-sm mb-1">KONSULTASI</h3>
-                                <h2 class="font-bold text-lg mb-1">GRATIS</h2>
-                                <p class="text-xs leading-tight">
+                        <div class="relative z-10 flex items-center justify-between p-3 h-32">
+                            <div class="text-white text-[10px] leading-tight">
+                                <h3 class="font-bold text-xs mb-1">KONSULTASI</h3>
+                                <h2 class="font-bold text-sm mb-1">GRATIS</h2>
+                                <p>
                                     KONSULTASI DENGAN<br>DOKTER AHLI<br>TANPA BIAYA<br>TAMBAHAN
                                 </p>
                             </div>
@@ -79,13 +83,26 @@
                 </div>
             </div>
 
-            <div class="flex justify-center space-x-2 mb-3">
+            <!-- Dots indikator -->
+            <div class="flex justify-center space-x-2 py-2">
                 <template x-for="(slide, index) in slides" :key="index">
-                    <button class="w-2 h-2 rounded-full transition-colors duration-200"
-                        :class="currentSlide === index ? 'bg-white' : 'bg-white/50'" @click="goToSlide(index)">
+                    <button class="w-2.5 h-2.5 rounded-full transition-all"
+                        :class="currentSlide === index ? 'bg-white' : 'bg-white/50'" 
+                        @click="goToSlide(index)">
                     </button>
                 </template>
             </div>
+
+            <!-- CTA -->
+            <div class="flex items-center justify-between px-4 py-2 bg-[#0B9078] text-white rounded-b-2xl">
+                <span class="font-medium text-sm">Anda Miliki Iklan?</span>
+                <button
+                    class="border border-white px-3 py-1 rounded-lg text-sm hover:bg-white hover:text-green-700 transition">
+                    Masuk di sini
+                </button>
+            </div>
+        </div>
+
 
             <div class="flex-1 bg-[#B4DBF1] rounded-t-3xl px-6 pt-6 pb-20 -mx-6">
                 <div class="flex items-center justify-between mb-5">
@@ -324,7 +341,7 @@
                 <div class="flex items-center justify-between mb-8 xl:mb-12 max-w-7xl mx-auto">
                     <h2 class="text-4xl xl:text-5xl 2xl:text-6xl font-bold text-gray-800">HEALTH NEWS</h2>
                     <div class="relative group cursor-pointer">
-                        <a href="{{ route('my-bookings')}}" class="p-2 xl:p-3 rounded-xl">
+                        <a href="{{ route('my-bookings') }}" class="p-2 xl:p-3 rounded-xl">
                             <img src="{{ asset('images/icons/icon-notif.png') }}" alt="Notifications"
                                 class="w-8 h-8 xl:w-10 xl:h-10">
                         </a>

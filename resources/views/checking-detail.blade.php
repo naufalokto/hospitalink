@@ -23,16 +23,11 @@
             <button onclick="document.getElementById('successOverlay').remove()" aria-label="Close"
                 style="position:absolute; top:10px; left:10px; background:transparent; border:none; font-size:18px; line-height:1; cursor:pointer">✕</button>
             <div style="padding:18px; text-align:center; display:flex; flex-direction:column; justify-content:center; align-items:center; height:100%; gap:12px;">
-                <div style="font-weight:700;">BOOKING ROOM SUCCESS</div>
-                <div style="font-size:12px; line-height:1.4;">
-                    SILAHKAN MENGHUBUNGI NOMOR DIBAWAH INI UNTUK MELAKUKAN KONFIRMASI BOOKING ROOM DAN PEMBAYARAN BOOKING ROOM
+                <div style="font-weight:700;">SIMULASI PEMBAYARAN BERHASIL!</div>
+                <div style="font-size:13px; line-height:1.4; text-align:center;">
+                    Proses simulasi pembayaran Anda telah kami catat. Perlu diketahui bahwa ini adalah bagian dari uji coba sistem dan bukan merupakan transaksi yang sebenarnya. Fitur pembayaran penuh saat ini sedang dalam tahap pengembangan.
                 </div>
-                <div style="font-size:12px; line-height:1.4;">
-                    ({{ $hospital->name }})<br>
-                    BPJS - 0318961649<br>
-                    Non BPJS - 0218961649
-                </div>
-                <div style="font-size:12px; font-weight:700;">Berlaku hingga 10 menit</div>
+                <div style="font-size:12px; font-weight:700; margin-top: 20px;">Terima Kasih.</div>
             </div>
         </div>
     </div>
