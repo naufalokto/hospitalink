@@ -25,83 +25,82 @@
         <div class="px-6 mb-4" x-data="carousel()">
             <!-- Container Iklan -->
             <div class="bg-[#0B9078] rounded-2xl mb-4 overflow-hidden max-w-md mx-auto shadow-lg">
-            <!-- Slider Container with proper overflow handling -->
-            <div class="mx-6 mt-4 rounded-2xl overflow-hidden">
-                <div class="flex transition-transform duration-500 ease-in-out"
-                    :style="`transform: translateX(-${currentSlide * 100}%)`">
+                <!-- Slider Container with proper overflow handling -->
+                <div class="mx-6 mt-4 rounded-2xl overflow-hidden">
+                    <div class="flex transition-transform duration-500 ease-in-out"
+                        :style="`transform: translateX(-${currentSlide * 100}%)`">
 
-                    <!-- Slide 1 -->
-                    <div class="w-full flex-shrink-0 relative rounded-2xl overflow-hidden">
-                        <div class="absolute inset-0 bg-cover bg-center"
-                            style="background-image: url('/images/Iklan/Iklan-Slide1.jpg');">
-                            <div class="absolute inset-0 bg-black/40"></div>
-                        </div>
-                        <div class="relative z-10 flex items-center justify-between p-3 h-32">
-                            <div class="text-white text-[10px] leading-tight">
-                                <h3 class="font-bold text-xs mb-1">TURUN HARGA</h3>
-                                <h2 class="font-bold text-sm mb-1">BESAR-BESARAN</h2>
-                                <p>
-                                    SEMUA PRODUK<br>TURUN HINGGA 50%<br>BURUAN SEBELUM<br>KEHABISAN
-                                </p>
+                        <!-- Slide 1 -->
+                        <div class="w-full flex-shrink-0 relative rounded-2xl overflow-hidden">
+                            <div class="absolute inset-0 bg-cover bg-center"
+                                style="background-image: url('/images/Iklan/Iklan-Slide1.jpg');">
+                                <div class="absolute inset-0 bg-black/40"></div>
+                            </div>
+                            <div class="relative z-10 flex items-center justify-between p-3 h-32">
+                                <div class="text-white text-[10px] leading-tight">
+                                    <h3 class="font-bold text-xs mb-1">TURUN HARGA</h3>
+                                    <h2 class="font-bold text-sm mb-1">BESAR-BESARAN</h2>
+                                    <p>
+                                        SEMUA PRODUK<br>TURUN HINGGA 50%<br>BURUAN SEBELUM<br>KEHABISAN
+                                    </p>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Slide 2 -->
-                    <div class="w-full flex-shrink-0 relative rounded-2xl overflow-hidden">
-                       <div class="absolute inset-0 bg-cover bg-center"
-                            style="background-image: url('/images/Iklan/Iklan-Slide2.png');">
-                            <div class="absolute inset-0 bg-black/40"></div>
-                        </div>
-                        <div class="relative z-10 flex items-center justify-between p-3 h-32">
-                            <div class="text-white text-[10px] leading-tight">
-                                <h3 class="font-bold text-xs mb-1">PROMO SPESIAL</h3>
-                                <h2 class="font-bold text-sm mb-1">ALAT KESEHATAN</h2>
-                                <p>
-                                    DAPATKAN DISKON<br>HINGGA 40%<br>UNTUK SEMUA<br>PRODUK PILIHAN
-                                </p>
+                        <!-- Slide 2 -->
+                        <div class="w-full flex-shrink-0 relative rounded-2xl overflow-hidden">
+                            <div class="absolute inset-0 bg-cover bg-center"
+                                style="background-image: url('/images/Iklan/Iklan-Slide2.png');">
+                                <div class="absolute inset-0 bg-black/40"></div>
+                            </div>
+                            <div class="relative z-10 flex items-center justify-between p-3 h-32">
+                                <div class="text-white text-[10px] leading-tight">
+                                    <h3 class="font-bold text-xs mb-1">PROMO SPESIAL</h3>
+                                    <h2 class="font-bold text-sm mb-1">ALAT KESEHATAN</h2>
+                                    <p>
+                                        DAPATKAN DISKON<br>HINGGA 40%<br>UNTUK SEMUA<br>PRODUK PILIHAN
+                                    </p>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Slide 3 -->
-                    <div class="w-full flex-shrink-0 relative rounded-2xl overflow-hidden">
-                        <div class="absolute inset-0 bg-cover bg-center"
-                            style="background-image: url('/images/Iklan/Iklan-Slide3.jpg');">
-                            <div class="absolute inset-0 bg-black/40"></div>
-                        </div>
-                        <div class="relative z-10 flex items-center justify-between p-3 h-32">
-                            <div class="text-white text-[10px] leading-tight">
-                                <h3 class="font-bold text-xs mb-1">KONSULTASI</h3>
-                                <h2 class="font-bold text-sm mb-1">GRATIS</h2>
-                                <p>
-                                    KONSULTASI DENGAN<br>DOKTER AHLI<br>TANPA BIAYA<br>TAMBAHAN
-                                </p>
+                        <!-- Slide 3 -->
+                        <div class="w-full flex-shrink-0 relative rounded-2xl overflow-hidden">
+                            <div class="absolute inset-0 bg-cover bg-center"
+                                style="background-image: url('/images/Iklan/Iklan-Slide3.jpg');">
+                                <div class="absolute inset-0 bg-black/40"></div>
+                            </div>
+                            <div class="relative z-10 flex items-center justify-between p-3 h-32">
+                                <div class="text-white text-[10px] leading-tight">
+                                    <h3 class="font-bold text-xs mb-1">KONSULTASI</h3>
+                                    <h2 class="font-bold text-sm mb-1">GRATIS</h2>
+                                    <p>
+                                        KONSULTASI DENGAN<br>DOKTER AHLI<br>TANPA BIAYA<br>TAMBAHAN
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Dots indikator -->
-            <div class="flex justify-center space-x-2 py-2">
-                <template x-for="(slide, index) in slides" :key="index">
-                    <button class="w-2.5 h-2.5 rounded-full transition-all"
-                        :class="currentSlide === index ? 'bg-white' : 'bg-white/50'" 
-                        @click="goToSlide(index)">
+                <!-- Dots indikator -->
+                <div class="flex justify-center space-x-2 py-2">
+                    <template x-for="(slide, index) in slides" :key="index">
+                        <button class="w-2.5 h-2.5 rounded-full transition-all"
+                            :class="currentSlide === index ? 'bg-white' : 'bg-white/50'" @click="goToSlide(index)">
+                        </button>
+                    </template>
+                </div>
+
+                <!-- CTA -->
+                <div class="flex items-center justify-between px-4 py-2 bg-[#0B9078] text-white rounded-b-2xl">
+                    <span class="font-medium text-sm">Anda Miliki Iklan?</span>
+                    <button
+                        class="border border-white px-3 py-1 rounded-lg text-sm hover:bg-white hover:text-green-700 transition">
+                        Masuk di sini
                     </button>
-                </template>
+                </div>
             </div>
-
-            <!-- CTA -->
-            <div class="flex items-center justify-between px-4 py-2 bg-[#0B9078] text-white rounded-b-2xl">
-                <span class="font-medium text-sm">Anda Miliki Iklan?</span>
-                <button
-                    class="border border-white px-3 py-1 rounded-lg text-sm hover:bg-white hover:text-green-700 transition">
-                    Masuk di sini
-                </button>
-            </div>
-        </div>
 
 
             <div class="flex-1 bg-[#B4DBF1] rounded-t-3xl px-6 pt-6 pb-20 -mx-6">
@@ -264,74 +263,88 @@
                     class="mx-auto h-32 xl:h-40 2xl:h-48 mb-3 xl:mb-4">
 
                 <!-- Enhanced Carousel Section with better responsive design -->
-                <div class="overflow-hidden rounded-2xl mb-4 max-w-3xl mx-auto relativ" x-data="carousel()">
-                    <!-- Enhanced Carousel Container with better styling -->
-                    <div class="rounded-2xl mb-4 max-w-3xl mx-auto">
-                        <div class="flex transition-transform duration-500 ease-in-out"
-                            :style="`transform: translateX(-${currentSlide * 100}%)`">
+                <div class="px-6 mb-6 max-w-2xl mx-auto" x-data="carousel()">
+                    <!-- Container Iklan -->
+                    <div class="bg-[#0B9078] rounded-2xl mb-4 overflow-hidden shadow-lg">
+                        <!-- Slider Container -->
+                        <div class="mx-6 mt-4 rounded-2xl overflow-hidden">
+                            <div class="flex transition-transform duration-500 ease-in-out"
+                                :style="`transform: translateX(-${currentSlide * 100}%)`">
 
-                            <!-- Slide 1 -->
-                            <div class="w-full flex-shrink-0 relative rounded-2xl overflow-hidden h-48">
-                                <div class="absolute inset-0 bg-cover bg-center"
-                                    style="background-image: url('/images/Iklan/Iklan-Slide1.jpg');">
-                                    <div class="absolute inset-0 bg-black/40"></div>
-                                </div>
-                                <div class="relative z-10 flex items-center h-full p-4">
-                                    <div class="text-white">
-                                        <h3 class="font-bold text-sm mb-1">TURUN HARGA</h3>
-                                        <h2 class="font-bold text-lg mb-1">BESAR-BESARAN</h2>
-                                        <p class="text-xs leading-tight">
-                                            SEMUA PRODUK<br>TURUN HINGGA 50%<br>BURUAN SEBELUM<br>DAN KEHABISAN
-                                        </p>
+                                <!-- Slide 1 -->
+                                <div class="w-full flex-shrink-0 relative rounded-2xl overflow-hidden">
+                                    <div class="absolute inset-0 bg-cover bg-center"
+                                        style="background-image: url('/images/Iklan/Iklan-Slide1.jpg');">
+                                        <div class="absolute inset-0 bg-black/40"></div>
+                                    </div>
+                                    <div class="relative z-10 flex items-center justify-between p-3 h-32">
+                                        <div class="text-white text-[10px] leading-tight">
+                                            <h3 class="font-bold text-xs mb-1">TURUN HARGA</h3>
+                                            <h2 class="font-bold text-sm mb-1">BESAR-BESARAN</h2>
+                                            <p>
+                                                SEMUA PRODUK<br>TURUN HINGGA 50%<br>BURUAN SEBELUM<br>KEHABISAN
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <!-- Slide 2 -->
-                            <div class="w-full flex-shrink-0 relative rounded-2xl overflow-hidden h-48">
-                                <div class="absolute inset-0 bg-cover bg-center"
-                                    style="background-image: url('/images/Iklan/Iklan-Slide2.png');">
-                                    <div class="absolute inset-0 bg-black/40"></div>
-                                </div>
-                                <div class="relative z-10 flex items-center h-full p-4">
-                                    <div class="text-white">
-                                        <h3 class="font-bold text-sm mb-1">PROMO SPESIAL</h3>
-                                        <h2 class="font-bold text-lg mb-1">ALAT KESEHATAN</h2>
-                                        <p class="text-xs leading-tight">
-                                            DAPATKAN DISKON<br>HINGGA 40%<br>UNTUK SEMUA<br>PRODUK PILIHAN
-                                        </p>
+                                <!-- Slide 2 -->
+                                <div class="w-full flex-shrink-0 relative rounded-2xl overflow-hidden">
+                                    <div class="absolute inset-0 bg-cover bg-center"
+                                        style="background-image: url('/images/Iklan/Iklan-Slide2.png');">
+                                        <div class="absolute inset-0 bg-black/40"></div>
+                                    </div>
+                                    <div class="relative z-10 flex items-center justify-between p-3 h-32">
+                                        <div class="text-white text-[10px] leading-tight">
+                                            <h3 class="font-bold text-xs mb-1">PROMO SPESIAL</h3>
+                                            <h2 class="font-bold text-sm mb-1">ALAT KESEHATAN</h2>
+                                            <p>
+                                                DAPATKAN DISKON<br>HINGGA 40%<br>UNTUK SEMUA<br>PRODUK PILIHAN
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <!-- Slide 3 -->
-                            <div class="w-full flex-shrink-0 relative rounded-2xl overflow-hidden h-48">
-                                <div class="absolute inset-0 bg-cover bg-center"
-                                    style="background-image: url('/images/Iklan/Iklan-Slide3.jpg');">
-                                    <div class="absolute inset-0 bg-black/40"></div>
-                                </div>
-                                <div class="relative z-10 flex items-center h-full p-4">
-                                    <div class="text-white">
-                                        <h3 class="font-bold text-sm mb-1">KONSULTASI</h3>
-                                        <h2 class="font-bold text-lg mb-1">GRATIS</h2>
-                                        <p class="text-xs leading-tight">
-                                            KONSULTASI DENGAN<br>DOKTER AHLI<br>TANPA BIAYA<br>TAMBAHAN
-                                        </p>
+                                <!-- Slide 3 -->
+                                <div class="w-full flex-shrink-0 relative rounded-2xl overflow-hidden">
+                                    <div class="absolute inset-0 bg-cover bg-center"
+                                        style="background-image: url('/images/Iklan/Iklan-Slide3.jpg');">
+                                        <div class="absolute inset-0 bg-black/40"></div>
+                                    </div>
+                                    <div class="relative z-10 flex items-center justify-between p-3 h-32">
+                                        <div class="text-white text-[10px] leading-tight">
+                                            <h3 class="font-bold text-xs mb-1">KONSULTASI</h3>
+                                            <h2 class="font-bold text-sm mb-1">GRATIS</h2>
+                                            <p>
+                                                KONSULTASI DENGAN<br>DOKTER AHLI<br>TANPA BIAYA<br>TAMBAHAN
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Dot indicators -->
-                    <div class="flex justify-center space-x-2">
-                        <template x-for="(slide, index) in slides" :key="index">
-                            <button class="w-2 h-2 rounded-full transition-colors duration-200"
-                                :class="currentSlide === index ? 'bg-white' : 'bg-white/50'" @click="goToSlide(index)">
+                        <!-- Dots indikator -->
+                        <div class="flex justify-center space-x-2 py-2">
+                            <template x-for="(slide, index) in slides" :key="index">
+                                <button class="w-2.5 h-2.5 rounded-full transition-all"
+                                    :class="currentSlide === index ? 'bg-white' : 'bg-white/50'"
+                                    @click="goToSlide(index)">
+                                </button>
+                            </template>
+                        </div>
+
+                        <!-- CTA -->
+                        <div class="flex items-center justify-between px-4 py-2 bg-[#0B9078] text-white rounded-b-2xl">
+                            <span class="font-medium text-sm">Anda Miliki Iklan?</span>
+                            <button
+                                class="border border-white px-3 py-1 rounded-lg text-sm hover:bg-white hover:text-green-700 transition">
+                                Masuk di sini
                             </button>
-                        </template>
+                        </div>
                     </div>
                 </div>
+
             </div>
 
             <!-- Enhanced Health News Section -->

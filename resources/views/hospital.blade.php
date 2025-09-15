@@ -143,21 +143,6 @@
                         <p class="text-lg xl:text-xl text-blue-100">Temukan rumah sakit terbaik untuk kebutuhan
                             kesehatan Anda</p>
                     </div>
-
-                    <!-- Search Bar -->
-                    <div class="max-w-md mx-auto">
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                </svg>
-                            </div>
-                            <input type="text" placeholder="Cari rumah sakit..."
-                                class="w-full pl-12 pr-4 py-3 xl:py-4 bg-white rounded-full text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-300 shadow-lg">
-                        </div>
-                    </div>
                 </div>
             </div>
 

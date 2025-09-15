@@ -32,8 +32,9 @@
                 <button @click="open = !open"
                     class="w-full flex items-center justify-between bg-white px-3 py-1.5 rounded-3xl text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 shadow-md hover:shadow-lg transition-all duration-200">
                     <span class="font-medium" x-text="selectedService">ALL</span>
-                    <svg :class="{ 'transform rotate-180': open }" class="w-4 h-4 ml-2 transition-transform duration-200"
-                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg :class="{ 'transform rotate-180': open }"
+                        class="w-4 h-4 ml-2 transition-transform duration-200" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                     </svg>
                 </button>
@@ -191,14 +192,43 @@
                         </p>
                     </div>
 
-                    <!-- Search Bar -->
-                    <div class="max-w-md mx-auto">
+                    <!-- Dropdown Filter (Desktop) -->
+                    <div class="max-w-md mx-auto" x-data="{ open: false, selectedService: '{{ request()->query('service', 'ALL') }}' }">
                         <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                <i class="fas fa-search text-gray-400"></i>
+                            <button @click="open = !open"
+                                class="w-full flex items-center justify-between bg-white px-5 py-3 xl:py-4 rounded-full text-gray-700 text-base focus:outline-none focus:ring-2 focus:ring-blue-300 shadow-lg hover:shadow-xl transition-all duration-200">
+                                <span class="font-medium" x-text="selectedService">ALL</span>
+                                <svg :class="{ 'transform rotate-180': open }"
+                                    class="w-5 h-5 ml-2 transition-transform duration-200" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+
+                            <!-- Dropdown menu -->
+                            <div x-show="open" @click.away="open = false"
+                                x-transition:enter="transition ease-out duration-200"
+                                x-transition:enter-start="opacity-0 transform scale-95"
+                                x-transition:enter-end="opacity-100 transform scale-100"
+                                x-transition:leave="transition ease-in duration-100"
+                                x-transition:leave-start="opacity-100 transform scale-100"
+                                x-transition:leave-end="opacity-0 transform scale-95"
+                                class="absolute left-0 right-0 mt-2 bg-white rounded-xl shadow-lg z-50">
+                                <div class="py-2">
+                                    <a href="{{ route('room', ['service' => 'ALL']) }}"
+                                        class="block w-full text-left px-4 py-2 text-sm rounded-lg text-gray-700 hover:bg-gray-100 hover:text-gray-900">ALL</a>
+                                    <a href="{{ route('room', ['service' => 'IGD 24 Jam']) }}"
+                                        class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">IGD
+                                        24 Jam</a>
+                                    <a href="{{ route('room', ['service' => 'Poliklinik']) }}"
+                                        class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">Poliklinik
+                                        Spesialis</a>
+                                    <a href="{{ route('room', ['service' => 'Farmasi 24 Jam']) }}"
+                                        class="block w-full text-left px-4 py-2 text-sm rounded-lg text-gray-700 hover:bg-gray-100 hover:text-gray-900">Farmasi
+                                        24 Jam</a>
+                                </div>
                             </div>
-                            <input type="text" placeholder="Cari rekomendasi"
-                                class="w-full pl-12 pr-4 py-3 xl:py-4 bg-white rounded-full text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-300 shadow-lg">
                         </div>
                     </div>
                 </div>
@@ -221,31 +251,32 @@
                     <div class="grid gap-6">
                         @foreach ($hospitalsData as $hospital)
                             <a href="{{ route('checking', ['hospital_id' => $hospital['slug']]) }}" class="block">
-                            <div
-                                class="bg-gray-50 rounded-2xl p-6 shadow-sm hover:shadow-lg hover:scale-[1.02] transition-all duration-300 cursor-pointer">
-                                <div class="flex justify-between items-start">
-                                    <div class="flex-1 pr-6">
-                                        <h3
-                                            class="text-xl font-semibold text-gray-800 mb-2 group-hover:text-[#00A2FA] transition-colors">
-                                            {{ $hospital['name'] }}
-                                        </h3>
+                                <div
+                                    class="bg-gray-50 rounded-2xl p-6 shadow-sm hover:shadow-lg hover:scale-[1.02] transition-all duration-300 cursor-pointer">
+                                    <div class="flex justify-between items-start">
+                                        <div class="flex-1 pr-6">
+                                            <h3
+                                                class="text-xl font-semibold text-gray-800 mb-2 group-hover:text-[#00A2FA] transition-colors">
+                                                {{ $hospital['name'] }}
+                                            </h3>
 
-                                        <div
-                                            class="text-sm font-medium px-3 py-1 rounded mb-3 inline-block {{ $hospital['total_rooms'] > 0 ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600' }}">
-                                            {{ $hospital['status'] }}
+                                            <div
+                                                class="text-sm font-medium px-3 py-1 rounded mb-3 inline-block {{ $hospital['total_rooms'] > 0 ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600' }}">
+                                                {{ $hospital['status'] }}
+                                            </div>
+
+                                            <p class="text-sm text-blue-600 mb-2 hover:underline">
+                                                {{ $hospital['website_url'] }}</p>
+                                            <p class="text-sm text-gray-500">{{ date('l, d F Y') }}</p>
                                         </div>
 
-                                        <p class="text-sm text-blue-600 mb-2 hover:underline">
-                                            {{ $hospital['website_url'] }}</p>
-                                        <p class="text-sm text-gray-500">{{ date('l, d F Y') }}</p>
-                                    </div>
-
-                                    <div class="w-32 h-24 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
-                                        <img src="{{ asset($hospital['image_url']) }}" alt="{{ $hospital['name'] }}"
-                                            class="w-full h-full object-cover transition-transform duration-300 hover:scale-110">
+                                        <div class="w-32 h-24 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
+                                            <img src="{{ asset($hospital['image_url']) }}"
+                                                alt="{{ $hospital['name'] }}"
+                                                class="w-full h-full object-cover transition-transform duration-300 hover:scale-110">
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
                             </a>
                         @endforeach
                     </div>
