@@ -92,7 +92,7 @@
 
                 <!-- Booking Button -->
                 <div class="flex justify-end">
-                    <a href="{{ route('payment.detail-booking', ['hospital_id' => $hospital->id, 'room_id' => $room['id']]) }}"
+                    <a href="/booking-success/{{ $hospital->id }}/{{ $room['id'] }}"
                         class="w-40 bg-[#0B9078] text-white font-bold py-3 rounded-xl text-base hover:bg-[#097A63] transition-colors shadow-2xl mb-7 text-center">
                         BOOKING ROOM
                     </a>
@@ -222,7 +222,7 @@
                                 <div class="text-gray-500 text-sm">Sudah termasuk pajak dan biaya layanan</div>
                             </div>
 
-                            <a href="{{ route('payment.detail-booking', ['hospital_id' => $hospital->id, 'room_id' => $room['id']]) }}"
+                            <a href="/booking-success/{{ $hospital->id }}/{{ $room['id'] }}"
                                 class="w-full bg-[#0B9078] text-white font-bold py-4 rounded-xl text-lg hover:bg-[#097A63] transition-colors shadow-lg text-center block">
                                 BOOKING ROOM
                             </a>

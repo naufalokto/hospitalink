@@ -40,7 +40,7 @@ Route::get('/register', function () {
 
 Route::get('/dashboard', function () {
     return view('dashboard');
-})->name('dashboard');
+})->name('dashboard')->middleware('auth');
 
 Route::get('/admin-dashboard', [App\Http\Controllers\AdminController::class, 'dashboard'])->name('admin-dashboard')->middleware('admin');
 
@@ -48,16 +48,16 @@ Route::get('/admin-dashboard', [App\Http\Controllers\AdminController::class, 'da
 Route::post('/admin/update-hospital', [App\Http\Controllers\AdminController::class, 'updateAllRoomQuantitiesWeb'])->name('admin.update-hospital')->middleware(['admin', 'web']);
 
 
-Route::get('/hospital', [HospitalController::class, 'index'])->name('hospital');
-Route::get('/hospital/{slug}', [HospitalController::class, 'show'])->name('hospital.detail');
+Route::get('/hospital', [HospitalController::class, 'index'])->name('hospital')->middleware('auth');
+Route::get('/hospital/{slug}', [HospitalController::class, 'show'])->name('hospital.detail')->middleware('auth');
 
-Route::get('/room', [RoomViewController::class, 'index'])->name('room');
+Route::get('/room', [RoomViewController::class, 'index'])->name('room')->middleware('auth');
 
-Route::get('/checking/{hospital_id}', [App\Http\Controllers\RoomController::class, 'checking'])->name('checking');
-Route::get('/checking/{hospital_id}/room/{room_id}', [App\Http\Controllers\RoomController::class, 'checkingDetail'])->name('checking-detail');
+Route::get('/checking/{hospital_id}', [App\Http\Controllers\RoomController::class, 'checking'])->name('checking')->middleware('auth');
+Route::get('/checking/{hospital_id}/room/{room_id}', [App\Http\Controllers\RoomController::class, 'checkingDetail'])->name('checking-detail')->middleware('auth');
 
 // API route for real-time room availability
-Route::get('/api/room-availability/{hospital_id}', [App\Http\Controllers\RoomController::class, 'getRoomAvailability'])->name('api.room-availability');
+Route::get('/api/room-availability/{hospital_id}', [App\Http\Controllers\RoomController::class, 'getRoomAvailability'])->name('api.room-availability')->middleware('auth');
 
 // Booking routes
 Route::middleware('auth')->group(function () {
@@ -90,13 +90,18 @@ Route::post('/payment/notification', [App\Http\Controllers\PaymentController::cl
 Route::get('/payment/success', [App\Http\Controllers\PaymentController::class, 'paymentSuccess'])->name('payment.success');
 Route::get('/payment/failed', [App\Http\Controllers\PaymentController::class, 'paymentFailed'])->name('payment.failed');
 
+// Direct booking success (skip payment process)
+Route::get('/booking-success/{hospital_id}/{room_id}', function ($hospital_id, $room_id) {
+    return redirect()->to(route('checking-detail', ['hospital_id' => $hospital_id, 'room_id' => $room_id]) . '?paid=1');
+})->name('booking.success')->middleware('auth');
+
 Route::get('/help', function () {
     return view('help');
-})->name('help');
+})->name('help')->middleware('auth');
 
 // News routes
-Route::get('/news/{slug}', [NewsController::class, 'show'])->name('news.detail');
-Route::get('/news', [NewsController::class, 'index'])->name('news.index');
+Route::get('/news/{slug}', [NewsController::class, 'show'])->name('news.detail')->middleware('auth');
+Route::get('/news', [NewsController::class, 'index'])->name('news.index')->middleware('auth');
 
 // OAuth Routes
 // Google OAuth
@@ -133,7 +138,7 @@ Route::get('/debug/facebook', function () {
         'facebook_url_new' => 'https://www.facebook.com/v23.0/dialog/oauth?' . http_build_query($params),
         'test_url' => route('auth.facebook')
     ]);
-});
+})->middleware('auth');
 
 // Debug Facebook Callback
 Route::get('/debug/facebook-callback', function () {
@@ -146,7 +151,7 @@ Route::get('/debug/facebook-callback', function () {
         'code' => request('code'),
         'state' => request('state'),
     ]);
-});
+})->middleware('auth');
 
 // Debug News Data
 Route::get('/debug/news-test', function () {
@@ -179,7 +184,7 @@ Route::get('/debug/news-test', function () {
             'trace' => $e->getTraceAsString()
         ], 500);
     }
-});
+})->middleware('auth');
 
 
 // Test Facebook Callback Simulation
@@ -210,7 +215,7 @@ Route::get('/debug/test-facebook-callback', function () {
             'trace' => $e->getTraceAsString()
         ], 500);
     }
-});
+})->middleware('auth');
 
 // Test Facebook OAuth with real callback
 Route::get('/debug/facebook-real-test', function () {
@@ -246,7 +251,7 @@ Route::get('/debug/facebook-real-test', function () {
             'trace' => $e->getTraceAsString()
         ], 500);
     }
-});
+})->middleware('auth');
 
 // Test Asset Helper for Production
 Route::get('/debug/asset-test', function () {
@@ -263,7 +268,7 @@ Route::get('/debug/asset-test', function () {
             'news2' => url('images/news/news-card2.jpg')
         ]
     ]);
-});
+})->middleware('auth');
 
 // Debug Hospital Data
 Route::get('/debug/hospital-test', function () {
@@ -295,7 +300,7 @@ Route::get('/debug/hospital-test', function () {
             'trace' => $e->getTraceAsString()
         ], 500);
     }
-});
+})->middleware('auth');
 
 // Twitter OAuth
 Route::get('/auth/twitter', [AuthController::class, 'redirectToTwitter']);
@@ -322,7 +327,7 @@ Route::get('/debug/midtrans-test', function () {
             'error' => $e->getMessage()
         ], 500);
     }
-});
+})->middleware('auth');
 
 // Test Midtrans Connection
 Route::get('/debug/midtrans-connection', function () {
@@ -352,7 +357,7 @@ Route::get('/debug/midtrans-connection', function () {
             'message' => 'Midtrans configuration error: ' . $e->getMessage()
         ], 500);
     }
-});
+})->middleware('auth');
 
 // Debug Payment Flow
 Route::get('/debug/payment-flow', function () {

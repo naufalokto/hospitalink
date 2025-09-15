@@ -228,7 +228,7 @@
         <!-- Left Column - Logo -->
         <div class="w-2/5 bg-hospitalink-blue flex items-center justify-center">
             <div class="text-center">
-                <img src="/images/logo-hospitalink.png" alt="HOSPITALINK Logo" class="w-112 mx-auto mb-6">
+                <img src="/images/Logo-Hospitalink.png" alt="HOSPITALINK Logo" class="w-112 mx-auto mb-6">
 
             </div>
         </div>
@@ -407,8 +407,9 @@
                         <a href="/auth/google" class="bg-red-600 text-white p-1.5 rounded-full hover:bg-red-700 text-xs transition-colors">
                             <i class="fab fa-google"></i>
                         </a>
-                        <button @click="showTwitterPopup = true" class="bg-black text-white p-1.5 rounded-full hover:bg-gray-800 text-xs transition-colors">
-                            <i class="fab fa-x-twitter"></i>
+                        <button @click="showTwitterPopup = true" class="bg-blue-400 text-white p-1.5 rounded-full hover:bg-blue-500 text-xs transition-colors" aria-label="Login dengan Twitter">
+                            <span class="lg:hidden"><i class="fab fa-x-twitter"></i></span>
+                            <img src="/images/X_Logo.png" alt="Twitter" class="hidden lg:inline-block w-4 h-4 object-contain" />
                         </button>
                     </div>
                 </div>

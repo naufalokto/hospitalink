@@ -546,11 +546,13 @@ class PaymentController extends Controller
                 // add ?paid=1 to trigger popup
                 return redirect()->to($url . '?paid=1');
             }
-            return redirect()->to(route('room'));
+            
+            // Fallback: Jika tidak ada payment data, redirect ke room dengan success message
+            return redirect()->to(route('room') . '?booking_success=1');
             
         } catch (\Exception $e) {
             Log::error('Payment success callback failed: ' . $e->getMessage());
-            return redirect()->to(route('payment.pay'));
+            return redirect()->to(route('room') . '?booking_success=1');
         }
     }
 

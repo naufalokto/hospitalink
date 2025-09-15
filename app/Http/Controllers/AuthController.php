@@ -413,48 +413,79 @@ class AuthController extends Controller
                 'ip' => $request->ip()
             ]);
 
+            // Validasi input
             $request->validate([
-                'email' => 'required|string|email',
-                'password' => 'required|string',
+                'email' => 'required|string|email|max:255',
+                'password' => 'required|string|min:6',
+            ], [
+                'email.required' => 'Email harus diisi',
+                'email.email' => 'Format email tidak valid',
+                'email.max' => 'Email maksimal 255 karakter',
+                'password.required' => 'Password harus diisi',
+                'password.min' => 'Password minimal 6 karakter'
             ]);
 
             \Log::info('Manual login validation passed');
 
-            if (Auth::attempt($request->only('email', 'password'))) {
-                $user = Auth::user();
-                \Log::info('Manual login successful', [
-                    'user_id' => $user->id,
-                    'email' => $user->email,
-                    'role' => $user->role
+            // Cari user berdasarkan email di database
+            $user = \App\Models\User::where('email', $request->email)->first();
+
+            if (!$user) {
+                \Log::warning('Login failed - user not found in database', [
+                    'email' => $request->email,
+                    'ip' => $request->ip()
                 ]);
-
-                // Store token in session for API access (same as OAuth)
-                session(['auth_token' => $user->createToken('auth-token')->plainTextToken]);
-                \Log::info('Manual login auth token stored in session');
-
-                // Redirect based on user role
-                if ($user->isAdmin()) {
-                    \Log::info('Manual login redirecting to admin dashboard');
-                    return redirect()->route('admin-dashboard')->with('success', 'Login successful!');
+                
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Email tidak terdaftar di sistem',
+                    ], 401);
                 }
-                \Log::info('Manual login redirecting to dashboard');
-                return redirect()->route('dashboard')->with('success', 'Login successful!');
+                
+                return redirect()->back()->withErrors(['email' => 'Email tidak terdaftar di sistem'])->withInput();
             }
 
-            \Log::warning('Manual login failed - invalid credentials', [
-                'email' => $request->email,
+            // Verifikasi password dengan hash
+            if (!\Illuminate\Support\Facades\Hash::check($request->password, $user->password)) {
+                \Log::warning('Login failed - invalid password', [
+                    'email' => $request->email,
+                    'user_id' => $user->id,
+                    'ip' => $request->ip()
+                ]);
+                
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Password salah',
+                    ], 401);
+                }
+                
+                return redirect()->back()->withErrors(['password' => 'Password salah'])->withInput();
+            }
+
+            // Login user dengan session
+            Auth::login($user, $request->has('remember'));
+
+            \Log::info('Manual login successful', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'role' => $user->role,
                 'ip' => $request->ip()
             ]);
 
-            // For web requests, redirect back with error
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Invalid credentials',
-                ], 401);
-            }
+            // Store token in session for API access (same as OAuth)
+            session(['auth_token' => $user->createToken('auth-token')->plainTextToken]);
+            \Log::info('Manual login auth token stored in session');
 
-            return redirect()->back()->withErrors(['email' => 'Invalid credentials']);
+            // Redirect based on user role
+            if ($user->isAdmin()) {
+                \Log::info('Manual login redirecting to admin dashboard');
+                return redirect()->route('admin-dashboard')->with('success', 'Login berhasil! Selamat datang admin.');
+            }
+            
+            \Log::info('Manual login redirecting to dashboard');
+            return redirect()->route('dashboard')->with('success', 'Login berhasil! Selamat datang.');
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             \Log::error('Manual login validation failed', [
@@ -468,7 +499,7 @@ class AuthController extends Controller
                 'trace' => $e->getTraceAsString(),
                 'email' => $request->email
             ]);
-            return redirect()->back()->with('error', 'Login failed. Please try again.')->withInput();
+            return redirect()->back()->with('error', 'Login gagal. Silakan coba lagi.')->withInput();
         }
     }
 

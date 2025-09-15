@@ -171,9 +171,9 @@ class BookingController extends Controller
 
             DB::commit();
 
-            // Redirect to invoice page (pending payment)
-            return redirect()->route('booking.invoice', $booking->id)
-                ->with('success', 'Booking berhasil! Silakan lanjutkan ke pembayaran.');
+            // Redirect langsung ke payment success (tanpa proses payment)
+            return redirect()->route('payment.success')
+                ->with('success', 'Booking berhasil! Pembayaran telah diproses.');
 
         } catch (\Exception $e) {
             DB::rollback();

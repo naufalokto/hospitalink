@@ -27,13 +27,9 @@
 
         <div class="flex flex-col items-center mb-16">
             <img src="{{ asset('images/Logo-Hospitalink.png') }}" alt="HOSPITALINK Logo" class="w-128 mb-6">
-
-        </div>
-
-
-        <div class="w-full max-w-sm">
+            
             <a href="{{ route('auth') }}"
-                class="block w-full bg-hospitalink-green text-white text-xl font-semibold py-4 px-8 rounded-full text-center hover:bg-opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl">
+                class="bg-hospitalink-green text-white text-xl font-semibold py-4 px-12 rounded-full hover:bg-opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl">
                 Get Started
             </a>
         </div>
@@ -44,13 +40,14 @@
         
         <div class="w-1/2 flex flex-col justify-center items-start px-16">
             <div class="max-w-md">
-                <img src="{{ asset('images/logo-hospitalink.png') }}" alt="HOSPITALINK Logo" class="w-112 mb-6">
+                <img src="{{ asset('images/Logo-Hospitalink.png') }}" alt="HOSPITALINK Logo" class="w-112 mb-6">
                 
-
-                <a href="{{ route('auth') }}"
-                    class="inline-block bg-hospitalink-green text-white text-xl font-semibold py-4 px-12 rounded-full hover:bg-opacity-90 transition-all duration-200">
-                    Get Started
-                </a>
+                <div class="flex justify-center">
+                    <a href="{{ route('auth') }}"
+                        class="bg-hospitalink-green text-white text-xl font-semibold py-4 px-12 rounded-full hover:bg-opacity-90 transition-all duration-200">
+                        Get Started
+                    </a>
+                </div>
             </div>
         </div>
 
