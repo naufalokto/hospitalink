@@ -503,6 +503,9 @@ class AuthController extends Controller
         }
     }
 
+  
+
+
     /**
      * Logout user
      */

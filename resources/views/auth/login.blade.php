@@ -399,17 +399,19 @@
 
                 <!-- Social Login -->
                 <div class="mt-5 mx-8">
-                    <p class="text-center text-xs text-gray-500 mb-3">Login dengan</p>
-                    <div class="flex justify-center space-x-3">
-                        <a href="/auth/facebook" class="bg-blue-600 text-white p-1.5 rounded-full hover:bg-blue-700 text-md transition-colors">
-                            <i class="fab fa-facebook-f"></i>
+                    <p class="text-center text-xs text-gray-500 mb-3">OR</p>
+                    <div class="flex justify-center space-x-4 sm:space-x-6">
+                        <a href="/auth/facebook"
+                            class="block w-8 h-8 sm:w-9 sm:h-9 rounded-full border-1 border-gray-300 overflow-hidden hover:scale-110 transition-transform">
+                            <img src="/images/Facebook_Logo.png" alt="Facebook" class="w-full h-full object-cover">
                         </a>
-                        <a href="/auth/google" class="bg-red-600 text-white p-1.5 rounded-full hover:bg-red-700 text-xs transition-colors">
-                            <i class="fab fa-google"></i>
+                        <a href="/auth/google"
+                            class="block w-9 h-9 sm:w-10 sm:h-10 rounded-full border-1 border-gray-300 overflow-hidden hover:scale-110 transition-transform">
+                            <img src="/images/Google_Logo.jpg" alt="Google" class="w-full h-full object-cover scale-125">
                         </a>
-                        <button @click="showTwitterPopup = true" class="bg-blue-400 text-white p-1.5 rounded-full hover:bg-blue-500 text-xs transition-colors" aria-label="Login dengan Twitter">
-                            <span class="lg:hidden"><i class="fab fa-x-twitter"></i></span>
-                            <img src="/images/X_Logo.png" alt="Twitter" class="hidden lg:inline-block w-4 h-4 object-contain" />
+                        <button @click="showTwitterPopup = true"
+                            class="block w-9 h-9 sm:w-10 sm:h-10 rounded-full border-1 border-gray-300 overflow-hidden -translate-x-1 hover:scale-110 transition-transform" aria-label="Login dengan Twitter">
+                            <img src="/images/X_Logo.png" alt="X" class="w-full h-full object-cover scale-75">
                         </button>
                     </div>
                 </div>
