@@ -389,74 +389,12 @@
         }
 
         function bookNow() {
-            try {
-                const serverHospitalSlug = '{{ $hospital ? ($hospital->slug ?? '') : '' }}';
-                const urlParams = new URLSearchParams(window.location.search);
-                const hospitalParam = serverHospitalSlug || urlParams.get('hospital_id');
-                const roomId = urlParams.get('room_id');
-                if (!hospitalParam || !roomId) {
-                    alert('Parameter rumah sakit atau tipe kamar tidak valid');
-                    return;
-                }
-
-                // Get Alpine data if available
-                let days = 5;
-                try {
-                    const alpineElement = document.querySelector('[x-data]');
-                    if (alpineElement && Alpine.$data) {
-                        const alpineData = Alpine.$data(alpineElement);
-                        days = alpineData ? alpineData.days : 5;
-                    }
-                } catch (e) {}
-
-                // Use existing data on the page (no extra inputs)
-                const patientName = '{{ $user->name ?? "Guest User" }}';
-                const patientPhone = '{{ $user->phone ?? '081234567890' }}';
-                const patientEmail = '{{ $user->email ?? 'guest@example.com' }}';
-                const patientAddress = '';
-
-                const today = new Date();
-                const checkIn = new Date(today);
-                checkIn.setDate(checkIn.getDate() + 1);
-                const checkOut = new Date(checkIn);
-                checkOut.setDate(checkOut.getDate() + days);
-
-                // Build and submit a real form so browser follows redirects
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = `/booking/${hospitalParam}/room/${roomId}`;
-
-                const csrf = document.createElement('input');
-                csrf.type = 'hidden';
-                csrf.name = '_token';
-                csrf.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                form.appendChild(csrf);
-
-                const fields = {
-                    patient_name: patientName,
-                    patient_phone: patientPhone,
-                    patient_email: patientEmail,
-                    patient_address: patientAddress,
-                    check_in_date: checkIn.toISOString().split('T')[0],
-                    check_out_date: checkOut.toISOString().split('T')[0],
-                    notes: 'Booking dari halaman detail booking',
-                };
-
-                Object.entries(fields).forEach(([name, value]) => {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = name;
-                    input.value = value;
-                    form.appendChild(input);
-                });
-
-                document.body.appendChild(form);
-                const btn = document.getElementById('bookButton');
-                if (btn) { btn.disabled = true; btn.textContent = 'Memproses...'; }
-                form.submit();
-            } catch (error) {
-                alert('Terjadi kesalahan saat membuat booking: ' + error.message);
-            }
+            // Get hospital and room ID from server data
+            const hospitalId = {{ $hospital ? $hospital->id : 1 }};
+            const roomId = {{ $roomType ? $roomType->id : 1 }};
+            
+            // Redirect langsung ke halaman pembayaran berhasil dengan popup (tanpa loading/processing)
+            window.location.href = `/booking-success/${hospitalId}/${roomId}`;
         }
 
         // Debug function for testing payment flow

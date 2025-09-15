@@ -260,7 +260,7 @@
         <div class="flex-1 overflow-y-auto">
             <!-- Enhanced Header with better typography and spacing -->
             <div class="bg-[#00A2FA] px-8 xl:px-12 py-8 xl:py-12 text-center">
-                <img src="{{ asset('images/logo-hospitalink.png') }}" alt="HOSPITALINK"
+                <img src="{{ asset('images/Logo-Hospitalink.png') }}" alt="HOSPITALINK"
                     class="mx-auto h-32 xl:h-40 2xl:h-48 mb-3 xl:mb-4">
 
                 <!-- Enhanced Carousel Section with better responsive design -->

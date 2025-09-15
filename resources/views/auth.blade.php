@@ -26,7 +26,7 @@
     <div class="lg:hidden flex flex-col items-center justify-center min-h-screen px-6">
 
         <div class="flex flex-col items-center mb-20">
-            <img src="{{ asset('images/logo-hospitalink.png') }}" alt="HOSPITALINK Logo" class="w-128 mb-6">
+            <img src="{{ asset('images/Logo-Hospitalink.png') }}" alt="HOSPITALINK Logo" class="w-128 mb-6">
 
         </div>
 
@@ -48,7 +48,7 @@
         
         <div class="w-2/5 flex flex-col justify-center items-center bg-hospitalink-blue">
             <div class="text-center">
-                <img src="{{ asset('images/logo-hospitalink.png') }}" alt="HOSPITALINK Logo" class="w-112 mb-8 mx-auto">
+                <img src="{{ asset('images/Logo-Hospitalink.png') }}" alt="HOSPITALINK Logo" class="w-112 mb-8 mx-auto">
                 
             </div>
         </div>

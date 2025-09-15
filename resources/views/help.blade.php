@@ -226,12 +226,12 @@
         // Mobile contact display
         function showContact(type) {
             if (type === 'hotline') {
-                document.getElementById('hotline-text').innerText = '081-354-011';
+                document.getElementById('hotline-text').innerText = '087766520122';
                 document.getElementById('message-text').innerText = 'MESSAGE';
                 document.getElementById('email-text').innerText = 'EMAIL';
             } else if (type === 'message') {
                 document.getElementById('hotline-text').innerText = 'HOTLINE';
-                document.getElementById('message-text').innerText = 'Whatsapp: 081-354-011';
+                document.getElementById('message-text').innerText = 'Whatsapp: 087766520122';
                 document.getElementById('email-text').innerText = 'EMAIL';
             } else if (type === 'email') {
                 document.getElementById('hotline-text').innerText = 'HOTLINE';
@@ -248,11 +248,11 @@
             document.getElementById('email-text-desktop').innerText = 'Klik untuk melihat';
             
             if (type === 'hotline') {
-                document.getElementById('hotline-text-desktop').innerText = '081-354-011';
+                document.getElementById('hotline-text-desktop').innerText = '087766520122';
             } else if (type === 'message') {
-                document.getElementById('message-text-desktop').innerText = '081-354-011';
+                document.getElementById('message-text-desktop').innerText = '087766520122';
             } else if (type === 'email') {
-                document.getElementById('email-text-desktop').innerText = 'ehospital.app@gmail.com';
+                document.getElementById('email-text-desktop').innerText = 'hospitalinksby.app@gmail.com';
             }
         }
     </script>
